@@ -128,7 +128,7 @@ template <typename Type>
         //! with values user wants to copy from.
         //! @return Array<Type>& link to array with values from "that"
         //-----------------------------------
-        Array<Type>& operator=(const Array<Type>& that);
+        Array<Type>& operator=(Array<Type>& that);
 
         //-----------------------------------
         //! @fn operator[]()
@@ -288,9 +288,14 @@ template <typename Type>
     }
 
     template <typename Type>
-    Array<Type>& Array<Type>::operator=(const Array<Type>& that)
+    Array<Type>& Array<Type>::operator=(Array<Type>& that)
     {
-        if ( this == &that )
+        Array<Type> victim(that);
+        std::swap(this->data_,victim.data_);
+        std::swap(this->size_,victim.size_);
+
+
+        /*if ( this == &that )
         {
             return *this;
         }
@@ -299,7 +304,7 @@ template <typename Type>
         {
             data_[i] = (that.GetData())[i];
         }
-        return *this;
+        return *this;*/
     }
 
     template <typename Type>
