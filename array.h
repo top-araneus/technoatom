@@ -160,6 +160,8 @@ template <typename Type>
         //-----------------------------------
         void Dump() const;
 
+        void Swap(Array<Type>& that);//documentary
+
 
 		//-----------------------------------
 		//! @fn GetData()
@@ -288,23 +290,22 @@ template <typename Type>
     }
 
     template <typename Type>
+    void Array<Type>::Swap(Array<Type> &that)
+    {
+        std::swap(this->data_,that.data_);
+        std::swap(this->size_,that.size_);
+    }
+
+    template <typename Type>
     Array<Type>& Array<Type>::operator=(Array<Type>& that)
     {
-        Array<Type> victim(that);
-        std::swap(this->data_,victim.data_);
-        std::swap(this->size_,victim.size_);
-
-
-        /*if ( this == &that )
+        if ( this == &that )
         {
             return *this;
         }
-        Resize(that.Size());
-        for (int i = 0; i < size_; i++)
-        {
-            data_[i] = (that.GetData())[i];
-        }
-        return *this;*/
+        Array<Type> victim(that);
+        Swap(victim);
+        return *this;
     }
 
     template <typename Type>
