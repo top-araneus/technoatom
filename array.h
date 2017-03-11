@@ -161,7 +161,7 @@ template <typename Type>
         void Dump() const;
 
         void Swap(Array<Type>& that);//documentary
-
+        Array<Type>& operator+=(Array<Type>& that);
 
 		//-----------------------------------
 		//! @fn GetData()
@@ -190,7 +190,6 @@ template <typename Type>
     //-----------------------------------
     template <typename Type>
     std::ostream& operator<<(std::ostream& ost, const Array<Type>& that);
-
 
 
     //===================================
@@ -297,7 +296,7 @@ template <typename Type>
     }
 
     template <typename Type>
-    Array<Type>& Array<Type>::operator=(Array<Type>& that)
+    Array<Type>& Array<Type>::operator+=(Array<Type>& that)
     {
         if ( this == &that )
         {
@@ -307,6 +306,18 @@ template <typename Type>
         Swap(victim);
         return *this;
     }
+
+    template <typename Type>
+    Array<Type>& Array<Type>::operator=(Array<Type>& that)
+    {
+        if ( this == &that )
+        {
+            return *this;
+        }
+        new(this) Array<Type>(that);
+        return *this;
+    }
+
 
     template <typename Type>
     Array<Type>& Array<Type>::operator+(const Array<Type>& second) const
@@ -330,14 +341,10 @@ template <typename Type>
         return ost;
     }
 
+
     template <typename Type>
     void Array<Type>::Clear()
     {
-        //TODO: NULLING NEW
-
-        /*delete[] data_;
-        data_ = new Type[size_]; */
-
         for (int i=0; i<size_; ++i)
         {
             data_[i] = static_cast<Type>(0);

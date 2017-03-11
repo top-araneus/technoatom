@@ -47,6 +47,9 @@ public:
 	   std::cout << "Starting TestErase" << std::endl;
 	   TestErase();
        std::cout << "\n\n";
+       std::cout << "Starting TestClear" << std::endl;
+       TestClear();
+       std::cout << "\n\n";
        std::cout << "Starting TestDump" << std::endl;
        TestDump();
     }
@@ -453,7 +456,46 @@ public:
 			status = "Test Erase failed";
 		}
 		std::cout << status << std::endl;
-	}
+    }
+    //-----------------------------------
+    //! @brief Testing clearing
+    //-----------------------------------
+    void TestClear()
+    {
+        std::string status = "Test Clear passed";
+        try
+        {
+            std::cout << "|.Given array with values (0.." << defaultSize-1 << ")" << std::endl;
+            std::cout << "|.When inserted "<<defaultSize<<" elements and clear" << std::endl;
+            Array<Type>* testobj = new Array<Type>(defaultSize);
+            for (int i = 0; i < defaultSize; i++)
+            {
+                (*testobj)[i] = static_cast<Type>(i);
+            }
+            testobj->Clear();
+            std::cout << "|.then expected that elements will be 0" <<std::endl;
+            for (int i = 0; i < defaultSize; i++)
+            {
+                if ( (*testobj)[i] != static_cast<Type>(0))
+                {
+                    throw Exception::ETestFailed;
+                }
+            }
+        }
+        catch(int codeError)
+        {
+            if(codeError == Exception::EMemAllocError)
+            {
+                std::cout << "|.then got exception: memory allocation error"<<std::endl;
+            }
+            if(codeError == Exception::EIndexOutOfRange)
+            {
+                std::cout << "|.then got exception: out of range"<<std::endl;
+            }
+            status = "Test Clear failed";
+        }
+        std::cout << status << std::endl;
+    }
     //-----------------------------------
     //! @brief Testing changing size of Array with border-case
     //-----------------------------------
