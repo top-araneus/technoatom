@@ -2,7 +2,7 @@
 #include <fstream>
 #include <iostream>
 #include <ctime>
-#include "Stack.h"
+#include "stack.h"
 #include "array.h"
 #include "arraytest.h"
 using namespace std;

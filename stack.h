@@ -1,3 +1,5 @@
+#ifndef STACK_H
+#define STACK_H
 #include "array.h"
 #include "exception.h"
 //-----------------------------------
@@ -250,3 +252,4 @@ void Stack<value_type>::dump()
     }
     dumpfile.close();
     }
+#endif

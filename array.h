@@ -6,13 +6,16 @@
 //-----------------------------------
 #ifndef ARRAY_H
 #define ARRAY_H
-#include "array.h"
+#define OK() \
+    if(parent_ == nullptr) throw Exception::EIterHasNoArray;
 #include "exception.h"
 #include <ctime>
 #include <typeinfo>
 #include <cstdlib>
 #include <fstream>
 using namespace std;
+
+
 //-----------------------------------
 //! @brief Array class. Type is a type of elements array stores.
 //-----------------------------------
@@ -42,6 +45,10 @@ template <typename Type>
         //! @return Type *: pointer to concatenated container
         //-----------------------------------
         inline Type *Concat(const Type *left, const Type *right, size_t leftLen, size_t rightLen) const;
+        //-----------------------------------
+
+        //-----------------------------------
+        inline Type *Concat(const Type *left,const Type *right, size_t leftLen) const;
 
         //-----------------------------------
         //! @var int size is a capacity of array
@@ -60,6 +67,7 @@ template <typename Type>
         //-----------------------------------
         static const size_t POISON_INT = 0xBADA55;
     public:
+
         Array();
         //-----------------------------------
         //! @fn Array(int size)
@@ -73,7 +81,7 @@ template <typename Type>
         //! @brief Copy constructor
         //! @arg Array& that is a link to array user wants to copy from
         //-----------------------------------
-        Array(const Array& that);
+        Array(Array& that);
 
         ~Array();
         //-----------------------------------
@@ -162,7 +170,14 @@ template <typename Type>
 		{
 			return(data_);
 		}
+
+        //-----------------------------------
+        //! @var iter
+        //! @brief Iterator for this array
+        //-----------------------------------
      };
+
+    #include "array_iter.h"
 
     //-----------------------------------
     //! @fn operator<<()
@@ -174,36 +189,35 @@ template <typename Type>
     template <typename Type>
     std::ostream& operator<<(std::ostream& ost, const Array<Type>& that);
 
+
+
     //===================================
 
     template <typename Type>
     Array<Type>::Array()
     {
         size_ = 0;
-       // size_ = DEFAULT_CAPACITY;
         data_ = new Type[size_];
-        if (data_ == nullptr)
-            throw Exception::EMemAllocError;
     }
 
     template <typename Type>
     Array<Type>::Array(const int size)
     {
         size_ = size;
-       // size_ = DEFAULT_CAPACITY;
         data_ = new Type[size_];
-        if (data_ == nullptr)
-            throw Exception::EMemAllocError;
     }
 
     template <typename Type>
-    Array<Type>::Array(const Array<Type>& that)
+    Array<Type>::Array(Array<Type>& that)
     {
-
         size_ = that.Size();
-		data_ = Copy(that.GetData(), 0, size_-1);
-        if (data_ == nullptr)
-            throw Exception::EMemAllocError;
+        data_ = new Type[size_];
+        Array_Iterator<Type>* i_in = new Array_Iterator<Type>(&that);
+        Array_Iterator<Type>* i_out = new Array_Iterator<Type>(this);
+        std::copy(i_in->begin(), i_in->end(), i_out->begin());
+        delete i_in;
+        delete i_out;
+        /* data_ = Copy(that.GetData(), 0, size_-1);*/
     }
 
     template <typename Type>
@@ -220,14 +234,22 @@ template <typename Type>
             throw Exception::EIndexOutOfRange;
         else
         {
-            Type* rArr = Copy(data_, index+1, size_-1);
-            Type* lArr = Copy(data_, 0, index-1);
-            Type* newData = Concat(lArr, rArr, index, size_-index-1);
-            delete[] rArr;
-            delete[] lArr;
+            Type* newData = nullptr;
+            if (size_ > 1)
+            {
+                newData = new Type[size_-1];
+                for(int i=0; i<index; ++i)
+                {
+                    newData[i] = data_[i];
+                }
+                for(int i=index+1; i<size_; ++i)
+                {
+                    newData[i-1] = data_[i];
+                }
+            }
             delete[] data_;
             data_ = newData;
-            size_ -= 1;
+            size_--;
         }
     }
 
@@ -238,19 +260,19 @@ template <typename Type>
             throw Exception::EIndexOutOfRange;
         else
         {
-            Type* rArr = Copy(data_, index, size_-1);
-            Type* lArr = new Type[index+1];
-            for (int i = 0; i < index; ++i)
+            Type* newData = new Type[size_ + 1];
+            for( int i = 0; i < index; ++i )
             {
-                lArr[i] = data_[i];
+                newData[i] = data_[i];
             }
-            lArr[index] = element;
-            Type* newData = Concat(lArr, rArr, index+1, size_-index);
-            delete[] rArr;
-            delete[] lArr;
+            newData[index] = element;
+            for( int i = index + 1; i < size_ + 1; ++i)
+            {
+                newData[i] = data_[i-1];
+            }
             delete[] data_;
             data_ = newData;
-            size_ += 1;
+            size_++;
         }
 
     }
@@ -262,7 +284,7 @@ template <typename Type>
         {
             throw Exception::EIndexOutOfRange;
         }
-        return((this->data_)[index]);
+        return data_[index];
     }
 
     template <typename Type>
@@ -275,7 +297,7 @@ template <typename Type>
         Resize(that.Size());
         for (int i = 0; i < size_; i++)
         {
-			(this->data_)[i] = (that.GetData())[i];
+            data_[i] = (that.GetData())[i];
         }
         return *this;
     }
@@ -287,7 +309,7 @@ template <typename Type>
 
 		result->data_ = Concat(data_, second.GetData(), this->size_, second.size_);
         result->size_ = this->size_ + second.size_;
-		return(*result);
+        return *result;
     }
 
     template <typename Type>
@@ -305,20 +327,24 @@ template <typename Type>
     template <typename Type>
     void Array<Type>::Clear()
     {
-        delete[] data_;
-        data_ = new Type[size_];
+        //TODO: NULLING NEW
+
+        /*delete[] data_;
+        data_ = new Type[size_]; */
+
+        for (int i=0; i<size_; ++i)
+        {
+            data_[i] = static_cast<Type>(0);
+        }
     }
 
     template <typename Type>
     void Array<Type>::PushBack(Type element)
     {
-        Type* rArr = new Type[1];
-        rArr[0] = element;
-        Type* newData = Concat(data_, rArr, size_, 1);
-        delete[] rArr;
+        Type* newData = Concat(data_, &element, size_);
         delete[] data_;
         data_ = newData;
-        size_ += 1;
+        size_++;
     }
 
     template <typename Type>
@@ -350,8 +376,6 @@ template <typename Type>
         {
                 int newSize = last-first+1;
                 Type* newdata = new Type[newSize];
-                if (newdata == nullptr)
-                    throw Exception::EMemAllocError;
                 for (int i = 0; i < newSize; ++i)
                 {
                     newdata[i] = that[first+i];
@@ -366,20 +390,30 @@ template <typename Type>
     template <typename Type>
     inline Type* Array<Type>::Concat(const Type *left, const Type *right, const size_t leftLen, const size_t rightLen) const
     {
+        if ( leftLen+rightLen == 0 )
+        {
+            return nullptr;
+        }
         Type* result = new Type[leftLen+rightLen];
-        if (result == nullptr)
-            throw Exception::EMemAllocError;
 		for (int i = 0; i < leftLen; ++i)
             result[i] = left[i];
 		for (int i = 0; i < rightLen; ++i)
             result[leftLen+i] = right[i];
-		if ( leftLen+rightLen == 0 )
-		{
-			return nullptr;
-		}
         return result;
 
     }
+
+    template <typename Type>
+    inline Type* Array<Type>::Concat(const Type *left, const Type *right, const size_t leftLen) const
+    {
+        Type* result = new Type[leftLen + 1];
+        for (int i = 0; i < leftLen; ++i)
+            result[i] = left[i];
+        result[leftLen] = *right;
+        return result;
+
+    }
+
 
     template <typename Type>
     void Array<Type>::Resize(int newsize)
@@ -395,26 +429,14 @@ template <typename Type>
         }
         else
         {
-            if (newsize<=size_)
+            Type* newdata = new Type[newsize];
+            for (int i = 0; i < ((newsize<=size_) ? newsize : size_); ++i)
             {
-                Type* newdata = Copy( this->data_ , 0, newsize-1);
-                delete[] this->data_;
-                this->data_ = newdata;
-                this->size_ = newsize;
+                newdata[i] = data_[i];
             }
-            else
-            {
-                Type* newdata = new Type[newsize];
-                if (newdata == nullptr)
-                    throw Exception::EMemAllocError;
-                for (int i = 0; i < size_; ++i)
-                {
-                    newdata[i] = data_[i];
-                }
-                delete[] data_;
-                data_ = newdata;
-                size_ = newsize;
-            }
+            delete[] data_;
+            data_ = newdata;
+            size_ = newsize;
         }
     }
 

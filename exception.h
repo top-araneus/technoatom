@@ -17,6 +17,7 @@ class Exception
         static const int EBadSize = 0xB5;   //!< Exception when new size of array is less than zero
         static const int EIndexOutOfRange = 0x10;   //!< Exception when index is out of range
         static const int ETestFailed = 0x7F;
+        static const int EIterHasNoArray = 0x1A;
         Exception();
 };
 

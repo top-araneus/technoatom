@@ -15,4 +15,5 @@ HEADERS += \
     stack.h \
     array.h \
     exception.h \
-    arraytest.h
+    arraytest.h \
+    array_iter.h
