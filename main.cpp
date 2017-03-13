@@ -2,6 +2,8 @@
 #include <fstream>
 #include <iostream>
 #include <ctime>
+#include <new>
+#include <cstring>
 #include "stack.h"
 #include "array.h"
 #include "arraytest.h"

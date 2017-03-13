@@ -5,7 +5,6 @@
 #include "array.h"
 #include "exception.h"
 
-
 const size_t TEST_SIZE=100;
 
 template<typename Type>

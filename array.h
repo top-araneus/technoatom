@@ -61,6 +61,7 @@ template <typename Type>
 
 		Type* data_;
 
+
         //-----------------------------------
         //! @brief static const size_t POISON_INT
         //! is a poison value to fill garbage objects
@@ -75,6 +76,23 @@ template <typename Type>
         //! @arg int size is a number of elements array can store
         //-----------------------------------
         Array(const int size);
+
+        void* operator new(size_t size) throw()
+        {
+            return ::new Type(size);
+        }
+
+        //-----------------------------------
+        //! @fn operator new(size_t size, void* ptr)
+        //! @brief placement new
+        //! @arg size_t size is a default arg which contains size of type
+        //! @arg void* ptr is an address where object will be created
+        //! @return void* address where object was created (equals to ptr)
+        //-----------------------------------
+        void* operator new(size_t size, void* ptr) throw()
+        {
+            return ptr;
+        }
 
         //-----------------------------------
         //! @fn Array(const Array& that)
@@ -190,6 +208,7 @@ template <typename Type>
     //-----------------------------------
     template <typename Type>
     std::ostream& operator<<(std::ostream& ost, const Array<Type>& that);
+
 
 
     //===================================
@@ -314,7 +333,7 @@ template <typename Type>
         {
             return *this;
         }
-        new(this) Array<Type>(that);
+        new (this) Array<Type>(that);
         return *this;
     }
 
@@ -452,6 +471,8 @@ template <typename Type>
             size_ = newsize;
         }
     }
+
+
 
 
 #endif // ARRAY_H

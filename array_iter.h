@@ -5,17 +5,29 @@ template<typename Type>
 class Array_Iterator
 {
 public:
-    typedef output_iterator_tag iterator_category;
+
+    //!< typedefs for std::copy standarts
+    typedef bidirectional_iterator_tag iterator_category;
     typedef Type value_type;
     typedef ptrdiff_t difference_type;
     typedef Type* pointer;
     typedef Type& reference;
+
+    //-----------------------------------
+    //! @fn Array_Iterator(Array<Type> *parent)
+    //! @brief Iterator's constructor
+    //! @arg Array<Type> *parent is an array iterator is used for
+    //-----------------------------------
     Array_Iterator(Array<Type> *parent)
     {
         parent_ = parent;
         index_ = 0;
     }
 
+    //-----------------------------------
+    //! @fn Array_Iterator& operator++()
+    //! @brief Increments size of operator
+    //-----------------------------------
     Array_Iterator & operator++()
     {
         OK()
@@ -23,6 +35,10 @@ public:
         return *this;
     }
 
+    //-----------------------------------
+    //! @fn Array_Iterator& begin()
+    //! @brief returns iterator pointing to begin of array
+    //-----------------------------------
     Array_Iterator & begin()
     {
         OK()
@@ -30,6 +46,10 @@ public:
         return *It;
     }
 
+    //-----------------------------------
+    //! @fn Array_Iterator& end()
+    //! @brief returns iterator pointing to end of array
+    //-----------------------------------
     Array_Iterator & end()
     {
         OK()
@@ -38,13 +58,20 @@ public:
         return *It;
     }
 
+    //-----------------------------------
+    //! @fn bool operator!=()
+    //! @brief returns true if two iterators are pointing to different indexes
+    //! @arg Array_Iterator& that is a second iterator for comparsion
+    //-----------------------------------
     bool operator!=(const Array_Iterator & that) const
     {
-        OK()
         return that.isUnEqual(index_);
-
     }
 
+    //-----------------------------------
+    //! @fn Type& operator*()
+    //! @brief returns element iterator is pointing to
+    //-----------------------------------
     Type & operator*() const
     {
         OK()
@@ -59,6 +86,12 @@ public:
         return (*(parent_))[index_];
 
     }
+
+    //-----------------------------------
+    //! @fn bool isUnEqual(const size_t that_index)
+    //! @brief compares indexes
+    //! @arg size_t that_index is a second index to compare
+    //-----------------------------------
     bool isUnEqual(const size_t that_index) const
     {
         OK()
