@@ -95,12 +95,22 @@ template <typename Type>
             return ptr;
         }
 
+        //-----------------------------------
+        //! @fn operator new(size_t size, void* ptr, int num)
+        //! @brief initializing placement new.
+        //! When placement new should be called, there should be called
+        //! a copy constructor with reference to this Array in argument
+        //! @example new(&example,0) Array<int>(example); //example is Array user wants to initialize
+        //! @arg size_t size is a default arg which contains size of type
+        //! @arg void* ptr is an address where object will be created
+        //! @arg int num is an initialization key
+        //! @return void* address where object was created (equals to ptr)
+        //-----------------------------------
 		void* operator new(size_t size, void* ptr, int num)
 		{
-			Array<Type> *bufptr = (Array<Type>*)ptr;
-			Array<Type> victim;
+            Array<Type> *bufptr = (Array<Type>*)ptr;
 			std::memset(bufptr->data_, num, sizeof(Type)*bufptr->size_);
-			return &victim;
+            return ptr;
 		}
 
         //-----------------------------------
