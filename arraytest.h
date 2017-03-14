@@ -51,6 +51,9 @@ public:
        std::cout << "\n\n";
        std::cout << "Starting TestDump" << std::endl;
        TestDump();
+	   std::cout << "\n\n";
+	   std::cout << "Starting TestInit" << std::endl;
+	   TestInit();
     }
     //-----------------------------------
     //! @brief Testing of correct getting elements by indexes
@@ -572,6 +575,31 @@ public:
         }
         std::cout << status << std::endl;
     }
+
+
+	void TestInit()
+	{
+		    std::string status = "Test Init passed";
+			std::cout << "Given array with values " << std::endl;
+
+		try
+		{
+			Array<int> test(10);
+			new(&test,0) Array<int>(test);
+			for (int i = 0; i < 10; i++)
+			{
+				if (test[i] != 0)
+					throw Exception::ETestFailed;
+			}
+		}
+		catch (int errorCode)
+		{
+			status = "Test Init failed";
+		}
+		std::cout << "\n" << status << std::endl;
+
+	}
+
 };
 
 

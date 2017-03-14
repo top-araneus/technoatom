@@ -13,6 +13,7 @@
 #include <typeinfo>
 #include <cstdlib>
 #include <fstream>
+#include <cstring>
 using namespace std;
 
 
@@ -77,7 +78,7 @@ template <typename Type>
         //-----------------------------------
         Array(const int size);
 
-        void* operator new(size_t size) throw()
+		void* operator new(size_t size) throw (std::bad_alloc)
         {
             return ::new Type(size);
         }
@@ -89,10 +90,18 @@ template <typename Type>
         //! @arg void* ptr is an address where object will be created
         //! @return void* address where object was created (equals to ptr)
         //-----------------------------------
-        void* operator new(size_t size, void* ptr) throw()
+		void* operator new(size_t size, void* ptr) throw (std::bad_alloc)
         {
             return ptr;
         }
+
+		void* operator new(size_t size, void* ptr, int num)
+		{
+			Array<Type> *bufptr = (Array<Type>*)ptr;
+			Array<Type> victim;
+			std::memset(bufptr->data_, num, sizeof(Type)*bufptr->size_);
+			return &victim;
+		}
 
         //-----------------------------------
         //! @fn Array(const Array& that)
@@ -217,7 +226,7 @@ template <typename Type>
     Array<Type>::Array()
     {
         size_ = 0;
-        data_ = new Type[size_];
+		data_ = nullptr;
     }
 
     template <typename Type>
@@ -230,14 +239,16 @@ template <typename Type>
     template <typename Type>
     Array<Type>::Array(Array<Type>& that)
     {
-        size_ = that.Size();
-        data_ = new Type[size_];
-        Array_Iterator<Type>* i_in = new Array_Iterator<Type>(&that);
-        Array_Iterator<Type>* i_out = new Array_Iterator<Type>(this);
-        std::copy(i_in->begin(), i_in->end(), i_out->begin());
-        delete i_in;
-        delete i_out;
-        /* data_ = Copy(that.GetData(), 0, size_-1);*/
+		if (&that != this)
+		{
+			size_ = that.Size();
+			data_ = new Type[size_];
+			Array_Iterator<Type>* i_in = new Array_Iterator<Type>(&that);
+			Array_Iterator<Type>* i_out = new Array_Iterator<Type>(this);
+			std::copy(i_in->begin(), i_in->end(), i_out->begin());
+			delete i_in;
+			delete i_out;
+		}
     }
 
     template <typename Type>
