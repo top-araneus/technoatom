@@ -4,6 +4,8 @@
 #include <ctime>
 #include <new>
 #include <cstring>
+#include "exception.h"
+#include "array_iter.h"
 #include "stack.h"
 #include "array.h"
 #include "arraytest.h"

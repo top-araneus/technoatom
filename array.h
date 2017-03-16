@@ -6,9 +6,6 @@
 //-----------------------------------
 #ifndef ARRAY_H
 #define ARRAY_H
-#define OK() \
-    if(parent_ == nullptr) throw Exception::EIterHasNoArray;
-#include "exception.h"
 #include <ctime>
 #include <typeinfo>
 #include <cstdlib>
@@ -156,6 +153,10 @@ public:
     //-----------------------------------
     void PushBack(Type element);
 
+    Array_Iterator<Type> begin();
+
+    Array_Iterator<Type> end();
+
     //-----------------------------------
     //! @fn operator=()
     //! @brief Makes a copy of array "that" by value.
@@ -252,11 +253,7 @@ Array<Type>::Array(Array<Type>& that)
     {
         size_ = that.Size();
         data_ = new Type[size_];
-        Array_Iterator<Type>* i_in = new Array_Iterator<Type>(&that);
-        Array_Iterator<Type>* i_out = new Array_Iterator<Type>(this);
-        std::copy(i_in->begin(), i_in->end(), i_out->begin());
-        delete i_in;
-        delete i_out;
+        std::copy(that.begin(), that.end(), this->begin());
     }
 }
 
@@ -265,6 +262,20 @@ Array<Type>::~Array()
 {
     delete[] data_;
     data_ = nullptr;
+}
+
+template <typename Type>
+Array_Iterator<Type> Array<Type>::begin()
+{
+    Array_Iterator<Type> it(data_);
+    return it;
+}
+
+template <typename Type>
+Array_Iterator<Type> Array<Type>::end()
+{
+    Array_Iterator<Type> it(data_+size_);
+    return it;
 }
 
 template <typename Type>
