@@ -153,8 +153,18 @@ public:
     //-----------------------------------
     void PushBack(Type element);
 
+    //-----------------------------------
+    //! @fn begin()
+    //! @brief Returns iterator to first element
+    //! @return Array_Iterator<Type> temporary iterator object
+    //-----------------------------------
     Array_Iterator<Type> begin();
 
+    //-----------------------------------
+    //! @fn begin()
+    //! @brief Returns iterator to place after the last element
+    //! @return Array_Iterator<Type> temporary iterator object
+    //-----------------------------------
     Array_Iterator<Type> end();
 
     //-----------------------------------
@@ -197,26 +207,30 @@ public:
     //-----------------------------------
     void Dump() const;
 
-    void Swap(Array<Type>& that);//documentary
+    //-----------------------------------
+    //! @fn Swap()
+    //! @brief Swaps fields of this and that Arrays
+    //! @arg Array<Type>& that is a reference to Array for swapping
+    //-----------------------------------
+    void Swap(Array<Type>& that);
+
+    //-----------------------------------
+    //! @fn operator+=(Array<Type>& that)
+    //! @brief assignment operator implemented with copy&swap algorithm
+    //! @arg Array<Type>& that is a reference to source Array
+    //-----------------------------------
     Array<Type>& operator+=(Array<Type>& that);
 
     //-----------------------------------
     //! @fn GetData()
-    //! @brief Returns const pointer to the beginig of array
+    //! @brief Returns const pointer to the beginning of array
     //! @return pointer
     //-----------------------------------
     const Type* GetData() const
     {
         return(data_);
     }
-
-    //-----------------------------------
-    //! @var iter
-    //! @brief Iterator for this array
-    //-----------------------------------
 };
-
-#include "array_iter.h"
 
 //-----------------------------------
 //! @fn operator<<()

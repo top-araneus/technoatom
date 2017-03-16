@@ -16,4 +16,5 @@ HEADERS += \
     array.h \
     exception.h \
     arraytest.h \
-    array_iter.h
+    array_iter.h \
+    stacktest.h

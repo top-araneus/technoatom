@@ -14,9 +14,9 @@ public:
     typedef Type& reference;
 
     //-----------------------------------
-    //! @fn Array_Iterator(Array<Type> *parent)
+    //! @fn Array_Iterator(Type* ptr)
     //! @brief Iterator's constructor
-    //! @arg Array<Type> *parent is an array iterator is used for
+    //! @arg Type* ptr is a pointer to array element
     //-----------------------------------
     Array_Iterator(Type* ptr)
     {
@@ -36,7 +36,8 @@ public:
     //-----------------------------------
     //! @fn bool operator!=()
     //! @brief returns true if two iterators are pointing to different indexes
-    //! @arg Array_Iterator& that is a second iterator for comparsion
+    //! @arg Array_Iterator& left is a first iterator for comparsion
+    //! @arg Array_Iterator& right is a second iterator for comparsion
     //-----------------------------------
     friend bool operator!=(const Array_Iterator<Type>& left, const Array_Iterator<Type>& right)
     {
