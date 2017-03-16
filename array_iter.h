@@ -7,6 +7,7 @@ class Array_Iterator
 public:
 
     //!< typedefs for std::copy standarts
+    typedef std::bidirectional_iterator_tag iterator_category;
     typedef Type value_type;
     typedef ptrdiff_t difference_type;
     typedef Type* pointer;
@@ -33,13 +34,13 @@ public:
     }
 
     //-----------------------------------
-
-    //-----------------------------------
     //! @fn bool operator!=()
     //! @brief returns true if two iterators are pointing to different indexes
     //! @arg Array_Iterator& that is a second iterator for comparsion
     //-----------------------------------
+    friend bool operator!=(const Array_Iterator<Type>& left, const Array_Iterator<Type>& right)
     {
+        return (left.pointer_ != right.pointer_);
     }
 
     //-----------------------------------
@@ -48,14 +49,17 @@ public:
     //-----------------------------------
     Type & operator*() const
     {
+        if(pointer_ == nullptr)
         {
             throw Exception::EMemAllocError;
         }
+        return *pointer_;
 
     }
 
 private:
 
+    Type *pointer_;
 };
 
 #endif // ARRAY_ITER_H
