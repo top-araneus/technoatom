@@ -31,7 +31,7 @@ public:
     Array_Iterator & operator++()
     {
         OK()
-        index_++;
+                index_++;
         return *this;
     }
 
@@ -42,7 +42,7 @@ public:
     Array_Iterator & begin()
     {
         OK()
-        Array_Iterator* It = new Array_Iterator(parent_);
+                Array_Iterator* It = new Array_Iterator(parent_);
         return *It;
     }
 
@@ -53,7 +53,7 @@ public:
     Array_Iterator & end()
     {
         OK()
-        Array_Iterator* It = new Array_Iterator(parent_);
+                Array_Iterator* It = new Array_Iterator(parent_);
         It->index_ = parent_->Size();
         return *It;
     }
@@ -75,7 +75,7 @@ public:
     Type & operator*() const
     {
         OK()
-        if(parent_->GetData() == nullptr)
+                if(parent_->GetData() == nullptr)
         {
             throw Exception::EMemAllocError;
         }
@@ -95,7 +95,7 @@ public:
     bool isUnEqual(const size_t that_index) const
     {
         OK()
-        return index_ != that_index;
+                return index_ != that_index;
     }
 
     size_t index_;
