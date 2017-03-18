@@ -450,7 +450,7 @@ std::ostream& operator<<(std::ostream& ost, const Array<Type>& that)
 {
     size_t size = that.Size();
     ost << "data_[" << size << "]:" << endl;
-    for (int i=0; i<size; ++i)
+	for (int i = 0; i < size; ++i)
     {
         ost << "      [" << i << "] = " << (that.GetData())[i] << endl;
     }
@@ -572,20 +572,20 @@ void Array<Type>::Resize(int newsize)
 //
 //
 //
-//
 
+/*
+
+class BitReference
+{
+public:
+   block_type* ptr_to_byte;
+   unsigned char number_of_bit;
+};
 
 template<>
 class Array<bool>
 {
 public:
-    class BitReference
-    {
-    public:
-       block_type* ptr_to_byte;
-       unsigned char number_of_bit;
-    };
-
     Array();
     Array(size_t size);
     ~Array();
@@ -614,5 +614,5 @@ Array<bool>::~Array()
 {
     delete[] data_;
 }
-
+*/
 #endif // ARRAY_H
