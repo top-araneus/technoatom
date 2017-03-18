@@ -110,11 +110,24 @@ public:
     }
 
     //-----------------------------------
+    //! @fn Array(const Array&& that)
+    //! @brief Moving constructor
+    //! @arg Array&& that is a r-value reference to temporary object
+    //-----------------------------------
+    Array(Array&& that);
+
+    //-----------------------------------
     //! @fn Array(const Array& that)
     //! @brief Copy constructor
     //! @arg Array& that is a link to array user wants to copy from
     //-----------------------------------
     Array(Array& that);
+
+    //-----------------------------------
+    //! @fn Array(std::initializer_list lst)
+    //! @brief initialization constructor
+    //-----------------------------------
+    Array(const std::initializer_list<Type>& lst);
 
     ~Array();
     //-----------------------------------
@@ -166,6 +179,12 @@ public:
     //! @return Array_Iterator<Type> temporary iterator object
     //-----------------------------------
     Array_Iterator<Type> end();
+
+    //-----------------------------------
+    //! @fn operator=()
+    //! @brief moves that to this array
+    //-----------------------------------
+    Array<Type>& operator=(Array<Type>&& that);
 
     //-----------------------------------
     //! @fn operator=()
@@ -249,6 +268,7 @@ std::ostream& operator<<(std::ostream& ost, const Array<Type>& that);
 template <typename Type>
 Array<Type>::Array()
 {
+    std::cout << __PRETTY_FUNCTION__ << std::endl;
     size_ = 0;
     data_ = nullptr;
 }
@@ -261,14 +281,34 @@ Array<Type>::Array(const int size)
 }
 
 template <typename Type>
+Array<Type>::Array(Array<Type>&& that):
+    size_    (0),
+    data_(nullptr)
+{
+    std::cout << __PRETTY_FUNCTION__ << std::endl;
+
+    Swap(that);
+}
+
+template <typename Type>
 Array<Type>::Array(Array<Type>& that)
 {
+    std::cout << __PRETTY_FUNCTION__ << std::endl;
     if (&that != this)
     {
         size_ = that.Size();
         data_ = new Type[size_];
         std::copy(that.begin(), that.end(), this->begin());
     }
+}
+
+template <typename Type>
+Array<Type>::Array(const std::initializer_list<Type>& lst)
+{
+    std::cout << __PRETTY_FUNCTION__ << std::endl;
+    size_ = lst.size();
+    data_ = new Type[size_];
+    std::copy(lst.begin(), lst.end(), this->begin());
 }
 
 template <typename Type>
@@ -353,7 +393,7 @@ Type& Array<Type>::operator [](int index) const
 }
 
 template <typename Type>
-void Array<Type>::Swap(Array<Type> &that)
+inline void Array<Type>::Swap(Array<Type> &that)
 {
     std::swap(this->data_,that.data_);
     std::swap(this->size_,that.size_);
@@ -374,6 +414,7 @@ Array<Type>& Array<Type>::operator+=(Array<Type>& that)
 template <typename Type>
 Array<Type>& Array<Type>::operator=(Array<Type>& that)
 {
+    std::cout << __PRETTY_FUNCTION__ << std::endl;
     if ( this == &that )
     {
         return *this;
@@ -382,6 +423,17 @@ Array<Type>& Array<Type>::operator=(Array<Type>& that)
     return *this;
 }
 
+template <typename Type>
+Array<Type>& Array<Type>::operator=(Array<Type>&& that)
+{
+    std::cout << __PRETTY_FUNCTION__ << std::endl;
+    if ( this == &that )
+    {
+        return *this;
+    }
+    Swap(that);
+    return *this;
+}
 
 template <typename Type>
 Array<Type>& Array<Type>::operator+(const Array<Type>& second) const
@@ -516,8 +568,51 @@ void Array<Type>::Resize(int newsize)
         size_ = newsize;
     }
 }
+//
+//
+//
+//
+//
 
 
+template<>
+class Array<bool>
+{
+public:
+    class BitReference
+    {
+    public:
+       block_type* ptr_to_byte;
+       unsigned char number_of_bit;
+    };
 
+    Array();
+    Array(size_t size);
+    ~Array();
+    bool&
+
+private:
+    size_t size_;
+    typedef unsigned long long int block_type;
+    block_type* data_;
+    static const size_t BLOCK_SIZE = sizeof(block_type);
+};
+
+Array<bool>::Array()
+{
+    data_ = nullptr;
+    size_ = 0;
+}
+
+Array<bool>::Array(size_t size)
+{
+    size_ = size;
+    data_ = new block_type[size / BLOCK_SIZE + 1];
+}
+
+Array<bool>::~Array()
+{
+    delete[] data_;
+}
 
 #endif // ARRAY_H

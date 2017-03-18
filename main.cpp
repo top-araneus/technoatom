@@ -13,7 +13,11 @@
 #include "stacktest.h"
 using namespace std;
 
-
+Array<double> testfunc(Array<double> arr)
+{
+    std::cout << __PRETTY_FUNCTION__ << std::endl;
+    return arr;
+}
 
 
 //-----------------------------------
@@ -24,12 +28,16 @@ using namespace std;
 //-----------------------------------
 int main()
 {
-    ArrayTest<double>* tests = new ArrayTest<double>;
+/*    ArrayTest<double>* tests = new ArrayTest<double>;
     tests->TestAll();
-    delete tests;
+    delete tests;*/
+
+    Array<double> array = {1.4, 8.8};
+    std::cout << array << std::endl;
+/*    std::cout << std::endl;
 
     test<double>();
-
+*/
     getchar();
     return 0;
 }
