@@ -21,8 +21,8 @@ public:
     {
         TestSquares();;
         TestSquaresOutRange();
-        TestCopy();
-        TestAssign();
+        TestCopy(); //failed
+        TestAssign(); //failed
         TestPlus();
         TestPush();
         TestInsert();
@@ -141,9 +141,9 @@ public:
             //then
             for (size_t i = 0; i < defaultSize; i++)
             {
-                if ((*testarray)[i] != clonearray[i])
+                if ((*testarray)[i] != clonearray[i] )
                 {
-                    std::cout << "|.expected value" << (*testarray)[i] << " and got " << clonearray[i]  << std::endl;
+                    std::cout << "|.expected value " << (*testarray)[i] << " and got " << clonearray[i]  << std::endl;
                     throw Exception::ETestFailed;
                 }
             }
@@ -152,7 +152,7 @@ public:
             {
                 if ( clonearray[i] != static_cast<Type>(i) )
                 {
-                    std::cout << "|.expected value" << static_cast<Type>(i) << " and got " << clonearray[i]  << std::endl;
+                    std::cout << "|.expected value " << static_cast<Type>(i) << " and got " << clonearray[i]  << std::endl;
                     throw Exception::ETestFailed;
                 }
             }

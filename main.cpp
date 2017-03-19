@@ -30,11 +30,10 @@ int main()
     tests->TestAll();
     delete tests;*/
 
-    Array<bool> st(18);
-    st[12] = true;
-    bool a = false;
-    a = st[12];
-    std::cout << st;
+    ArrayTest<bool>* tests = new ArrayTest<bool>;
+        tests->TestAll();
+        delete tests;
+
  /*   Array<double> array = {1.4, 8.8};
    std::cout << array << std::endl;*/
 

@@ -24,17 +24,6 @@ class Array
 {
 private:
     //-----------------------------------
-    //! @fn Copy()
-    //! @brief Creates copy of container from args in range of
-    //! provided indexes (including them).
-    //! @arg Type * that is container user wants to copy from
-    //! @arg int first is index from which copying started
-    //! @arg int last is index on which copying finished
-    //! @return Type *: pointer to container with copied elements
-    //-----------------------------------
-    inline Type *Copy(const Type *that, int first, int last);
-
-    //-----------------------------------
     //! @fn Concat()
     //! @brief Creates concatenated container from two others
     //! @arg Type * left is container which stores left elements
@@ -60,12 +49,6 @@ private:
 
     Type* data_;
 
-
-    //-----------------------------------
-    //! @brief static const size_t POISON_INT
-    //! is a poison value to fill garbage objects
-    //-----------------------------------
-    static const size_t POISON_INT = 0xBADA55;
 public:
 
     Array();
@@ -247,10 +230,7 @@ public:
     //! @brief Returns const pointer to the beginning of array
     //! @return pointer
     //-----------------------------------
-    const Type* GetData() const
-    {
-        return(data_);
-    }
+    const Type* GetData() const;
 };
 
 //-----------------------------------
@@ -261,7 +241,7 @@ public:
 //! @return std::ostream& : reference to output stream user writes to
 //-----------------------------------
 template <typename Type>
-std::ostream& operator<<(std::ostream& ost, const Array<Type>& that);
+std::ostream& operator<<(std::ostream& ost, Array<Type>& that);
 
 
 
@@ -298,8 +278,7 @@ Array<Type>::Array(Array<Type>& that)
     std::cout << __PRETTY_FUNCTION__ << std::endl;
     if (&that != this)
     {
-        size_ = that.Size();
-        data_ = new Type[size_];
+        Resize(that.Size());
         std::copy(that.begin(), that.end(), this->begin());
     }
 }
@@ -332,6 +311,12 @@ Array_Iterator<Type> Array<Type>::end()
 {
     Array_Iterator<Type> it(data_+size_);
     return it;
+}
+
+template <typename Type>
+const Type* Array<Type>::GetData() const
+{
+    return(data_);
 }
 
 template <typename Type>
@@ -402,7 +387,7 @@ inline void Array<Type>::Swap(Array<Type> &that)
 }
 
 template <typename Type>
-Array<Type>& Array<Type>::operator+=(Array<Type>& that)
+Array<Type>& Array<Type>::operator=(Array<Type>& that)
 {
     if ( this == &that )
     {
@@ -414,7 +399,7 @@ Array<Type>& Array<Type>::operator+=(Array<Type>& that)
 }
 
 template <typename Type>
-Array<Type>& Array<Type>::operator=(Array<Type>& that)
+Array<Type>& Array<Type>::operator+=(Array<Type>& that)
 {
     std::cout << __PRETTY_FUNCTION__ << std::endl;
     if ( this == &that )
@@ -448,7 +433,7 @@ Array<Type>& Array<Type>::operator+(const Array<Type>& second) const
 }
 
 template <typename Type>
-std::ostream& operator<<(std::ostream& ost, const Array<Type>& that)
+std::ostream& operator<<(std::ostream& ost, Array<Type>& that)
 {
     size_t size = that.Size();
     ost << "data_[" << size << "]:" << endl;
@@ -502,22 +487,6 @@ void Array<Type>::Dump() const
 }
 
 template <typename Type>
-inline Type* Array<Type>::Copy(const Type *that, int first, int last)
-{
-    int newSize = last-first+1;
-    Type* newdata = new Type[newSize];
-    for (int i = 0; i < newSize; ++i)
-    {
-        newdata[i] = that[first+i];
-    }
-    if (newSize == 0)
-    {
-        return nullptr;
-    }
-    return newdata;
-}
-
-template <typename Type>
 inline Type* Array<Type>::Concat(const Type *left, const Type *right, const size_t leftLen, const size_t rightLen) const
 {
     if ( leftLen+rightLen == 0 )
@@ -530,7 +499,6 @@ inline Type* Array<Type>::Concat(const Type *left, const Type *right, const size
     for (int i = 0; i < rightLen; ++i)
         result[leftLen+i] = right[i];
     return result;
-
 }
 
 template <typename Type>
@@ -546,7 +514,7 @@ inline Type* Array<Type>::Concat(const Type *left, const Type *right, const size
 
 
 template <typename Type>
-void Array<Type>::Resize(int newsize)
+inline void Array<Type>::Resize(int newsize)
 {   if( newsize < 0 )
     {
         throw Exception::EBadSize;
@@ -581,18 +549,24 @@ class Array<bool>
 public:
     typedef unsigned char block_type;
     static const size_t BLOCK_SIZE = sizeof(block_type) * 8;
-    class BitIterator
+    class BitReference
     {
     public:
-        typedef std::bidirectional_iterator_tag iterator_category;
-        typedef bool value_type;
-        typedef ptrdiff_t difference_type;
-        typedef bool* pointer;
-        typedef bool& reference;
+
 
        block_type* ptr_to_block;
        unsigned char number_of_bit;
-       BitIterator(block_type* ptr, int number);
+
+       BitReference(block_type* ptr, int number)
+       {
+           if( number < 0 || number >= BLOCK_SIZE)
+           {
+               throw Exception::EIndexOutOfRange;
+           }
+           ptr_to_block = ptr;
+           number_of_bit = number;
+       }
+
        operator bool() const
        {
            bool result = ((*ptr_to_block) >> number_of_bit) & 1;
@@ -610,14 +584,14 @@ public:
            }
            return right;
        }
-       bool operator=(BitIterator right)
+       bool operator=(BitReference right)
        {
            bool result;
            result = *(right.ptr_to_block) & (1 << right.number_of_bit);
            this->operator =(result);
            return result;
        }
-       BitIterator& operator++()
+       BitReference& operator++()
        {
            if (number_of_bit == BLOCK_SIZE-1)
            {
@@ -631,24 +605,48 @@ public:
            return *this;
        }
 
-       friend bool operator!=(const BitIterator& left, const BitIterator& right)
+       virtual bool operator!=(const BitReference& right)
        {
-           return ((left.ptr_to_block != right.ptr_to_block) || (left.number_of_bit != right.number_of_bit));
+           return ((bool)(*this) != (bool)right);
        }
 
-       BitIterator& operator*()
+       BitReference& operator*()
        {
            return *this;
        }
     };
 
+    class BitIterator : public BitReference
+    {
+       public:
+       BitIterator(block_type* ptr, int number) :
+           BitReference(ptr, number)
+        {}
+
+       typedef std::bidirectional_iterator_tag iterator_category;
+       typedef bool value_type;
+       typedef ptrdiff_t difference_type;
+       typedef bool* pointer;
+       typedef bool& reference;
+        virtual bool operator!=(const BitReference& right)
+        {
+            return (((*this).ptr_to_block != right.ptr_to_block) || ((*this).number_of_bit != right.number_of_bit));
+        }
+    };
 
     Array();
     Array(size_t size);
     ~Array();
+    Array(Array<bool>& that);
+    Array(Array<bool>&& that);
+    Array<bool>& operator=(Array<bool>& that);
+    Array<bool>& operator=(Array<bool>&& that);
+    void Dump();
+    inline void Swap(Array<bool>& that);
+    Array<bool>& operator+(Array<bool>& that);
     Array(const std::initializer_list<bool>& lst);
-    BitIterator& operator[](int index);
-    size_t Size();
+    BitReference& operator[](int index);
+    size_t Size() const;
     void Resize(size_t size);
     void Clear();
     void Erase(int index);
@@ -656,9 +654,11 @@ public:
     void PushBack(bool element);
     BitIterator begin();
     BitIterator end();
+    const block_type* GetData() const;
 private:
     size_t size_;
     block_type* data_;
+
 };
 
 std::ostream& operator<<(std::ostream& ost, Array<bool>& that)
@@ -670,16 +670,6 @@ std::ostream& operator<<(std::ostream& ost, Array<bool>& that)
         ost << "      [" << i << "] = " << that[i] << endl;
     }
     return ost;
-}
-
-Array<bool>::BitIterator::BitIterator(block_type* ptr, int number)
-{
-    if( number < 0 || number >= BLOCK_SIZE)
-    {
-        throw Exception::EIndexOutOfRange;
-    }
-    ptr_to_block = ptr;
-    number_of_bit = number;
 }
 
 Array<bool>::Array()
@@ -698,6 +688,65 @@ Array<bool>::Array(size_t size)
     }
 }
 
+Array<bool>::Array(Array<bool>&& that):
+    size_    (0),
+    data_(nullptr)
+{
+    std::cout << __PRETTY_FUNCTION__ << std::endl;
+
+    Swap(that);
+}
+
+Array<bool>::Array(Array<bool>& that)
+{
+    std::cout << __PRETTY_FUNCTION__ << std::endl;
+    if (&that != this)
+    {
+        size_ = that.Size();
+        data_ = new block_type[size_ / BLOCK_SIZE + 1];
+        std::copy(that.begin(), that.end(), this->begin());
+    }
+}
+
+Array<bool>& Array<bool>::operator=(Array<bool>&& that)
+{
+    std::cout << __PRETTY_FUNCTION__ << std::endl;
+    if ( this == &that )
+    {
+        return *this;
+    }
+    Swap(that);
+    return *this;
+}
+
+Array<bool>& Array<bool>::operator=(Array<bool>& that)
+{
+    if ( this == &that )
+    {
+        return *this;
+    }
+    Array<bool> victim(that);
+    Swap(victim);
+    return *this;
+}
+
+void Array<bool>::Dump()
+{
+    const char* DUMP_FILENAME = "dumpArray.txt";     //!< name of dump file
+    time_t t = time(NULL);                      //!< current system time
+    std::ofstream dumpfile(DUMP_FILENAME, std::ofstream::app);
+    if (dumpfile.fail())
+        throw Exception::EFileCreationError;
+    dumpfile << "====== ARRAY DUMP ======" << endl;
+    dumpfile << asctime(localtime(&t));
+    dumpfile << "ARRAY " << "addr " << data_ << endl;
+    dumpfile << *this;
+    //-----------------------------------
+    //! Show all data in array, even some indexes was never used.
+    //-----------------------------------
+    dumpfile.close();
+}
+
 Array<bool>::~Array()
 {
     delete[] data_;
@@ -711,24 +760,46 @@ Array<bool>::Array(const std::initializer_list<bool>& lst)
     std::copy(lst.begin(), lst.end(), this->begin());
 }
 
-Array<bool>::BitIterator& Array<bool>::operator[](int index)
+Array<bool>::BitReference& Array<bool>::operator[](int index)
 {
     if( index < 0 || index >= size_ )
     {
         throw Exception::EIndexOutOfRange;
     }
-    BitIterator* result = new BitIterator( data_ + ( index / BLOCK_SIZE ), index % BLOCK_SIZE );
+    BitReference* result = new BitReference( data_ + ( index / BLOCK_SIZE ), index % BLOCK_SIZE );
     return *result;
 
 }
 
-size_t Array<bool>::Size()
+Array<bool>& Array<bool>::operator+(Array<bool>& second)
+{
+    if ((Size() + second.Size()) == 0)
+    {
+        Array<bool>* result = new Array<bool>;
+        return *result;
+    }
+
+    Array<bool>* result = new Array<bool>(Size() + second.Size());
+    for (int i=0; i<Size(); ++i)
+    {
+        (*result)[i] = (*this)[i];
+    }
+    for (int i=Size(); i<(Size()+second.Size()); ++i)
+    {
+        (*result)[i] = second[i-Size()];
+    }
+    result->size_ = this->size_ + second.size_;
+    return *result;
+}
+
+size_t Array<bool>::Size() const
 {
     return size_;
 }
 
 void Array<bool>::Resize(size_t size)
 {
+    print("#\n", __PRETTY_FUNCTION__);
     if (( size < ((size_ / BLOCK_SIZE) + 1) * BLOCK_SIZE) && (size >= size_ - (size_ % BLOCK_SIZE)))
     {
         size_ = size;
@@ -737,11 +808,14 @@ void Array<bool>::Resize(size_t size)
     else
     {
         block_type* newdata = new block_type[size / BLOCK_SIZE + 1];
-        for (int i = 0; i <= (size > size_ ? size_/BLOCK_SIZE : size/BLOCK_SIZE); ++i)
+        if (data_ != nullptr)
         {
-            newdata[i] = data_[i];
+            for (int i = 0; i <= (size > size_ ? size_/BLOCK_SIZE : size/BLOCK_SIZE); ++i)
+            {
+                newdata[i] = data_[i];
+            }
+            delete[] data_;
         }
-        delete[] data_;
         data_ = newdata;
         size_ = size;
     }
@@ -755,6 +829,12 @@ void Array<bool>::Clear()
         }
 }
 
+inline void Array<bool>::Swap(Array<bool> &that)
+{
+    std::swap(this->data_,that.data_);
+    std::swap(this->size_,that.size_);
+}
+
 void Array<bool>::Erase(int index)
 {
     for (int i = index; i < size_-1; ++i)
@@ -762,15 +842,20 @@ void Array<bool>::Erase(int index)
         (*this)[i] = (*this)[i+1];
     }
     Resize(size_ - 1);
+    if (size_ == 0)
+    {
+        delete[] data_;
+        data_ = nullptr;
+    }
 }
 
 
 void Array<bool>::Insert(int index, bool element)
 {
     Resize(size_ + 1);
-    for (int i = index; i < size_; ++i)
+    for (int i = index+1; i < size_; i++)
     {
-        (*this)[i+1] = (*this)[i];
+        (*this)[i] = (*this)[i-1];
     }
     (*this)[index] = element;
 }
@@ -795,5 +880,10 @@ Array<bool>::BitIterator Array<bool>::end()
     }
     BitIterator bit(data_ + (size_/BLOCK_SIZE) , size_ % BLOCK_SIZE + 1);
     return bit;
+}
+
+const Array<bool>::block_type* Array<bool>::GetData() const
+{
+    return(data_);
 }
 #endif // ARRAY_H
