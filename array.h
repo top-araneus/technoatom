@@ -573,30 +573,67 @@ void Array<Type>::Resize(int newsize)
 //
 //
 
-/*
 
-class BitReference
-{
-public:
-   block_type* ptr_to_byte;
-   unsigned char number_of_bit;
-};
 
 template<>
 class Array<bool>
 {
 public:
+    typedef char block_type;
+    static const size_t BLOCK_SIZE = sizeof(block_type) * 8;
+    class BitReference
+    {
+    public:
+       block_type* ptr_to_block;
+       unsigned char number_of_bit;
+       BitReference(block_type* ptr, int number);
+       operator bool() const
+       {
+           bool result = ((*ptr_to_block) >> number_of_bit) & 1;
+           return result;
+       }
+       bool operator=(bool right)
+       {
+           if( right )
+           {
+               *ptr_to_block = ( ( *ptr_to_block ) | ( 1 << number_of_bit ) );
+           }
+           else
+           {
+               *ptr_to_block = ( ( *ptr_to_block ) & ~( 1 << number_of_bit ) );
+           }
+           return right;
+       }
+       bool operator=(BitReference right)
+       {
+           bool result;
+           result = *(right.ptr_to_block) & (1 << right.number_of_bit);
+           this->operator =(result);
+           return result;
+       }
+    };
+
+
     Array();
     Array(size_t size);
     ~Array();
-    bool&
+    BitReference& operator[](int index);
+    size_t Size();
 
 private:
     size_t size_;
-    typedef unsigned long long int block_type;
     block_type* data_;
-    static const size_t BLOCK_SIZE = sizeof(block_type);
 };
+
+Array<bool>::BitReference::BitReference(block_type* ptr, int number)
+{
+    if( number < 0 || number >= BLOCK_SIZE)
+    {
+        throw Exception::EIndexOutOfRange;
+    }
+    ptr_to_block = ptr;
+    number_of_bit = number;
+}
 
 Array<bool>::Array()
 {
@@ -608,11 +645,30 @@ Array<bool>::Array(size_t size)
 {
     size_ = size;
     data_ = new block_type[size / BLOCK_SIZE + 1];
+    for (int i=0; i<= (size/BLOCK_SIZE); ++i)
+    {
+        data_[i] = 0;
+    }
 }
 
 Array<bool>::~Array()
 {
     delete[] data_;
 }
-*/
+
+Array<bool>::BitReference& Array<bool>::operator[](int index)
+{
+    if( index < 0 || index >= size_ )
+    {
+        throw Exception::EIndexOutOfRange;
+    }
+    BitReference* result = new BitReference( data_ + ( index / BLOCK_SIZE ), index % BLOCK_SIZE );
+    return *result;
+
+}
+
+size_t Array<bool>::Size()
+{
+    return size_;
+}
 #endif // ARRAY_H
