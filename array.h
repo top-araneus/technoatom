@@ -11,6 +11,8 @@
 #include <cstdlib>
 #include <fstream>
 #include <cstring>
+#include "array_iter.h"
+#include "exception.h"
 using namespace std;
 
 //-----------------------------------
@@ -452,11 +454,10 @@ std::ostream& operator<<(std::ostream& ost, const Array<Type>& that)
     ost << "data_[" << size << "]:" << endl;
 	for (int i = 0; i < size; ++i)
     {
-        ost << "      [" << i << "] = " << (that.GetData())[i] << endl;
+        ost << "      [" << i << "] = " << that[i] << endl;
     }
     return ost;
 }
-
 
 template <typename Type>
 void Array<Type>::Clear()
@@ -574,19 +575,24 @@ void Array<Type>::Resize(int newsize)
 //
 
 
-
 template<>
 class Array<bool>
 {
 public:
-    typedef char block_type;
+    typedef unsigned char block_type;
     static const size_t BLOCK_SIZE = sizeof(block_type) * 8;
-    class BitReference
+    class BitIterator
     {
     public:
+        typedef std::bidirectional_iterator_tag iterator_category;
+        typedef bool value_type;
+        typedef ptrdiff_t difference_type;
+        typedef bool* pointer;
+        typedef bool& reference;
+
        block_type* ptr_to_block;
        unsigned char number_of_bit;
-       BitReference(block_type* ptr, int number);
+       BitIterator(block_type* ptr, int number);
        operator bool() const
        {
            bool result = ((*ptr_to_block) >> number_of_bit) & 1;
@@ -604,12 +610,35 @@ public:
            }
            return right;
        }
-       bool operator=(BitReference right)
+       bool operator=(BitIterator right)
        {
            bool result;
            result = *(right.ptr_to_block) & (1 << right.number_of_bit);
            this->operator =(result);
            return result;
+       }
+       BitIterator& operator++()
+       {
+           if (number_of_bit == BLOCK_SIZE-1)
+           {
+               ptr_to_block++;
+               number_of_bit = 0;
+           }
+           else
+           {
+               number_of_bit++;
+           }
+           return *this;
+       }
+
+       friend bool operator!=(const BitIterator& left, const BitIterator& right)
+       {
+           return ((left.ptr_to_block != right.ptr_to_block) || (left.number_of_bit != right.number_of_bit));
+       }
+
+       BitIterator& operator*()
+       {
+           return *this;
        }
     };
 
@@ -617,15 +646,33 @@ public:
     Array();
     Array(size_t size);
     ~Array();
-    BitReference& operator[](int index);
+    Array(const std::initializer_list<bool>& lst);
+    BitIterator& operator[](int index);
     size_t Size();
-
+    void Resize(size_t size);
+    void Clear();
+    void Erase(int index);
+    void Insert(int index, bool element);
+    void PushBack(bool element);
+    BitIterator begin();
+    BitIterator end();
 private:
     size_t size_;
     block_type* data_;
 };
 
-Array<bool>::BitReference::BitReference(block_type* ptr, int number)
+std::ostream& operator<<(std::ostream& ost, Array<bool>& that)
+{
+    size_t size = that.Size();
+    ost << "data_[" << size << "]:" << endl;
+    for (int i = 0; i < size; ++i)
+    {
+        ost << "      [" << i << "] = " << that[i] << endl;
+    }
+    return ost;
+}
+
+Array<bool>::BitIterator::BitIterator(block_type* ptr, int number)
 {
     if( number < 0 || number >= BLOCK_SIZE)
     {
@@ -656,13 +703,21 @@ Array<bool>::~Array()
     delete[] data_;
 }
 
-Array<bool>::BitReference& Array<bool>::operator[](int index)
+Array<bool>::Array(const std::initializer_list<bool>& lst)
+{
+    std::cout << __PRETTY_FUNCTION__ << std::endl;
+    size_ = lst.size();
+    data_ = new block_type[size_ / BLOCK_SIZE + 1];
+    std::copy(lst.begin(), lst.end(), this->begin());
+}
+
+Array<bool>::BitIterator& Array<bool>::operator[](int index)
 {
     if( index < 0 || index >= size_ )
     {
         throw Exception::EIndexOutOfRange;
     }
-    BitReference* result = new BitReference( data_ + ( index / BLOCK_SIZE ), index % BLOCK_SIZE );
+    BitIterator* result = new BitIterator( data_ + ( index / BLOCK_SIZE ), index % BLOCK_SIZE );
     return *result;
 
 }
@@ -670,5 +725,75 @@ Array<bool>::BitReference& Array<bool>::operator[](int index)
 size_t Array<bool>::Size()
 {
     return size_;
+}
+
+void Array<bool>::Resize(size_t size)
+{
+    if (( size < ((size_ / BLOCK_SIZE) + 1) * BLOCK_SIZE) && (size >= size_ - (size_ % BLOCK_SIZE)))
+    {
+        size_ = size;
+        return;
+    }
+    else
+    {
+        block_type* newdata = new block_type[size / BLOCK_SIZE + 1];
+        for (int i = 0; i <= (size > size_ ? size_/BLOCK_SIZE : size/BLOCK_SIZE); ++i)
+        {
+            newdata[i] = data_[i];
+        }
+        delete[] data_;
+        data_ = newdata;
+        size_ = size;
+    }
+}
+
+void Array<bool>::Clear()
+{
+    for (int i = 0; i <= size_/BLOCK_SIZE; ++i)
+        {
+            data_[i] = 0;
+        }
+}
+
+void Array<bool>::Erase(int index)
+{
+    for (int i = index; i < size_-1; ++i)
+    {
+        (*this)[i] = (*this)[i+1];
+    }
+    Resize(size_ - 1);
+}
+
+
+void Array<bool>::Insert(int index, bool element)
+{
+    Resize(size_ + 1);
+    for (int i = index; i < size_; ++i)
+    {
+        (*this)[i+1] = (*this)[i];
+    }
+    (*this)[index] = element;
+}
+
+void Array<bool>::PushBack(bool element)
+{
+    Insert(size_, element);
+}
+
+Array<bool>::BitIterator Array<bool>::begin()
+{
+    BitIterator bit(data_, 0);
+    return bit;
+}
+
+Array<bool>::BitIterator Array<bool>::end()
+{
+    if (size_ % BLOCK_SIZE == BLOCK_SIZE-1)
+    {
+        BitIterator bit(data_ + (size_/BLOCK_SIZE + 1) , 0);
+        return bit;
+    }
+    BitIterator bit(data_ + (size_/BLOCK_SIZE) , size_ % BLOCK_SIZE + 1);
+    return bit;
 }
 #endif // ARRAY_H

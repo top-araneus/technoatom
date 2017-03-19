@@ -1,6 +1,7 @@
 #ifndef STACKTEST_H
 #define STACKTEST_H
 #include "stack.h"
+#include "exception.h"
 //-----------------------------------
 //! @fn test()
 //! @brief 11 unit tests for stack.

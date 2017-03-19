@@ -1,6 +1,7 @@
 #ifndef ARRAY_ITER_H
 #define ARRAY_ITER_H
 
+#include "exception.h"
 template<typename Type>
 class Array_Iterator
 {

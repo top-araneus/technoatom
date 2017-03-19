@@ -5,8 +5,6 @@
 #include <new>
 #include <cstring>
 #include "print.h"
-#include "exception.h"
-#include "array_iter.h"
 #include "stack.h"
 #include "array.h"
 #include "arraytest.h"
@@ -32,13 +30,13 @@ int main()
     tests->TestAll();
     delete tests;*/
 
-    Array<bool> st(128);
-    st[37] = true;
+    Array<bool> st(18);
+    st[12] = true;
     bool a = false;
-    a = st[37];
-   // std::cout<<st[0];
-  //  Array<double> array = {1.4, 8.8};
-   // std::cout << array << std::endl;
+    a = st[12];
+    std::cout << st;
+ /*   Array<double> array = {1.4, 8.8};
+   std::cout << array << std::endl;*/
 
 
 /*    std::cout << std::endl;
