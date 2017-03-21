@@ -6,7 +6,6 @@
 #include <cstring>
 #include "print.h"
 #include "stack.h"
-#include "array.h"
 #include "arraytest.h"
 #include "stacktest.h"
 using namespace std;
@@ -26,13 +25,13 @@ Array<double> testfunc(Array<double> arr)
 //-----------------------------------
 int main()
 {
-/*    ArrayTest<double>* tests = new ArrayTest<double>;
+	/*ArrayTest<double>* tests = new ArrayTest<double>;
     tests->TestAll();
-    delete tests;*/
+	delete tests;*/
 
-    ArrayTest<bool>* tests = new ArrayTest<bool>;
+	ArrayTest<bool>* tests = new ArrayTest<bool>;
         tests->TestAll();
-        delete tests;
+		delete tests;
 
  /*   Array<double> array = {1.4, 8.8};
    std::cout << array << std::endl;*/

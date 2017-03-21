@@ -1,7 +1,6 @@
 #ifndef STACK_H
 #define STACK_H
 #include "array.h"
-#include "exception.h"
 //-----------------------------------
 //! @file stack.h
 //! Implements a stack class

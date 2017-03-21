@@ -1,9 +1,7 @@
 #ifndef ARRAYTEST_H
 #define ARRAYTEST_H
 #include <iostream>
-#include "arraytest.h"
 #include "array.h"
-#include "exception.h"
 
 const size_t TEST_SIZE=100;
 
