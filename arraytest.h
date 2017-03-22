@@ -1,9 +1,13 @@
+//-----------------------------------
+//! @file arraytest.h
+//! Unit tests for Array class
+//!
+//! team araneus, 2017
+//-----------------------------------
 #ifndef ARRAYTEST_H
 #define ARRAYTEST_H
 #include <iostream>
-#include "arraytest.h"
 #include "array.h"
-#include "exception.h"
 
 const size_t TEST_SIZE=100;
 
@@ -13,6 +17,7 @@ class ArrayTest
 public:
     ArrayTest()
     {
+        std::cout << __PRETTY_FUNCTION__ << std::endl;
         defaultSize=TEST_SIZE;
         std::cout << "Starting array test . . ." << std::endl;
     }
@@ -141,9 +146,9 @@ public:
             //then
             for (size_t i = 0; i < defaultSize; i++)
             {
-                if ((*testarray)[i] != clonearray[i])
+                if ((*testarray)[i] != clonearray[i] )
                 {
-                    std::cout << "|.expected value" << (*testarray)[i] << " and got " << clonearray[i]  << std::endl;
+                    std::cout << "|.expected value " << (*testarray)[i] << " and got " << clonearray[i]  << std::endl;
                     throw Exception::ETestFailed;
                 }
             }
@@ -152,7 +157,7 @@ public:
             {
                 if ( clonearray[i] != static_cast<Type>(i) )
                 {
-                    std::cout << "|.expected value" << static_cast<Type>(i) << " and got " << clonearray[i]  << std::endl;
+                    std::cout << "|.expected value " << static_cast<Type>(i) << " and got " << clonearray[i]  << std::endl;
                     throw Exception::ETestFailed;
                 }
             }

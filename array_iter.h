@@ -1,6 +1,13 @@
+//-----------------------------------
+//! @file array.h
+//! Implements array iterator for operating with Array elements
+//!
+//! team araneus, 2017
+//-----------------------------------
 #ifndef ARRAY_ITER_H
 #define ARRAY_ITER_H
 
+#include "exception.h"
 template<typename Type>
 class Array_Iterator
 {

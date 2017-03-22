@@ -10,7 +10,8 @@
 #include <typeinfo>
 #include <cstdlib>
 #include <fstream>
-#include <cstring>
+#include "array_iter.h"
+#include "bit_iter.h"
 using namespace std;
 
 //-----------------------------------
@@ -22,32 +23,6 @@ class Array
 {
 private:
     //-----------------------------------
-    //! @fn Copy()
-    //! @brief Creates copy of container from args in range of
-    //! provided indexes (including them).
-    //! @arg Type * that is container user wants to copy from
-    //! @arg int first is index from which copying started
-    //! @arg int last is index on which copying finished
-    //! @return Type *: pointer to container with copied elements
-    //-----------------------------------
-    inline Type *Copy(const Type *that, int first, int last);
-
-    //-----------------------------------
-    //! @fn Concat()
-    //! @brief Creates concatenated container from two others
-    //! @arg Type * left is container which stores left elements
-    //! @arg Type * right is container which stores right elements
-    //! @arg size_t leftLen is capacity of left container
-    //! @arg size_t rightLen is capacity of right container
-    //! @return Type *: pointer to concatenated container
-    //-----------------------------------
-    inline Type *Concat(const Type *left, const Type *right, size_t leftLen, size_t rightLen) const;
-    //-----------------------------------
-
-    //-----------------------------------
-    inline Type *Concat(const Type *left,const Type *right, size_t leftLen) const;
-
-    //-----------------------------------
     //! @var int size is a capacity of array
     //-----------------------------------
     int size_;
@@ -58,13 +33,42 @@ private:
 
     Type* data_;
 
-
-    //-----------------------------------
-    //! @brief static const size_t POISON_INT
-    //! is a poison value to fill garbage objects
-    //-----------------------------------
-    static const size_t POISON_INT = 0xBADA55;
 public:
+
+	void* operator new(size_t size) throw (std::bad_alloc)
+	{
+		return ::new Type(size);
+	}
+
+	//-----------------------------------
+	//! @fn operator new(size_t size, void* ptr)
+	//! @brief placement new
+	//! @arg size_t size is a default arg which contains size of type
+	//! @arg void* ptr is an address where object will be created
+	//! @return void* address where object was created (equals to ptr)
+	//-----------------------------------
+	void* operator new(size_t size, void* ptr) throw (std::bad_alloc)
+	{
+		return ptr;
+	}
+
+	//-----------------------------------
+	//! @fn operator new(size_t size, void* ptr, int num)
+	//! @brief initializing placement new.
+	//! When placement new should be called, there should be called
+	//! a copy constructor with reference to this Array in argument
+	//! @example new(&example,0) Array<int>(example); //example is Array user wants to initialize
+	//! @arg size_t size is a default arg which contains size of type
+	//! @arg void* ptr is an address where object will be created
+	//! @arg int num is an initialization key
+	//! @return void* address where object was created (equals to ptr)
+	//-----------------------------------
+	void* operator new(size_t size, void* ptr, int num)
+	{
+		Array<Type> *bufptr = (Array<Type>*)ptr;
+		std::memset(bufptr->data_, num, sizeof(Type)*bufptr->size_);
+		return ptr;
+	}
 
     Array();
     //-----------------------------------
@@ -74,40 +78,12 @@ public:
     //-----------------------------------
     Array(const int size);
 
-    void* operator new(size_t size) throw (std::bad_alloc)
-    {
-        return ::new Type(size);
-    }
-
     //-----------------------------------
-    //! @fn operator new(size_t size, void* ptr)
-    //! @brief placement new
-    //! @arg size_t size is a default arg which contains size of type
-    //! @arg void* ptr is an address where object will be created
-    //! @return void* address where object was created (equals to ptr)
+    //! @fn Array(const Array&& that)
+    //! @brief Moving constructor
+    //! @arg Array&& that is a r-value reference to temporary object
     //-----------------------------------
-    void* operator new(size_t size, void* ptr) throw (std::bad_alloc)
-    {
-        return ptr;
-    }
-
-    //-----------------------------------
-    //! @fn operator new(size_t size, void* ptr, int num)
-    //! @brief initializing placement new.
-    //! When placement new should be called, there should be called
-    //! a copy constructor with reference to this Array in argument
-    //! @example new(&example,0) Array<int>(example); //example is Array user wants to initialize
-    //! @arg size_t size is a default arg which contains size of type
-    //! @arg void* ptr is an address where object will be created
-    //! @arg int num is an initialization key
-    //! @return void* address where object was created (equals to ptr)
-    //-----------------------------------
-    void* operator new(size_t size, void* ptr, int num)
-    {
-        Array<Type> *bufptr = (Array<Type>*)ptr;
-        std::memset(bufptr->data_, num, sizeof(Type)*bufptr->size_);
-        return ptr;
-    }
+    Array(Array&& that);
 
     //-----------------------------------
     //! @fn Array(const Array& that)
@@ -115,6 +91,12 @@ public:
     //! @arg Array& that is a link to array user wants to copy from
     //-----------------------------------
     Array(Array& that);
+
+    //-----------------------------------
+    //! @fn Array(std::initializer_list lst)
+    //! @brief initialization constructor
+    //-----------------------------------
+    Array(const std::initializer_list<Type>& lst);
 
     ~Array();
     //-----------------------------------
@@ -128,7 +110,7 @@ public:
     //-----------------------------------
     //! @fn Insert()
     //! @brief Inserts element to the array, translocating right elements
-    //! @arg int index is a future index of element in array
+	//! @arg int index is a future index of element in array . diaposone = [0...size_].
     //! @arg Type element is an element user wants to insert
     //-----------------------------------
     void Insert(int index,Type element);
@@ -169,6 +151,12 @@ public:
 
     //-----------------------------------
     //! @fn operator=()
+    //! @brief moves that to this array
+    //-----------------------------------
+    Array<Type>& operator=(Array<Type>&& that);
+
+    //-----------------------------------
+    //! @fn operator=()
     //! @brief Makes a copy of array "that" by value.
     //! Resizes this if necessary.
     //! @arg Array<Type>& that is a right value of operator
@@ -191,7 +179,7 @@ public:
     //! @arg Array<Type>& second is an array with future right values
     //! @return Array<Type>& result: result of concatenation
     //-----------------------------------
-    Array<Type>& operator+(const Array<Type>& second) const;
+	Array<Type>& operator+(const Array<Type>& that) const;
 
     //-----------------------------------
     //! @fn Size()
@@ -205,7 +193,7 @@ public:
     //! @brief Creates dump of array - size, all elements from,
     //! state and other debug information.
     //-----------------------------------
-    void Dump() const;
+	void Dump();
 
     //-----------------------------------
     //! @fn Swap()
@@ -226,10 +214,7 @@ public:
     //! @brief Returns const pointer to the beginning of array
     //! @return pointer
     //-----------------------------------
-    const Type* GetData() const
-    {
-        return(data_);
-    }
+    const Type* GetData() const;
 };
 
 //-----------------------------------
@@ -240,11 +225,11 @@ public:
 //! @return std::ostream& : reference to output stream user writes to
 //-----------------------------------
 template <typename Type>
-std::ostream& operator<<(std::ostream& ost, const Array<Type>& that);
+std::ostream& operator<<(std::ostream& ost, Array<Type>& that);
 
 
 
-//===================================
+//-----------------------------------------------------------------=
 
 template <typename Type>
 Array<Type>::Array()
@@ -261,14 +246,30 @@ Array<Type>::Array(const int size)
 }
 
 template <typename Type>
+Array<Type>::Array(Array<Type>&& that)
+{
+	size_ = 0;
+	data_ = nullptr;
+    Swap(that);
+}
+
+template <typename Type>
 Array<Type>::Array(Array<Type>& that)
 {
     if (&that != this)
     {
-        size_ = that.Size();
-        data_ = new Type[size_];
+		data_ = new Type[that.Size()];
+		size_ = that.Size();
         std::copy(that.begin(), that.end(), this->begin());
     }
+}
+
+template <typename Type>
+Array<Type>::Array(const std::initializer_list<Type>& lst)
+{
+    data_ = new Type[size_];
+	size_ = lst.size();
+    std::copy(lst.begin(), lst.end(), this->begin());
 }
 
 template <typename Type>
@@ -288,13 +289,21 @@ Array_Iterator<Type> Array<Type>::begin()
 template <typename Type>
 Array_Iterator<Type> Array<Type>::end()
 {
-    Array_Iterator<Type> it(data_+size_);
+	Array_Iterator<Type> it(data_ + size_);
     return it;
+}
+
+template <typename Type>
+const Type* Array<Type>::GetData() const
+{
+    return(data_);
 }
 
 template <typename Type>
 void Array<Type>::Erase(int index)
 {
+	if ( size_ == 0)
+		return;
     if (index < 0 || index >= size_)
         throw Exception::EIndexOutOfRange;
     else
@@ -321,7 +330,7 @@ void Array<Type>::Erase(int index)
 template <typename Type>
 void Array<Type>::Insert(int index, Type element)
 {
-    if (index < 0 || index >= size_)
+	if (index < 0 || index > size_)
         throw Exception::EIndexOutOfRange;
     else
     {
@@ -353,14 +362,14 @@ Type& Array<Type>::operator [](int index) const
 }
 
 template <typename Type>
-void Array<Type>::Swap(Array<Type> &that)
+inline void Array<Type>::Swap(Array<Type> &that)
 {
     std::swap(this->data_,that.data_);
     std::swap(this->size_,that.size_);
 }
 
 template <typename Type>
-Array<Type>& Array<Type>::operator+=(Array<Type>& that)
+Array<Type>& Array<Type>::operator=(Array<Type>& that)
 {
     if ( this == &that )
     {
@@ -372,7 +381,7 @@ Array<Type>& Array<Type>::operator+=(Array<Type>& that)
 }
 
 template <typename Type>
-Array<Type>& Array<Type>::operator=(Array<Type>& that)
+Array<Type>& Array<Type>::operator+=(Array<Type>& that)
 {
     if ( this == &that )
     {
@@ -382,29 +391,44 @@ Array<Type>& Array<Type>::operator=(Array<Type>& that)
     return *this;
 }
 
+template <typename Type>
+Array<Type>& Array<Type>::operator=(Array<Type>&& that)
+{
+    if ( this == &that )
+    {
+        return *this;
+    }
+    Swap(that);
+    return *this;
+}
 
 template <typename Type>
-Array<Type>& Array<Type>::operator+(const Array<Type>& second) const
+Array<Type>& Array<Type>::operator+(const Array<Type>& that) const
 {
-    Array<Type>* result = new Array<Type>;
-
-    result->data_ = Concat(data_, second.GetData(), this->size_, second.size_);
-    result->size_ = this->size_ + second.size_;
+	if (size_ + that.Size() == 0)
+	{
+		Array<Type>* result = new Array<Type>;
+		return *result;
+	}
+	Array<Type>* result = new Array<Type>(size_ + that.Size());
+	for (int i = 0; i < size_; ++i)
+		(*result)[i] = (*this)[i];
+	for (int i = 0; i < that.Size(); ++i)
+		(*result)[size_ + i] = that[i];
     return *result;
 }
 
 template <typename Type>
-std::ostream& operator<<(std::ostream& ost, const Array<Type>& that)
+std::ostream& operator<<(std::ostream& ost, Array<Type>& that)
 {
     size_t size = that.Size();
     ost << "data_[" << size << "]:" << endl;
-    for (int i=0; i<size; ++i)
+	for (int i = 0; i < size; ++i)
     {
-        ost << "      [" << i << "] = " << (that.GetData())[i] << endl;
+        ost << "      [" << i << "] = " << that[i] << endl;
     }
     return ost;
 }
-
 
 template <typename Type>
 void Array<Type>::Clear()
@@ -418,10 +442,7 @@ void Array<Type>::Clear()
 template <typename Type>
 void Array<Type>::PushBack(Type element)
 {
-    Type* newData = Concat(data_, &element, size_);
-    delete[] data_;
-    data_ = newData;
-    size_++;
+	Insert(size_, element);
 }
 
 template <typename Type>
@@ -431,7 +452,7 @@ size_t Array<Type>::Size() const
 }
 
 template <typename Type>
-void Array<Type>::Dump() const
+void Array<Type>::Dump()
 {
     const char* DUMP_FILENAME = "dumpArray.txt";     //!< name of dump file
     time_t t = time(NULL);                      //!< current system time
@@ -449,51 +470,7 @@ void Array<Type>::Dump() const
 }
 
 template <typename Type>
-inline Type* Array<Type>::Copy(const Type *that, int first, int last)
-{
-    int newSize = last-first+1;
-    Type* newdata = new Type[newSize];
-    for (int i = 0; i < newSize; ++i)
-    {
-        newdata[i] = that[first+i];
-    }
-    if (newSize == 0)
-    {
-        return nullptr;
-    }
-    return newdata;
-}
-
-template <typename Type>
-inline Type* Array<Type>::Concat(const Type *left, const Type *right, const size_t leftLen, const size_t rightLen) const
-{
-    if ( leftLen+rightLen == 0 )
-    {
-        return nullptr;
-    }
-    Type* result = new Type[leftLen+rightLen];
-    for (int i = 0; i < leftLen; ++i)
-        result[i] = left[i];
-    for (int i = 0; i < rightLen; ++i)
-        result[leftLen+i] = right[i];
-    return result;
-
-}
-
-template <typename Type>
-inline Type* Array<Type>::Concat(const Type *left, const Type *right, const size_t leftLen) const
-{
-    Type* result = new Type[leftLen + 1];
-    for (int i = 0; i < leftLen; ++i)
-        result[i] = left[i];
-    result[leftLen] = *right;
-    return result;
-
-}
-
-
-template <typename Type>
-void Array<Type>::Resize(int newsize)
+inline void Array<Type>::Resize(int newsize)
 {   if( newsize < 0 )
     {
         throw Exception::EBadSize;
@@ -517,7 +494,365 @@ void Array<Type>::Resize(int newsize)
     }
 }
 
+//
+//
+//
+//
+
+template<>
+class Array<bool>
+{
+public:
+	//-----------------------------------------------------------------
+	//! block_type and BLOCK_SIZE described in file "bit_iter.h"
+	//-----------------------------------------------------------------
+
+	Array();
+	//-----------------------------------
+	//! @fn Array(int size)
+	//! @brief Constructs array with defined size
+	//! @arg int size is a number of elements array can store
+	//-----------------------------------
+    Array(size_t size);
+    ~Array();
+	//----------------------------------
+	//! @brief copy constructor that uses std::copy
+	//----------------------------------
+    Array(Array<bool>& that);
+
+	//----------------------------------
+	//! @brief move constructor that uses copy and swap semantic
+	//----------------------------------
+    Array(Array<bool>&& that);
+
+	//-----------------------------------------------------------------
+	//! @brief copy assignment
+	//-----------------------------------------------------------------
+    Array<bool>& operator=(Array<bool>& that);
+
+	//-----------------------------------------------------------------
+	//! @brief move assignment
+	//-----------------------------------------------------------------
+    Array<bool>& operator=(Array<bool>&& that);
+
+	//-----------------------------------------------------------------
+	//! @brief writes to file "dump.txt" all information about Array
+	//-----------------------------------------------------------------
+    void Dump();
+
+	//-----------------------------------------------------------------
+	//! @brief shell of std::swap,interchanging fields of objects
+	//-----------------------------------------------------------------
+    inline void Swap(Array<bool>& that);
+
+	//-----------------------------------------------------------------
+	//! @brief concatenation of two Arrays in one and returns new Array
+	//! @arg Array<bool>& - second part of result Array
+	//! @return Array<bool>& - new Array that is result of concatenation
+	//-----------------------------------------------------------------
+    Array<bool>& operator+(Array<bool>& that);
+
+	//-----------------------------------
+	//! @fn Array(std::initializer_list lst)
+	//! @brief initialization constructor
+	//-----------------------------------
+    Array(const std::initializer_list<bool>& lst);
+
+	//-----------------------------------------------------------------
+	//! returns element with needed index
+	//! @arg int - index of element in Array
+	//! @return BitReference& - pointer to bit
+	//-----------------------------------------------------------------
+    BitReference& operator[](int index);
+
+	//-----------------------------------------------------------------
+	//! @brief size_ getter
+	//-----------------------------------------------------------------
+    size_t Size() const;
+
+	//-----------------------------------
+	//! @fn Resize()
+	//! @brief Changes capacity of array (how many elements can it store).
+	//! Deletes last elements if new size is less than old size.
+	//! @arg int newsize is new capacity of array
+	//-----------------------------------
+    void Resize(size_t size);
+
+	//-----------------------------------
+	//! @fn Clear()
+	//! @brief Removes all elements from array with saving size.
+	//-----------------------------------
+    void Clear();
+
+	//-----------------------------------
+	//! @fn Erase()
+	//! @brief Removes element from array, translocating right elements
+	//! @arg int index is index of the element that will be deleted
+	//-----------------------------------
+    void Erase(int index);
+
+	//-----------------------------------
+	//! @fn Insert()
+	//! @brief Inserts element to the array, translocating right elements
+	//! @arg int index is a future index of element in array . diaposone = [0...size_].
+	//! @arg bool element is an element user wants to insert
+	//-----------------------------------
+    void Insert(int index, bool element);
+
+	//-----------------------------------
+	//! @fn PushBack()
+	//! @brief Pushes element to the end of stack with enlarging size.
+	//! @arg Type element is an element user wants to insert
+	//-----------------------------------
+    void PushBack(bool element);
+
+	//-----------------------------------
+	//! @fn begin()
+	//! @brief Returns iterator to begin of Array
+	//! @return BitIterator temporary iterator object
+	//-----------------------------------
+    BitIterator begin();
+
+	//-----------------------------------
+	//! @fn begin()
+	//! @brief Returns iterator to place after the last element
+	//! @return BitIterator temporary iterator object
+	//-----------------------------------
+    BitIterator end();
 
 
+    const block_type* GetData() const;
+private:
+    size_t size_;
+    block_type* data_;
+
+};
+
+std::ostream& operator<<(std::ostream& ost, Array<bool>& that)
+{
+    size_t size = that.Size();
+    ost << "data_[" << size << "]:" << endl;
+    for (size_t i = 0; i < size; ++i)
+    {
+        ost << "      [" << i << "] = " << that[i] << endl;
+    }
+    return ost;
+}
+
+Array<bool>::Array()
+{
+    data_ = nullptr;
+    size_ = 0;
+}
+
+Array<bool>::Array(size_t size)
+{
+    size_ = size;
+    data_ = new block_type[size / BLOCK_SIZE + 1];
+    for (size_t i=0; i<= (size/BLOCK_SIZE); ++i)
+    {
+        data_[i] = 0;
+    }
+}
+
+Array<bool>::Array(Array<bool>&& that)
+{
+	size_ = 0;
+	data_ = nullptr;
+    Swap(that);
+}
+
+Array<bool>::Array(Array<bool>& that)
+{
+    if (&that != this)
+    {
+        size_ = that.Size();
+        data_ = new block_type[size_ / BLOCK_SIZE + 1];
+        std::copy(that.begin(), that.end(), this->begin());
+    }
+}
+
+Array<bool>& Array<bool>::operator=(Array<bool>&& that)
+{
+    if ( this == &that )
+    {
+        return *this;
+    }
+    Swap(that);
+    return *this;
+}
+
+Array<bool>& Array<bool>::operator=(Array<bool>& that)
+{
+    if ( this == &that )
+    {
+        return *this;
+    }
+    Array<bool> victim(that);
+    Swap(victim);
+    return *this;
+}
+
+void Array<bool>::Dump()
+{
+    const char* DUMP_FILENAME = "dumpArray.txt";     //!< name of dump file
+    time_t t = time(NULL);                      //!< current system time
+    std::ofstream dumpfile(DUMP_FILENAME, std::ofstream::app);
+    if (dumpfile.fail())
+        throw Exception::EFileCreationError;
+    dumpfile << "====== ARRAY DUMP ======" << endl;
+    dumpfile << asctime(localtime(&t));
+    dumpfile << "ARRAY " << "addr " << data_ << endl;
+    dumpfile << *this;
+    //-----------------------------------
+    //! Show all data in array, even some indexes was never used.
+    //-----------------------------------
+    dumpfile.close();
+}
+
+Array<bool>::~Array()
+{
+    delete[] data_;
+}
+
+Array<bool>::Array(const std::initializer_list<bool>& lst)
+{
+    size_ = lst.size();
+    data_ = new block_type[size_ / BLOCK_SIZE + 1];
+    std::copy(lst.begin(), lst.end(), this->begin());
+}
+
+BitReference& Array<bool>::operator[](int index)
+{
+    if( index < 0 || index >= size_ )
+    {
+        throw Exception::EIndexOutOfRange;
+    }
+    BitReference* result = new BitReference( data_ + ( index / BLOCK_SIZE ), index % BLOCK_SIZE );
+    return *result;
+
+}
+
+Array<bool>& Array<bool>::operator+(Array<bool>& second)
+{
+    if ((Size() + second.Size()) == 0)
+    {
+        Array<bool>* result = new Array<bool>;
+        return *result;
+    }
+
+    Array<bool>* result = new Array<bool>(Size() + second.Size());
+    for (int i=0; i<Size(); ++i)
+    {
+        (*result)[i] = (*this)[i];
+    }
+    for (int i=Size(); i<(Size()+second.Size()); ++i)
+    {
+        (*result)[i] = second[i-Size()];
+    }
+    result->size_ = this->size_ + second.size_;
+    return *result;
+}
+
+size_t Array<bool>::Size() const
+{
+    return size_;
+}
+
+void Array<bool>::Resize(size_t size)
+{
+	if (size == 0)
+	{
+		delete[] data_;
+		data_ = nullptr;
+		size_ = 0;
+	}
+    if (( size < ((size_ / BLOCK_SIZE) + 1) * BLOCK_SIZE) && (size >= size_ - (size_ % BLOCK_SIZE)))
+    {
+        size_ = size;
+        return;
+    }
+    else
+    {
+        block_type* newdata = new block_type[size / BLOCK_SIZE + 1];
+        if (data_ != nullptr)
+        {
+            for (int i = 0; i <= (size > size_ ? size_/BLOCK_SIZE : size/BLOCK_SIZE); ++i)
+            {
+                newdata[i] = data_[i];
+            }
+            delete[] data_;
+        }
+        data_ = newdata;
+        size_ = size;
+    }
+}
+
+void Array<bool>::Clear()
+{
+    for (int i = 0; i <= size_/BLOCK_SIZE; ++i)
+        {
+            data_[i] = 0;
+        }
+}
+
+inline void Array<bool>::Swap(Array<bool> &that)
+{
+    std::swap(this->data_,that.data_);
+    std::swap(this->size_,that.size_);
+}
+
+void Array<bool>::Erase(int index)
+{
+    for (int i = index; i < size_-1; ++i)
+    {
+        (*this)[i] = (*this)[i+1];
+    }
+    Resize(size_ - 1);
+    if (size_ == 0)
+    {
+        delete[] data_;
+        data_ = nullptr;
+    }
+}
+
+void Array<bool>::Insert(int index, bool element)
+{
+	if (index < 0 || index > size_)
+		throw Exception::EIndexOutOfRange;
+    Resize(size_ + 1);
+    for (int i = index+1; i < size_; i++)
+    {
+        (*this)[i] = (*this)[i-1];
+    }
+    (*this)[index] = element;
+}
+
+void Array<bool>::PushBack(bool element)
+{
+    Insert(size_, element);
+}
+
+BitIterator Array<bool>::begin()
+{
+    BitIterator bit(data_, 0);
+    return bit;
+}
+
+BitIterator Array<bool>::end()
+{
+    if (size_ % BLOCK_SIZE == BLOCK_SIZE-1)
+    {
+        BitIterator bit(data_ + (size_/BLOCK_SIZE + 1) , 0);
+        return bit;
+    }
+    BitIterator bit(data_ + (size_/BLOCK_SIZE) , size_ % BLOCK_SIZE + 1);
+    return bit;
+}
+
+const block_type* Array<bool>::GetData() const
+{
+    return(data_);
+}
 
 #endif // ARRAY_H
