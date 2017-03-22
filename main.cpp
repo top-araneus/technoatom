@@ -25,22 +25,22 @@ Array<double> testfunc(Array<double> arr)
 //-----------------------------------
 int main()
 {
-	/*ArrayTest<double>* tests = new ArrayTest<double>;
+    ArrayTest<double>* tests = new ArrayTest<double>;
     tests->TestAll();
-	delete tests;*/
+    delete tests;
 
-	ArrayTest<bool>* tests = new ArrayTest<bool>;
-        tests->TestAll();
-		delete tests;
+    ArrayTest<bool>* testsBool = new ArrayTest<bool>;
+        testsBool->TestAll();
+        delete testsBool;
 
  /*   Array<double> array = {1.4, 8.8};
    std::cout << array << std::endl;*/
 
 
-/*    std::cout << std::endl;
+    std::cout << std::endl;
 
     test<double>();
-*/
+
     getchar();
     return 0;
 }

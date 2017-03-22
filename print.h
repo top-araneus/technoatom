@@ -1,3 +1,9 @@
+//-----------------------------------
+//! @file print.h
+//! Custom print function.
+//!
+//! author SultanovAR, 2017
+//-----------------------------------
 #ifndef PRINT_H
 #define PRINT_H
 

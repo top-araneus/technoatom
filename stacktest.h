@@ -1,3 +1,9 @@
+//-----------------------------------
+//! @file stacktest.h
+//! Unit tests for Stack class
+//!
+//! team araneus, 2017
+//-----------------------------------
 #ifndef STACKTEST_H
 #define STACKTEST_H
 #include "stack.h"
@@ -14,6 +20,7 @@
 template<typename value_type>
 void test()
 {
+    std::cout << __PRETTY_FUNCTION__ << std::endl;
     cout << "Starting stack test . . .: " << endl;
     //given for all test
     Stack<value_type>* stack;

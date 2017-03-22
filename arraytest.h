@@ -1,3 +1,9 @@
+//-----------------------------------
+//! @file arraytest.h
+//! Unit tests for Array class
+//!
+//! team araneus, 2017
+//-----------------------------------
 #ifndef ARRAYTEST_H
 #define ARRAYTEST_H
 #include <iostream>
@@ -11,6 +17,7 @@ class ArrayTest
 public:
     ArrayTest()
     {
+        std::cout << __PRETTY_FUNCTION__ << std::endl;
         defaultSize=TEST_SIZE;
         std::cout << "Starting array test . . ." << std::endl;
     }
@@ -19,8 +26,8 @@ public:
     {
         TestSquares();;
         TestSquaresOutRange();
-        TestCopy(); //failed
-        TestAssign(); //failed
+        TestCopy();
+        TestAssign();
         TestPlus();
         TestPush();
         TestInsert();

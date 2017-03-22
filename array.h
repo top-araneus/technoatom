@@ -632,7 +632,7 @@ std::ostream& operator<<(std::ostream& ost, Array<bool>& that)
 {
     size_t size = that.Size();
     ost << "data_[" << size << "]:" << endl;
-    for (int i = 0; i < size; ++i)
+    for (size_t i = 0; i < size; ++i)
     {
         ost << "      [" << i << "] = " << that[i] << endl;
     }
@@ -649,7 +649,7 @@ Array<bool>::Array(size_t size)
 {
     size_ = size;
     data_ = new block_type[size / BLOCK_SIZE + 1];
-    for (int i=0; i<= (size/BLOCK_SIZE); ++i)
+    for (size_t i=0; i<= (size/BLOCK_SIZE); ++i)
     {
         data_[i] = 0;
     }
@@ -664,7 +664,6 @@ Array<bool>::Array(Array<bool>&& that)
 
 Array<bool>::Array(Array<bool>& that)
 {
-    std::cout << __PRETTY_FUNCTION__ << std::endl;
     if (&that != this)
     {
         size_ = that.Size();
@@ -675,7 +674,6 @@ Array<bool>::Array(Array<bool>& that)
 
 Array<bool>& Array<bool>::operator=(Array<bool>&& that)
 {
-    std::cout << __PRETTY_FUNCTION__ << std::endl;
     if ( this == &that )
     {
         return *this;
@@ -719,7 +717,6 @@ Array<bool>::~Array()
 
 Array<bool>::Array(const std::initializer_list<bool>& lst)
 {
-    std::cout << __PRETTY_FUNCTION__ << std::endl;
     size_ = lst.size();
     data_ = new block_type[size_ / BLOCK_SIZE + 1];
     std::copy(lst.begin(), lst.end(), this->begin());
