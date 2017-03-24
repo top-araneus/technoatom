@@ -8,6 +8,7 @@
 #include "stack.h"
 #include "arraytest.h"
 #include "stacktest.h"
+#include "smart_ptr.h"
 using namespace std;
 
 Array<double> testfunc(Array<double> arr)

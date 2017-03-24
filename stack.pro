@@ -19,4 +19,5 @@ HEADERS += \
     array_iter.h \
     stacktest.h \
     print.h \
-    bit_iter.h
+    bit_iter.h \
+    smart_ptr.h
