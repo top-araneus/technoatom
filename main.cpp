@@ -26,6 +26,8 @@ Array<double> testfunc(Array<double> arr)
 //-----------------------------------
 int main()
 {
+
+
     ArrayTest<double>* tests = new ArrayTest<double>;
     tests->TestAll();
     delete tests;
