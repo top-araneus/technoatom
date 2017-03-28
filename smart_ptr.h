@@ -2,6 +2,7 @@
 #define SMART_PTR_H
 
 #include <cstdlib>
+#include "exception.h"
 
 template <typename Type>
 class Auto_ptr
@@ -14,6 +15,9 @@ public:
 	Auto_ptr& operator=(Auto_ptr& that);
 	Type& operator*();
 	Type* operator->();
+	bool IsEmpty();
+	template <typename Convertion_Type>
+	    operator Auto_ptr<Convertion_Type>();
 protected:
 	Type* ptr_;
 };
@@ -54,13 +58,34 @@ Auto_ptr<Type>& Auto_ptr<Type>::operator=(Auto_ptr& that)
 template <typename Type>
 Type& Auto_ptr<Type>::operator*()
 {
+	if (IsEmpty())
+	{
+		throw Exception(Exception::ENullDereference, "Try to dereference nullptr", __FILE__, __LINE__, nullptr);
+	}
 	return(*ptr_);
 }
 
 template <typename Type>
 Type* Auto_ptr<Type>::operator->()
 {
+	if (IsEmpty())
+	{
+		throw Exception(Exception::ENullDereference, "Try to dereference nullptr", __FILE__, __LINE__, nullptr);
+	}
 	return(ptr_);
+}
+
+template <typename Type>
+bool Auto_ptr<Type>::IsEmpty()
+{
+	return !ptr_;
+}
+
+template <typename Type>
+template <typename Convertion_Type>
+Auto_ptr<Type>::operator Auto_ptr<Convertion_Type>()
+{
+   return Auto_ptr<Convertion_Type>((Convertion_Type*)ptr_);
 }
 
 template <typename Type>
@@ -117,8 +142,10 @@ public:
     Shared_ptr(Shared_ptr&& that);
     Shared_ptr& operator=(Shared_ptr& that);
     Shared_ptr& operator=(Shared_ptr&& that);
+	size_t GetCount();
     Type& operator*();
     Type* operator->();
+	bool IsEmpty();
 private:
     class SharedProxy
     {
@@ -150,6 +177,16 @@ private:
             NumofRef_++;
             return *this;
         }
+
+		Type* GetPointer()
+		{
+			return pObject_;
+		}
+
+		size_t GetCount()
+		{
+			return NumofRef_;
+		}
     };
 
     SharedProxy* proxy_;
@@ -170,7 +207,7 @@ Shared_ptr<Type>::~Shared_ptr()
 template <typename Type>
 Shared_ptr<Type>::Shared_ptr(Type* pObject)
 {
-    proxy_ = new SharedProxy(pObject);
+	(pObject) ? proxy_ = new SharedProxy(pObject) : proxy_ = nullptr;
 }
 
 template <typename Type>
@@ -206,14 +243,33 @@ Shared_ptr<Type>& Shared_ptr<Type>::operator=(Shared_ptr<Type>&& that)
 template <typename Type>
 Type& Shared_ptr<Type>::operator*()
 {
-    return *(proxy_->pObject_);
+	if (IsEmpty())
+	{
+		throw Exception(Exception::ENullDereference, "Try to dereference nullptr", __FILE__, __LINE__, nullptr);
+	}
+	return *(proxy_->GetPointer());
 }
 
 template <typename Type>
 Type* Shared_ptr<Type>::operator->()
 {
+	if (IsEmpty())
+	{
+		throw Exception(Exception::ENullDereference, "Try to dereference nullptr", __FILE__, __LINE__, nullptr);
+	}
     return proxy_->pObject_;
 }
 
+template <typename Type>
+bool Shared_ptr<Type>::IsEmpty()
+{
+	return !proxy_;
+}
+
+template <typename Type>
+size_t Shared_ptr<Type>::GetCount()
+{
+	return proxy_->GetCount();
+}
 
 #endif // SMART_PTR_H

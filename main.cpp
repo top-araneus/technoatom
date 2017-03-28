@@ -9,6 +9,8 @@
 #include "arraytest.h"
 #include "stacktest.h"
 #include "smart_ptr.h"
+#include "smart_ptr_test.h"
+
 using namespace std;
 
 Array<double> testfunc(Array<double> arr)
@@ -28,7 +30,7 @@ int main()
 {
 
 
-    ArrayTest<double>* tests = new ArrayTest<double>;
+   /* ArrayTest<double>* tests = new ArrayTest<double>;
     tests->TestAll();
     delete tests;
 
@@ -36,14 +38,29 @@ int main()
         testsBool->TestAll();
         delete testsBool;
 
- /*   Array<double> array = {1.4, 8.8};
-   std::cout << array << std::endl;*/
+
 
 
     std::cout << std::endl;
 
-    test<double>();
+	test<double>();*/
 
+//	test_auto_ptr();
+Test_auto_ptr<int> test_auto;
+Test_unique_ptr<int> test_unique;
+Test_shared_ptr<int> test_shared;
+test_auto.Copy();
+test_auto.Arrow();
+test_unique.MoveAssignment();
+test_unique.MoveCopy();
+test_unique.Arrow();
+test_shared.Copy();
+test_shared.Assignment();
+test_shared.Arrow();
+test_shared.CountIncrease();
+test_shared.CountDecreaseDelete();
+test_shared.CountDecreaseAssignment();
+test_shared.CountMove();
     getchar();
     return 0;
 }

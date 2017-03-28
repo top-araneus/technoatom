@@ -11,6 +11,8 @@
 Exception(ERRCODE, DESC, __FILE__, __LINE__, PARENT) \
 
 #include <exception>
+#include <iomanip>
+
 class Exception : public std::exception
 {
 public:
@@ -23,6 +25,7 @@ public:
     static const int ETestFailed = 0x7F;
     static const int EIterHasNoArray = 0x1A;
     static const int EDullException = 0xDE;
+	static const int ENullDereference = 0xDB;
     int errcode_;
     char* description_;
     char* file_;
