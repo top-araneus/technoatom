@@ -287,6 +287,13 @@ public:
     //-----------------------------------
 	bool IsEmpty();
 
+    //-----------------------------------
+    //! @fn operator Shared_ptr<Convertion_Type>()
+    //! @brief operator for using pointer as a pointer of another type
+    //-----------------------------------
+    template <typename Convertion_Type>
+        operator Shared_ptr<Convertion_Type>();
+
 private:
     //-----------------------------------
     //! @brief SharedProxy class. It's a counter for objects that contains pointers to address pObject_.
@@ -434,4 +441,10 @@ size_t Shared_ptr<Type>::GetCount()
 	return proxy_->GetCount();
 }
 
+template <typename Type>
+template <typename Convertion_Type>
+Shared_ptr<Type>::operator Shared_ptr<Convertion_Type>()
+{
+   return Shared_ptr<Convertion_Type>((Convertion_Type*)(proxy_->GetPointer()));
+}
 #endif // SMART_PTR_H
