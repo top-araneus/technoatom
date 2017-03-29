@@ -1,15 +1,40 @@
+//-----------------------------------
+//! @file smart_ptr_test.h
+//! Unit tests for custom smart pointers
+//!
+//! team araneus, 2017
+//-----------------------------------
 #ifndef SMART_PTR_TEST_H
 #define SMART_PTR_TEST_H
 #include "smart_ptr.h"
 #include "array.h"
 
+//-----------------------------------
+//! @brief Tests for auto_ptr.
+//! Contains assignment, copy and arrow tests.
+//-----------------------------------
 template <typename Type>
 class Test_auto_ptr
 {
 public:
-	static const int TEST_VALUE = 10;
+    static const int TEST_VALUE = 10;
+
+    void TestAll()
+    {
+        print("Starting tests for Auto_ptr \n");
+        Assignment();
+        Copy();
+        Arrow();
+        print("Tests finished. \n\n");
+    }
+
+    //-----------------------------------
+    //! @fn Assignment()
+    //! @brief Test for dereferencing and assignment between auto_ptrs
+    //-----------------------------------
 	void Assignment()
 	{
+        print("/# \n", __PRETTY_FUNCTION__);
 		try
 		{
 			//given
@@ -32,8 +57,13 @@ public:
 		}
 	}
 
+    //-----------------------------------
+    //! @fn Copy()
+    //! @brief Test for auto_ptr's copy constructor
+    //-----------------------------------
 	void Copy()
-	{
+    {
+        print("/# \n", __PRETTY_FUNCTION__);
 		try
 		{
 			//given
@@ -55,8 +85,14 @@ public:
 		}
 	}
 
+    //-----------------------------------
+    //! @fn Arrow()
+    //! @brief Test for operator ->,
+    //! using auto_ptr as simple pointer to object
+    //-----------------------------------
 	void Arrow()
-	{
+    {
+        print("/# \n", __PRETTY_FUNCTION__);
 		try
 		{
 			//given
@@ -77,36 +113,32 @@ public:
 
 };
 
+//-----------------------------------
+//! @brief Tests for unique_ptr.
+//! Contains move assignment, move constructor and arrow tests.
+//-----------------------------------
 template <typename Type>
 class Test_unique_ptr
 {
 public:
-	static const int TEST_VALUE = 10;
-	void Assignment()
-	{
-		try
-		{
-			//given
-			Unique_ptr<Type> p1_unique(new Type);
-			Unique_ptr<Type> p2_unique(new Type);
-			*p1_unique = TEST_VALUE;
-			//when
-			//		p2_unique = p1_unique;
-			//then
-			if(*p2_unique != TEST_VALUE)
-			{
-				throw EXCEPT(Exception::ETestFailed, "Wrong assignment", nullptr);
-			}
-			*p1_unique;
-		}
-		catch(Exception err)
-		{
-			if(err.errcode_ != Exception::ENullDereference)
-				std::cout << err;
-		}
-	}
+    static const int TEST_VALUE = 10;
+
+    void TestAll()
+    {
+        print("Starting tests for Unique_ptr \n");
+        MoveAssignment();
+        MoveCopy();
+        Arrow();
+        print("Tests finished. \n\n");
+    }
+
+    //-----------------------------------
+    //! @fn MoveAssignment()
+    //! @brief Test for assignment temporary object to unique_ptr
+    //-----------------------------------
 	void MoveAssignment()
-	{
+    {
+        print("/# \n", __PRETTY_FUNCTION__);
 		try
 		{
 			//given
@@ -126,9 +158,13 @@ public:
 			std::cout << err;
 		}
 	}
-
+    //-----------------------------------
+    //! @fn MoveCopy()
+    //! @brief Test for initializing unique_ptr by temporary object
+    //-----------------------------------
 	void MoveCopy()
-	{
+    {
+        print("/# \n", __PRETTY_FUNCTION__);
 		try
 		{
 			//given
@@ -147,9 +183,14 @@ public:
 			std::cout << err;
 		}
 	}
-
+    //-----------------------------------
+    //! @fn Arrow()
+    //! @brief Test for operator ->,
+    //! using unique_ptr as simple pointer to object
+    //-----------------------------------
 	void Arrow()
-	{
+    {
+        print("/# \n", __PRETTY_FUNCTION__);
 		try
 		{
 			//given
@@ -170,6 +211,11 @@ public:
 
 };
 
+//-----------------------------------
+//! @brief Tests for shared_ptr
+//! Contains assignment, copy, arrow tests,
+//! and tests for operations with proxy.
+//-----------------------------------
 template <typename Type>
 class Test_shared_ptr
 {
@@ -178,18 +224,35 @@ public:
 	static const int TEST_VALUE = 10;
 	static const int TEST_VALUE_2 = 100;
 
+    void TestAll()
+    {
+        print("Starting tests for Shared_ptr \n");
+        Assignment();
+        Copy();
+        Arrow();
+        CountIncrease();
+        CountDecreaseDelete();
+        CountDecreaseAssignment();
+        CountMove();
+        print("Tests finished. \n\n");
+    }
+    //-----------------------------------
+    //! @fn Assignment()
+    //! @brief Test for dereferencing and assignment between shared_ptrs
+    //-----------------------------------
 	void Assignment()
-	{
+    {
+        print("/# \n", __PRETTY_FUNCTION__);
 		try
 		{
 			//given
-			Shared_ptr<Type> p1_auto(new Type);
-			Shared_ptr<Type> p2_auto(new Type);
-			*p1_auto = TEST_VALUE;
+            Shared_ptr<Type> p1_shared(new Type);
+            Shared_ptr<Type> p2_shared(new Type);
+            *p1_shared = TEST_VALUE;
 			//when
-			p2_auto = p1_auto;
+            p2_shared = p1_shared;
 			//then
-			if(*p1_auto != static_cast<Type>(TEST_VALUE) || *p2_auto != static_cast<Type>(TEST_VALUE) )
+            if(*p1_shared != static_cast<Type>(TEST_VALUE) || *p2_shared != static_cast<Type>(TEST_VALUE) )
 			{
 				throw EXCEPT(Exception::ETestFailed, "Wrong assignment", nullptr);
 			}
@@ -200,9 +263,13 @@ public:
 			std::cout << err;
 		}
 	}
-
+    //-----------------------------------
+    //! @fn Copy()
+    //! @brief Test for shared_ptr's copy constructor
+    //-----------------------------------
 	void Copy()
-	{
+    {
+        print("/# \n", __PRETTY_FUNCTION__);
 		try
 		{
 			//given
@@ -221,9 +288,14 @@ public:
 			std::cout << err;
 		}
 	}
-
+    //-----------------------------------
+    //! @fn Arrow()
+    //! @brief Test for operator ->,
+    //! using shared_ptr as simple pointer to object
+    //-----------------------------------
 	void Arrow()
-	{
+    {
+        print("/# \n", __PRETTY_FUNCTION__);
 		try
 		{
 			//given
@@ -241,9 +313,14 @@ public:
 			std::cout << err;
 		}
 	}
-
+    //-----------------------------------
+    //! @fn CountIncrease()
+    //! @brief Test for proxy and increasing number of links
+    //! if permanent shared_ptr was initialized by existing shared_ptr
+    //-----------------------------------
 	void CountIncrease()
-	{
+    {
+        print("/# \n", __PRETTY_FUNCTION__);
 		try
 		{
 			//given
@@ -262,9 +339,14 @@ public:
 			std::cout << err;
 		}
 	}
-
+    //-----------------------------------
+    //! @fn CountDecreaseDelete()
+    //! @brief Test for proxy and decreasing number of links
+    //! when connected with proxy object was deleted
+    //-----------------------------------
 	void CountDecreaseDelete()
-	{
+    {
+        print("/# \n", __PRETTY_FUNCTION__);
 		try
 		{
 			//given
@@ -285,8 +367,14 @@ public:
 			std::cout << err;
 		}
 	}
+    //-----------------------------------
+    //! @fn CountDecreaseAssignment()
+    //! @brief Test for proxy and decreasing number of links
+    //! when connected with proxy object was reassigned
+    //-----------------------------------
 	void CountDecreaseAssignment()
-	{
+    {
+        print("/# \n", __PRETTY_FUNCTION__);
 		try
 		{
 			//given
@@ -309,9 +397,14 @@ public:
 			std::cout << err;
 		}
 	}
-
+    //-----------------------------------
+    //! @fn CountDecreaseAssignment()
+    //! @brief Test for proxy: count of references
+    //! mustn't change if rvalue object was initialized with same proxy
+    //-----------------------------------
 	void CountMove()
-	{
+    {
+        print("/# \n", __PRETTY_FUNCTION__);
 		try
 		{
 			//given

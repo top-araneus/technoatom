@@ -46,9 +46,11 @@ int main()
 	test<double>();*/
 
 //	test_auto_ptr();
-Test_auto_ptr<int> test_auto;
-Test_unique_ptr<int> test_unique;
-Test_shared_ptr<int> test_shared;
+    Test_auto_ptr<int> test_auto;
+    Test_unique_ptr<int> test_unique;
+    Test_shared_ptr<int> test_shared;
+
+/*test_auto.Assignment();
 test_auto.Copy();
 test_auto.Arrow();
 test_unique.MoveAssignment();
@@ -60,7 +62,11 @@ test_shared.Arrow();
 test_shared.CountIncrease();
 test_shared.CountDecreaseDelete();
 test_shared.CountDecreaseAssignment();
-test_shared.CountMove();
+test_shared.CountMove();*/
+
+    test_auto.TestAll();
+    test_unique.TestAll();
+    test_shared.TestAll();
     getchar();
     return 0;
 }
