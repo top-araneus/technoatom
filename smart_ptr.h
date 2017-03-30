@@ -70,7 +70,7 @@ public:
 	template <typename Convertion_Type>
 	    operator Auto_ptr<Convertion_Type>();
 
-protected:
+private:
     Type* ptr_; //!< Type* ptr_ is a simple pointer that is contained in auto_ptr
 };
 
@@ -102,9 +102,13 @@ Auto_ptr<Type>::Auto_ptr(Type *pObject)
 template <typename Type>
 Auto_ptr<Type>& Auto_ptr<Type>::operator=(Auto_ptr& that)
 {
-	delete ptr_;
-	ptr_ = nullptr;
-	std::swap(this->ptr_, that.ptr_);
+    if (this != &that)
+    {
+        delete ptr_;
+        ptr_ = nullptr;
+        std::swap(this->ptr_, that.ptr_);
+    }
+    return *this;
 }
 
 template <typename Type>
@@ -145,7 +149,7 @@ Auto_ptr<Type>::operator Auto_ptr<Convertion_Type>()
 //! Unique_ptr works as pointer, but copy and assignment are forbidden for permanent objects.
 //-----------------------------------
 template <typename Type>
-class Unique_ptr : public Auto_ptr<Type>
+class Unique_ptr
 {
     public:
         Unique_ptr();
@@ -157,6 +161,8 @@ class Unique_ptr : public Auto_ptr<Type>
         //! @arg Type* pObject is a pointer that will be saved to this Unique_ptr
         //-----------------------------------
         Unique_ptr(Type* pObject);
+
+        //!< Copy semantics is forbidden for Unique_ptr
         Unique_ptr(Unique_ptr& that) = delete;
         Unique_ptr& operator=(Unique_ptr& that) = delete;
 
@@ -176,6 +182,35 @@ class Unique_ptr : public Auto_ptr<Type>
         //! @return this Unique_ptr
         //-----------------------------------
         Unique_ptr& operator=(Unique_ptr&& that);
+
+        //-----------------------------------
+        //! @fn Type& operator*()
+        //! @brief Depointing operator
+        //! @return reference to value of object
+        //-----------------------------------
+        Type& operator*();
+
+        //-----------------------------------
+        //! @fn Type& operator->()
+        //! @brief operator for access to fields of object inside
+        //! @return simple pointer to object
+        //-----------------------------------
+        Type* operator->();
+
+        //-----------------------------------
+        //! @fn bool IsEmpty()
+        //! @return true if pointer is null
+        //-----------------------------------
+        bool IsEmpty();
+
+        //-----------------------------------
+        //! @fn operator Unique_ptr<Convertion_Type>()
+        //! @brief operator for using pointer as a pointer of another type
+        //-----------------------------------
+        template <typename Convertion_Type>
+            operator Unique_ptr<Convertion_Type>();
+private:
+    Type* ptr_; //!< Type* ptr_ is a simple pointer that is contained in Unique_ptr
 };
 
 template <typename Type>
@@ -207,6 +242,39 @@ Unique_ptr<Type>& Unique_ptr<Type>::operator=(Unique_ptr&& that)
 {
 	std::swap(this->ptr_, that.ptr_);
     return *this;
+}
+
+template <typename Type>
+Type& Unique_ptr<Type>::operator*()
+{
+    if (IsEmpty())
+    {
+        throw Exception(Exception::ENullDereference, "Try to dereference nullptr", __FILE__, __LINE__, nullptr);
+    }
+    return(*ptr_);
+}
+
+template <typename Type>
+Type* Unique_ptr<Type>::operator->()
+{
+    if (IsEmpty())
+    {
+        throw Exception(Exception::ENullDereference, "Try to dereference nullptr", __FILE__, __LINE__, nullptr);
+    }
+    return(ptr_);
+}
+
+template <typename Type>
+bool Unique_ptr<Type>::IsEmpty()
+{
+    return !ptr_;
+}
+
+template <typename Type>
+template <typename Convertion_Type>
+Unique_ptr<Type>::operator Unique_ptr<Convertion_Type>()
+{
+   return Unique_ptr<Convertion_Type>((Convertion_Type*)ptr_);
 }
 
 //-----------------------------------
@@ -304,6 +372,7 @@ private:
         Type* pObject_;
         size_t NumofRef_;
     public:
+
         //-----------------------------------
         //! @fn SharedProxy(Type* pObject)
         //! @brief Initializing constructor
@@ -317,26 +386,26 @@ private:
 
         ~SharedProxy()
         {
-            if (NumofRef_ == 1)
-            {
-                delete pObject_;
-                pObject_ = nullptr;
-            }
-            else
-            {
-                NumofRef_--;
-            }
+            NumofRef_ = 0;
+            delete pObject_;
         }
 
         //-----------------------------------
-        //! @fn SharedProxy& operator++()
+        //! @fn void Increase()
         //! @brief Increases number of references.
-        //! @return this SharedProxy
         //-----------------------------------
-        SharedProxy& operator ++()
+        void Increase()
         {
             NumofRef_++;
-            return *this;
+        }
+
+        //-----------------------------------
+        //! @fn void Decrease()
+        //! @brief Decreases number of references.
+        //-----------------------------------
+        void Decrease()
+        {
+            NumofRef_--;
         }
 
         //-----------------------------------
@@ -364,26 +433,30 @@ private:
 template <typename Type>
 Shared_ptr<Type>::Shared_ptr()
 {
-    proxy_ = nullptr;
+    proxy_ = new SharedProxy(nullptr);
 }
 
 template <typename Type>
 Shared_ptr<Type>::~Shared_ptr()
 {
-    delete proxy_;
+    if (proxy_->GetCount() > 1)
+        proxy_->Decrease();
+    else
+        delete proxy_;
 }
+
 
 template <typename Type>
 Shared_ptr<Type>::Shared_ptr(Type* pObject)
 {
-	(pObject) ? proxy_ = new SharedProxy(pObject) : proxy_ = nullptr;
+    proxy_ = new SharedProxy(pObject);
 }
 
 template <typename Type>
 Shared_ptr<Type>::Shared_ptr(Shared_ptr<Type> &that)
 {
     proxy_ = that.proxy_;
-    ++(*proxy_);
+    proxy_->Increase();
 }
 
 template <typename Type>
@@ -396,9 +469,15 @@ Shared_ptr<Type>::Shared_ptr(Shared_ptr<Type>&& that)
 template <typename Type>
 Shared_ptr<Type>& Shared_ptr<Type>::operator=(Shared_ptr<Type>& that)
 {
-    delete proxy_;
-    proxy_ = that.proxy_;
-    ++(*proxy_);
+    if (this != &that)
+    {
+        if (proxy_->GetCount() > 1)
+            proxy_->Decrease();
+        else
+            delete proxy_;
+        proxy_ = that.proxy_;
+        proxy_->Increase();
+    }
     return *this;
 }
 
@@ -432,7 +511,7 @@ Type* Shared_ptr<Type>::operator->()
 template <typename Type>
 bool Shared_ptr<Type>::IsEmpty()
 {
-	return !proxy_;
+    return !(proxy_->GetPointer());
 }
 
 template <typename Type>

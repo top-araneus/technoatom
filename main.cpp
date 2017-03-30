@@ -63,10 +63,11 @@ test_shared.CountIncrease();
 test_shared.CountDecreaseDelete();
 test_shared.CountDecreaseAssignment();
 test_shared.CountMove();*/
-
-    test_auto.TestAll();
+/*    test_auto.TestAll();
     test_unique.TestAll();
-    test_shared.TestAll();
+    test_shared.TestAll();*/
+    while (1)
+        test_shared.CountDecreaseDelete();
     getchar();
     return 0;
 }

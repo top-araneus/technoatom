@@ -350,16 +350,26 @@ public:
 		try
 		{
 			//given
-			Shared_ptr<Type> p1_shared(new Type);
+            print("/# \n", __LINE__);
+            Type* a = new Type;
+            *a = 0;
+            Shared_ptr<Type> p1_shared(a);
+            print("/# \n", __LINE__);
 			*p1_shared = static_cast<Type>(TEST_VALUE);
 			//when
-			Shared_ptr<Type> p2_shared = p1_shared;
-			delete &p1_shared;
-			//then
-			if(p2_shared.GetCount() != 1 || *p2_shared != static_cast<Type>(TEST_VALUE) )
+            print("/# \n", __LINE__);
+
+            {
+                Shared_ptr<Type> p2_shared = p1_shared;
+                print("/# \n", __LINE__);
+            }
+
+            //then
+            print("/# \n", __LINE__);
+            if(p1_shared.GetCount() != 1 || *p1_shared != static_cast<Type>(TEST_VALUE) )
 			{
 				throw EXCEPT(Exception::ETestFailed, "count not decrease", nullptr);
-			}
+            }
 
 		}
 		catch(Exception err)
