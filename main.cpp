@@ -10,7 +10,7 @@
 #include "stacktest.h"
 #include "smart_ptr.h"
 #include "smart_ptr_test.h"
-
+#include "alu.h"
 using namespace std;
 
 
@@ -31,12 +31,10 @@ Array<double> testfunc(Array<double> arr)
 int main()
 {
 
-while(1)
-{
-   ArrayTest<double>* tests = new ArrayTest<double>;
-   tests->TestAll();
+/*    ArrayTest<double>* tests = new ArrayTest<double>;
+    tests->TestAll();
     delete tests;
-  ArrayTest<bool>* testsBool = new ArrayTest<bool>;
+    ArrayTest<bool>* testsBool = new ArrayTest<bool>;
     testsBool->TestAll();
     delete testsBool;
 
@@ -50,8 +48,9 @@ while(1)
     test_unique.TestAll();
     test_shared.TestAll();
 
-    hack_ptrs<int>();
-}
+    hack_ptrs<int>();*/
+    ALU alu;
+
     getchar();
     return 0;
 }

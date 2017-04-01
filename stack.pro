@@ -21,4 +21,5 @@ HEADERS += \
     print.h \
     bit_iter.h \
     smart_ptr.h \
-    smart_ptr_test.h
+    smart_ptr_test.h \
+    alu.h
