@@ -97,7 +97,6 @@ private:
     static const size_t SIZE_STEP = 5;   //!< When stack is full, its capacity will be increased to this value
     size_t capacity_;                     //!< Max number of elements stack can contain without enlarging
     size_t size_;                   //!< Number of elements in a stack now
-    // value_type* data;                    //!< Container of stack elements
     Array<value_type>* data_;
 };
 //-----------------------------------
@@ -105,10 +104,9 @@ template<typename value_type>
 Stack<value_type>::Stack()
 {
     capacity_ = SIZE_STEP;
-    //data = (value_type*)malloc(capacity_*sizeof(value_type));
     data_ = new Array<value_type>(capacity_);
-    if (data_->GetData() == nullptr)
-        throw Exception::EMemAllocError;
+ /*   if (data_->GetData() == nullptr)
+        throw EMemAllocError(__FL__);*/
     size_ = 0;
 }
 //-----------------------------------
@@ -118,8 +116,6 @@ Stack<value_type>::Stack(const Stack<value_type>& that)
     if (&that != this)
     {
         this->data_ = new Array<value_type>(that.capacity());
-        if (this->data_->GetData() == nullptr)
-            throw Exception::EMemAllocError;
         this->size_ = that.size();
         this->capacity_ = that.capacity();
         for (size_t i = 0; i<size_; ++i)
@@ -130,10 +126,7 @@ Stack<value_type>::Stack(const Stack<value_type>& that)
 template<typename value_type>
 Stack<value_type>::~Stack()
 {
-    size_ = POISON_INT;
-    capacity_ = POISON_INT;
     delete data_;
-    // data = (value_type*)realloc(data, 0);
 }
 //-----------------------------------
 template<typename value_type>
@@ -143,8 +136,6 @@ Stack<value_type>& Stack<value_type>::operator=(Stack<value_type>& rArg)
     {
         data_->Resize(0);
         data_->Resize(rArg.capacity());
-        if (data_->GetData() == nullptr)
-            throw Exception::EMemAllocError;
         this->size_ = rArg.size();
         this->capacity_ = rArg.capacity();
         for (size_t i = 0; i<size_; ++i)
@@ -162,7 +153,7 @@ value_type Stack<value_type>::top()
     }
     else
     {
-        throw Exception::EStackIsEmpty;
+        throw EStackIsEmpty(__FL__);
     }
 }
 //-----------------------------------
@@ -190,12 +181,7 @@ void Stack<value_type>::push(value_type value)
     if (size_ == capacity_-1)                                       //!< stack is full
     {
         capacity_ += SIZE_STEP;
-        //data = (value_type*)realloc(data, capacity_*sizeof(value_type)); //!< adding space for another SIZE_STEP elements
         data_->Resize(capacity_);
-        if (data_->GetData() == nullptr)                                               //!< if realloc failed
-        {
-            throw Exception::EMemAllocError;
-        }
     }
     (*data_)[size_++] = value;
 }
@@ -208,17 +194,12 @@ value_type Stack<value_type>::pop()
         if (capacity_-size_ > SIZE_STEP)
         {
             capacity_ -= SIZE_STEP;
-            //data = (value_type*)realloc(data, capacity_*sizeof(value_type));
             data_->Resize(capacity_);
-            if (data_->GetData() == nullptr)                                               //!< if realloc failed
-            {
-                throw Exception::EMemAllocError;
-            }
         }
         return (*data_)[--size_];   //!< dont forget to decrease stack size
     }
     else
-        throw Exception::EStackIsEmpty;
+        throw EStackIsEmpty(__FL__);
 }
 //-----------------------------------
 template<typename value_type>
@@ -235,7 +216,7 @@ void Stack<value_type>::dump()
     time_t t = time(NULL);                      //!< current system time
     std::ofstream dumpfile(DUMP_FILENAME, std::ofstream::app);
     if (dumpfile.fail())
-        throw Exception::EFileCreationError;
+        throw EFileCreationError(__FL__);
     dumpfile << "====== STACK DUMP ======" << endl;
     dumpfile << asctime(localtime(&t));
     dumpfile << "STACK " << (ok() ? "(OK)" : "(ERROR)") << endl;

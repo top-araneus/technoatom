@@ -35,10 +35,13 @@ private:
 
 public:
 
-	void* operator new(size_t size) throw (std::bad_alloc)
-	{
-		return ::new Type(size);
-	}
+    void* operator new(size_t size) throw (std::bad_alloc)
+    {
+        void* ptr = malloc(size);
+        if (!ptr)
+            throw EMemAllocError(__FL__);
+        return ptr;
+    }
 
 	//-----------------------------------
 	//! @fn operator new(size_t size, void* ptr)
@@ -50,7 +53,7 @@ public:
 	void* operator new(size_t size, void* ptr) throw (std::bad_alloc)
 	{
 		return ptr;
-	}
+    }
 
 	//-----------------------------------
 	//! @fn operator new(size_t size, void* ptr, int num)
@@ -177,9 +180,9 @@ public:
     //! @fn operator+()
     //! @brief Concatenates this array and array from args
     //! @arg Array<Type>& second is an array with future right values
-    //! @return Array<Type>& result: result of concatenation
+    //! @return Array<Type> result: result of concatenation
     //-----------------------------------
-	Array<Type>& operator+(const Array<Type>& that) const;
+    Array<Type> operator+(const Array<Type>& that) const;
 
     //-----------------------------------
     //! @fn Size()
@@ -305,7 +308,7 @@ void Array<Type>::Erase(int index)
 	if ( size_ == 0)
 		return;
     if (index < 0 || index >= size_)
-        throw Exception::EIndexOutOfRange;
+        throw EIndexOutOfRange(__FL__);
     else
     {
         Type* newData = nullptr;
@@ -331,7 +334,7 @@ template <typename Type>
 void Array<Type>::Insert(int index, Type element)
 {
 	if (index < 0 || index > size_)
-        throw Exception::EIndexOutOfRange;
+        throw EIndexOutOfRange(__FL__);
     else
     {
         Type* newData = new Type[size_ + 1];
@@ -356,7 +359,7 @@ Type& Array<Type>::operator [](int index) const
 {
     if (index < 0 || index >= size_)
     {
-        throw Exception::EIndexOutOfRange;
+        throw EIndexOutOfRange(__FL__);
     }
     return data_[index];
 }
@@ -403,19 +406,19 @@ Array<Type>& Array<Type>::operator=(Array<Type>&& that)
 }
 
 template <typename Type>
-Array<Type>& Array<Type>::operator+(const Array<Type>& that) const
+Array<Type> Array<Type>::operator+(const Array<Type>& that) const
 {
 	if (size_ + that.Size() == 0)
 	{
-		Array<Type>* result = new Array<Type>;
-		return *result;
+        Array<Type> result (0);
+        return result;
 	}
-	Array<Type>* result = new Array<Type>(size_ + that.Size());
+    Array<Type> result(size_ + that.Size());
 	for (int i = 0; i < size_; ++i)
-		(*result)[i] = (*this)[i];
+        result[i] = (*this)[i];
 	for (int i = 0; i < that.Size(); ++i)
-		(*result)[size_ + i] = that[i];
-    return *result;
+        result[size_ + i] = that[i];
+    return result;
 }
 
 template <typename Type>
@@ -458,7 +461,7 @@ void Array<Type>::Dump()
     time_t t = time(NULL);                      //!< current system time
     std::ofstream dumpfile(DUMP_FILENAME, std::ofstream::app);
     if (dumpfile.fail())
-        throw Exception::EFileCreationError;
+        throw EFileCreationError(__FL__);
     dumpfile << "====== ARRAY DUMP ======" << endl;
     dumpfile << asctime(localtime(&t));
     dumpfile << "ARRAY " << "addr " << data_ << endl;
@@ -473,7 +476,7 @@ template <typename Type>
 inline void Array<Type>::Resize(int newsize)
 {   if( newsize < 0 )
     {
-        throw Exception::EBadSize;
+        throw EBadSize(__FL__);
     }
     if( newsize == 0 )
     {
@@ -550,7 +553,7 @@ public:
 	//! @arg Array<bool>& - second part of result Array
 	//! @return Array<bool>& - new Array that is result of concatenation
 	//-----------------------------------------------------------------
-    Array<bool>& operator+(Array<bool>& that);
+    Array<bool> operator+(Array<bool>& that);
 
 	//-----------------------------------
 	//! @fn Array(std::initializer_list lst)
@@ -563,7 +566,7 @@ public:
 	//! @arg int - index of element in Array
 	//! @return BitReference& - pointer to bit
 	//-----------------------------------------------------------------
-    BitReference& operator[](int index);
+    BitReference operator[](int index);
 
 	//-----------------------------------------------------------------
 	//! @brief size_ getter
@@ -664,12 +667,9 @@ Array<bool>::Array(Array<bool>&& that)
 
 Array<bool>::Array(Array<bool>& that)
 {
-    if (&that != this)
-    {
-        size_ = that.Size();
-        data_ = new block_type[size_ / BLOCK_SIZE + 1];
-        std::copy(that.begin(), that.end(), this->begin());
-    }
+    size_ = that.Size();
+    data_ = new block_type[size_ / BLOCK_SIZE + 1];
+    std::copy(that.begin(), that.end(), this->begin());
 }
 
 Array<bool>& Array<bool>::operator=(Array<bool>&& that)
@@ -699,7 +699,7 @@ void Array<bool>::Dump()
     time_t t = time(NULL);                      //!< current system time
     std::ofstream dumpfile(DUMP_FILENAME, std::ofstream::app);
     if (dumpfile.fail())
-        throw Exception::EFileCreationError;
+        throw EFileCreationError(__FL__);
     dumpfile << "====== ARRAY DUMP ======" << endl;
     dumpfile << asctime(localtime(&t));
     dumpfile << "ARRAY " << "addr " << data_ << endl;
@@ -722,36 +722,36 @@ Array<bool>::Array(const std::initializer_list<bool>& lst)
     std::copy(lst.begin(), lst.end(), this->begin());
 }
 
-BitReference& Array<bool>::operator[](int index)
+BitReference Array<bool>::operator[](int index)
 {
     if( index < 0 || index >= size_ )
     {
-        throw Exception::EIndexOutOfRange;
+        throw EIndexOutOfRange(__FL__);
     }
-    BitReference* result = new BitReference( data_ + ( index / BLOCK_SIZE ), index % BLOCK_SIZE );
-    return *result;
+    BitReference result( data_ + ( index / BLOCK_SIZE ), index % BLOCK_SIZE );
+    return result;
 
 }
 
-Array<bool>& Array<bool>::operator+(Array<bool>& second)
+Array<bool> Array<bool>::operator+(Array<bool>& second)
 {
     if ((Size() + second.Size()) == 0)
     {
-        Array<bool>* result = new Array<bool>;
-        return *result;
+        Array<bool> result(0);
+        return result;
     }
 
-    Array<bool>* result = new Array<bool>(Size() + second.Size());
+    Array<bool> result(Size() + second.Size());
     for (int i=0; i<Size(); ++i)
     {
-        (*result)[i] = (*this)[i];
+        result[i] = (*this)[i];
     }
     for (int i=Size(); i<(Size()+second.Size()); ++i)
     {
-        (*result)[i] = second[i-Size()];
+        result[i] = second[i-Size()];
     }
-    result->size_ = this->size_ + second.size_;
-    return *result;
+    result.size_ = this->size_ + second.size_;
+    return result;
 }
 
 size_t Array<bool>::Size() const
@@ -819,7 +819,7 @@ void Array<bool>::Erase(int index)
 void Array<bool>::Insert(int index, bool element)
 {
 	if (index < 0 || index > size_)
-		throw Exception::EIndexOutOfRange;
+        throw EIndexOutOfRange(__FL__);
     Resize(size_ + 1);
     for (int i = index+1; i < size_; i++)
     {

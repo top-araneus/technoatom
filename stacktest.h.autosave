@@ -235,7 +235,7 @@ void test()
     try
     {
         //when
-        stack->dump();
+//        stack->dump();
     }
     //then
     catch (Exception e)

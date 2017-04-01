@@ -8,7 +8,12 @@
 #include "stack.h"
 #include "arraytest.h"
 #include "stacktest.h"
+#include "smart_ptr.h"
+#include "smart_ptr_test.h"
+
 using namespace std;
+
+
 
 Array<double> testfunc(Array<double> arr)
 {
@@ -25,22 +30,28 @@ Array<double> testfunc(Array<double> arr)
 //-----------------------------------
 int main()
 {
-    ArrayTest<double>* tests = new ArrayTest<double>;
-    tests->TestAll();
+
+while(1)
+{
+   ArrayTest<double>* tests = new ArrayTest<double>;
+   tests->TestAll();
     delete tests;
-
-    ArrayTest<bool>* testsBool = new ArrayTest<bool>;
-        testsBool->TestAll();
-        delete testsBool;
-
- /*   Array<double> array = {1.4, 8.8};
-   std::cout << array << std::endl;*/
-
-
-    std::cout << std::endl;
+  ArrayTest<bool>* testsBool = new ArrayTest<bool>;
+    testsBool->TestAll();
+    delete testsBool;
 
     test<double>();
 
+    Test_auto_ptr<int> test_auto;
+    Test_unique_ptr<int> test_unique;
+    Test_shared_ptr<int> test_shared;
+
+    test_auto.TestAll();
+    test_unique.TestAll();
+    test_shared.TestAll();
+
+    hack_ptrs<int>();
+}
     getchar();
     return 0;
 }
