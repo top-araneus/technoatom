@@ -15,6 +15,7 @@ template<typename Type>
 class ArrayTest
 {
 public:
+
     ArrayTest()
     {
         std::cout << __PRETTY_FUNCTION__ << std::endl;
@@ -71,7 +72,7 @@ public:
         {
             print("|.Test 1 failed. \n/#", error);
         }
-
+        delete testArray;
     }
     //-----------------------------------
     //! @brief Testing of correct catching exceptions when index is out of range
@@ -90,7 +91,7 @@ public:
         //then
         catch(Exception error)
         {
-            if(error == static_cast<Exception>(EIndexOutOfRange()))
+            if(error == EIndexOutOfRange())
             {
                 e1 = true;
             }
@@ -121,6 +122,7 @@ public:
         {
             std::cout << "TestSquaresOutRange failed" << std::endl;
         }
+        delete testArray;
 
     }
     //-----------------------------------
@@ -241,6 +243,8 @@ public:
         {
             print("|.Test 5 failed. \n/#", error);
         }
+        delete f;
+        delete s;
     }
     //-----------------------------------
     //! @brief Testing adding elements in the end of Array
@@ -269,6 +273,7 @@ public:
         {
             print("|.Test 6 failed. \n/#", error);
         }
+        delete array;
     }
     //-----------------------------------
     //! @brief Testing inserting elements by defined indexes. Cheking borders of Array
@@ -288,11 +293,13 @@ public:
             //then
             if ( (*testobj)[defaultSize - 1] != static_cast<Type>(defaultSize) || (*testobj).Size() != defaultSize + 1 )
             {
+                delete testobj;
                 throw ETestFailed(__FL__);
             }
 
             if((*testobj)[(*testobj).Size() -1 ] != static_cast<Type>(defaultSize - 1))
             {
+                delete testobj;
                 throw ETestFailed(__FL__);
             }
             //when
@@ -300,10 +307,12 @@ public:
             //then
             if ( (*testobj)[defaultSize/2] != static_cast<Type>(defaultSize + 1) || (*testobj).Size() != defaultSize + 2 )
             {
+                delete testobj;
                 throw ETestFailed(__FL__);
             }
             if((*testobj)[defaultSize/2 + 1] != static_cast<Type>(defaultSize/2))
             {
+                delete testobj;
                 throw ETestFailed(__FL__);
             }
             //when
@@ -311,12 +320,15 @@ public:
             //then
             if ( (*testobj)[0] != static_cast<Type>(defaultSize + 2) || (*testobj).Size() != defaultSize + 3 )
             {
+                delete testobj;
                 throw ETestFailed(__FL__);
             }
             if((*testobj)[1] != static_cast<Type>(0))
             {
+                delete testobj;
                 throw ETestFailed(__FL__);
             }
+            delete testobj;
 
         }
         catch (Exception error)
@@ -345,6 +357,7 @@ public:
             //then
             if ( (*testobj)[0] != static_cast<Type>(defaultSize-1) || testobj->Size() != 1 )
             {
+                delete testobj;
                 throw ETestFailed(__FL__);
             }
             //when
@@ -352,8 +365,10 @@ public:
             //then
             if( testobj->GetData() != nullptr || testobj->Size() != 0)
             {
+                delete testobj;
                 throw ETestFailed(__FL__);
             }
+            delete testobj;
         }
         catch (Exception error)
         {
@@ -380,9 +395,11 @@ public:
             {
                 if ( (*testobj)[i] != static_cast<Type>(0))
                 {
+                    delete testobj;
                     throw ETestFailed(__FL__);
                 }
             }
+            delete testobj;
         }
         catch (Exception error)
         {
@@ -407,6 +424,7 @@ public:
             }
             if ( (*testobj)[defaultSize - 1] != static_cast<Type>(defaultSize - 1) || testobj->Size() != defaultSize)
             {
+                delete testobj;
                 throw ETestFailed(__FL__);
             }
             //when
@@ -414,8 +432,10 @@ public:
             //then
             if ( (*testobj)[0] != static_cast<Type>(0) || testobj->Size() != 1)
             {
+                delete testobj;
                 throw ETestFailed(__FL__);
             }
+            delete testobj;
         }
         catch (Exception error)
         {
@@ -443,6 +463,7 @@ public:
         {
             print("|.Test 11 failed. \n/#", error);
         }
+        delete testobj;
     }
     //-----------------------------------
     //! @brief Testing placement&initializing operator new

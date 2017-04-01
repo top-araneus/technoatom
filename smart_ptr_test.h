@@ -79,9 +79,9 @@ public:
 			*p1_auto;
 		}
 		catch(Exception err)
-		{
+        {
             if(err != ENullDereference())
-				std::cout << err;
+                std::cout << err;
 		}
 	}
 
@@ -432,5 +432,60 @@ public:
 	}
 
 };
+
+
+template <typename Type>
+Auto_ptr<Type> auto_ptr_copyprobe(Auto_ptr<Type> victim)
+{
+    return victim;
+}
+
+template <typename Type>
+Shared_ptr<Type> shared_ptr_copyprobe(Shared_ptr<Type> victim)
+{
+    return victim;
+}
+
+template <typename Type>
+void hack_autoptr()
+{
+    print("Auto_ptr has bad copy constructor:\n");
+    Type obj = static_cast<Type>(1);
+    Auto_ptr<Type> victim(&obj);
+    auto_ptr_copyprobe(victim);
+    try
+    {
+        *victim;
+    }
+    catch(Exception err)
+    {
+        print("/#",err);
+    }
+}
+
+template <typename Type>
+void hack_sharedptr()
+{
+    print("Shared_ptr has good copy constructor: ");
+    Type obj = static_cast<Type>(1);
+    Shared_ptr<Type> victim(&obj);
+    shared_ptr_copyprobe(victim);
+    try
+    {
+        *victim;
+        print("no exceptions\n");
+    }
+    catch(Exception err)
+    {
+        print("/#",err);
+    }
+}
+
+template <typename Type>
+void hack_ptrs()
+{
+    hack_autoptr<Type>();
+    hack_sharedptr<Type>();
+}
 
 #endif // SMART_PTR_TEST_H

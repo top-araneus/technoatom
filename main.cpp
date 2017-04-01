@@ -13,6 +13,8 @@
 
 using namespace std;
 
+
+
 Array<double> testfunc(Array<double> arr)
 {
     std::cout << __PRETTY_FUNCTION__ << std::endl;
@@ -29,43 +31,27 @@ Array<double> testfunc(Array<double> arr)
 int main()
 {
 
-
-    ArrayTest<double>* tests = new ArrayTest<double>;
-    tests->TestAll();
+while(1)
+{
+   ArrayTest<double>* tests = new ArrayTest<double>;
+   tests->TestAll();
     delete tests;
-
-    ArrayTest<bool>* testsBool = new ArrayTest<bool>;
-        testsBool->TestAll();
-        delete testsBool;
-
-
-
-
-    std::cout << std::endl;
+  ArrayTest<bool>* testsBool = new ArrayTest<bool>;
+    testsBool->TestAll();
+    delete testsBool;
 
     test<double>();
 
-//	test_auto_ptr();
     Test_auto_ptr<int> test_auto;
     Test_unique_ptr<int> test_unique;
     Test_shared_ptr<int> test_shared;
 
-/*test_auto.Assignment();
-test_auto.Copy();
-test_auto.Arrow();
-test_unique.MoveAssignment();
-test_unique.MoveCopy();
-test_unique.Arrow();
-test_shared.Copy();
-test_shared.Assignment();
-test_shared.Arrow();
-test_shared.CountIncrease();
-test_shared.CountDecreaseDelete();
-test_shared.CountDecreaseAssignment();
-test_shared.CountMove();*/
     test_auto.TestAll();
     test_unique.TestAll();
     test_shared.TestAll();
+
+    hack_ptrs<int>();
+}
     getchar();
     return 0;
 }

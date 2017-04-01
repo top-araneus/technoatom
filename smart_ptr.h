@@ -439,10 +439,13 @@ Shared_ptr<Type>::Shared_ptr()
 template <typename Type>
 Shared_ptr<Type>::~Shared_ptr()
 {
-    if (proxy_->GetCount() > 1)
-        proxy_->Decrease();
-    else
-        delete proxy_;
+    if (proxy_)
+    {
+        if (proxy_->GetCount() > 1)
+            proxy_->Decrease();
+        else
+            delete proxy_;
+    }
 }
 
 
