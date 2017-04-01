@@ -33,9 +33,9 @@ void test()
         stack = new Stack<value_type>();
     }
     //then
-    catch (int e)
+    catch (Exception e)
     {
-        if (e == Exception::EMemAllocError)
+        if (e == EMemAllocError())
             cout << "Test 1 failed: EMemAllocError" << endl;
         else
             cout << "Test 1 failed: exception code " << e << endl;
@@ -49,9 +49,9 @@ void test()
         stack->push(static_cast<value_type>(123));
     }
     //then
-    catch (int e)
+    catch (Exception e)
     {
-        if (e == Exception::EMemAllocError)
+        if (e == EMemAllocError())
             cout << "Test 2 failed: EMemAllocError" << endl;
         else
             cout << "Test 2 failed: exception code " << e << endl;
@@ -66,9 +66,9 @@ void test()
         a = stack->pop();
     }
     //then
-    catch (int e)
+    catch (Exception e)
     {
-        if (e == Exception::EStackIsEmpty)
+        if (e == EStackIsEmpty())
             cout << "Test 3 failed: EStackIsEmpty" << endl;
         else
             cout << "Test 3 failed: exception code " << e << endl;
@@ -84,9 +84,12 @@ void test()
         a = stack->pop();
     }
     //then
-    catch (int e)
+    catch (Exception e)
     {
-        if (e != Exception::EStackIsEmpty)
+        if (e == EStackIsEmpty())
+        {
+        }
+        else
             cout << "Test 4 failed: exception code " << e << ", a = " << a << endl;
     }
     //-----------------------------------
@@ -100,9 +103,9 @@ void test()
         stack->push(static_cast<value_type>(3));
     }
     //then
-    catch (int e)
+    catch (Exception e)
     {
-        if (e == Exception::EMemAllocError)
+        if (e == EMemAllocError())
             cout << "Test 5 failed: EMemAllocError" << endl;
         else
             cout << "Test 5 failed: exception code " << e << endl;
@@ -116,9 +119,9 @@ void test()
         a = stack->top();
     }
     //then
-    catch (int e)
+    catch (Exception e)
     {
-        if (e == Exception::EStackIsEmpty)
+        if (e == EStackIsEmpty())
             cout << "Test 6 failed: EStackIsEmpty" << endl;
         else
             cout << "Test 6 failed: exception code " << e << endl;
@@ -138,9 +141,9 @@ void test()
 
     }
     //then
-    catch (int e)
+    catch (Exception e)
     {
-        if (e == Exception::EMemAllocError)
+        if (e == EMemAllocError())
             cout << "Test 7 failed: EMemAllocError" << endl;
         else
             cout << "Test 7 failed: exception code " << e << endl;
@@ -168,9 +171,9 @@ void test()
         }
 
     }
-    catch(int e)
+    catch(Exception e)
     {
-        if (e == Exception::EMemAllocError)
+        if (e == EMemAllocError())
             cout << "Test 8 failed: EMemAllocError" << endl;
         else
             cout << "Test 8 failed: exception code " << e << endl;
@@ -193,9 +196,9 @@ void test()
         }
 
     }
-    catch(int e)
+    catch(Exception e)
     {
-        if (e == Exception::EMemAllocError)
+        if (e == EMemAllocError())
             cout << "Test 9 failed: EMemAllocError" << endl;
         else
             cout << "Test 9 failed: exception code " << e << endl;
@@ -219,10 +222,10 @@ void test()
             }
         }
     }
-    catch (int e)
+    catch (Exception e)
     {
 
-        if (e == Exception::EStackIsEmpty)
+        if (e == EStackIsEmpty())
             cout << "Test 10 failed: EStackIsEmpty" << endl;
         else
             cout << "Test 10 failed: exception code " << e << endl;
@@ -236,9 +239,9 @@ void test()
         stack->dump();
     }
     //then
-    catch (int e)
+    catch (Exception e)
     {
-        if (e == Exception::EFileCreationError)
+        if (e == EFileCreationError())
             cout << "Test 11 failed: EFileCreationError" << endl;
         else
             cout << "Test 11 failed: exception code " << e << endl;

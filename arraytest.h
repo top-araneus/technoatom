@@ -63,20 +63,13 @@ public:
                 if( (*testArray)[i] != static_cast<Type>(i))
                 {
                     std::cout << "|.Test 1 failed: expected " << static_cast<Type>(i) << " and got " << testArray[i]  << std::endl;
-                    throw Exception::ETestFailed;
+                    throw ETestFailed(__FL__);
                 }
             }
         }
-        catch(int codeError)
+        catch(Exception error)
         {
-            if(codeError == Exception::EMemAllocError)
-            {
-                std::cout << "|.Test 1 failed: memory allocation error"<<std::endl;
-            }
-            if(codeError == Exception::EIndexOutOfRange)
-            {
-                std::cout << "|.Test 1 failed: out of range"<<std::endl;
-            }
+            print("|.Test 1 failed. \n/#", error);
         }
 
     }
@@ -92,34 +85,36 @@ public:
         {
             //when
             (*testArray)[defaultSize];
-            throw Exception::ETestFailed;
+            throw ETestFailed(__FL__);
         }
-        catch(int errorCode)
+        //then
+        catch(Exception error)
         {
-            if(errorCode == Exception::EIndexOutOfRange)
+            if(error == static_cast<Exception>(EIndexOutOfRange()))
             {
                 e1 = true;
             }
-            if(errorCode == Exception::ETestFailed)
+            if(error == ETestFailed())
             {
-                std::cout << "Test 2.1 failed" << std::endl;
+                print("|.Test 2.1 failed. \n/#", error);
             }
         }
         try
         {
             //when
             (*testArray)[-1];
-            throw Exception::ETestFailed;
+            throw ETestFailed(__FL__);
         }
-        catch(int errorCode)
+        //then
+        catch(Exception error)
         {
-            if(errorCode == Exception::EIndexOutOfRange)
+            if(error == EIndexOutOfRange())
             {
                 e2 = true;
             }
-            if(errorCode == Exception::ETestFailed)
+            if(error == ETestFailed())
             {
-                std::cout << "Test 2.2 failed" << std::endl;
+                print("|.Test 2.2 failed. \n/#", error);
             }
         }
         if(!(e1 && e2))
@@ -149,7 +144,7 @@ public:
                 if ((*testarray)[i] != clonearray[i] )
                 {
                     std::cout << "|.expected value " << (*testarray)[i] << " and got " << clonearray[i]  << std::endl;
-                    throw Exception::ETestFailed;
+                    throw ETestFailed(__FL__);
                 }
             }
             delete testarray;
@@ -158,25 +153,14 @@ public:
                 if ( clonearray[i] != static_cast<Type>(i) )
                 {
                     std::cout << "|.expected value " << static_cast<Type>(i) << " and got " << clonearray[i]  << std::endl;
-                    throw Exception::ETestFailed;
+                    throw ETestFailed(__FL__);
                 }
             }
 
         }
-        catch (int codeError)
+        catch (Exception error)
         {
-            if(codeError == Exception::EMemAllocError)
-            {
-                std::cout << "|.Test 3 failed: memory allocation error"<<std::endl;
-            }
-            if(codeError == Exception::EIndexOutOfRange)
-            {
-                std::cout << "|.Test 3 failed: out of range"<<std::endl;
-            }
-            if(codeError == Exception::ETestFailed)
-            {
-                std::cout << "|.Test 3 failed"<<std::endl;
-            }
+            print("|.Test 3 failed. \n/#", error);
         }
     }
     //-----------------------------------
@@ -200,7 +184,7 @@ public:
             {
                 if ((*testarray)[i] != clonearray[i])
                 {
-                    throw Exception::ETestFailed;
+                    throw ETestFailed(__FL__);
                 }
             }
             delete testarray;
@@ -208,24 +192,13 @@ public:
             {
                 if ( clonearray[i] != static_cast<Type>(i) )
                 {
-                    throw Exception::ETestFailed;
+                    throw ETestFailed(__FL__);
                 }
             }
         }
-        catch (int codeError)
+        catch (Exception error)
         {
-            if(codeError == Exception::EMemAllocError)
-            {
-                std::cout << "|.Test 4 failed: memory allocation error"<<std::endl;
-            }
-            if(codeError == Exception::EIndexOutOfRange)
-            {
-                std::cout << "|.Test 4 failed: out of range"<<std::endl;
-            }
-            if(codeError == Exception::ETestFailed)
-            {
-                std::cout << "|.Test 4 failed"<<std::endl;
-            }
+            print("|.Test 4 failed. \n/#", error);
         }
     }
     //-----------------------------------
@@ -253,31 +226,20 @@ public:
             //then
             if (result.Size() != 2*defaultSize)
             {
-                throw Exception::ETestFailed;
+                throw ETestFailed(__FL__);
             }
             for (int i = 0; i<2*defaultSize; ++i)
             {
                 if (static_cast<Type>(i) != result[i])
                 {
-                    throw Exception::ETestFailed;
+                    throw ETestFailed(__FL__);
                 }
             }
 
         }
-        catch(int codeError)
+        catch (Exception error)
         {
-            if(codeError == Exception::EMemAllocError)
-            {
-                std::cout << "|.Test 5 failed: memory allocation error"<<std::endl;
-            }
-            if(codeError == Exception::EIndexOutOfRange)
-            {
-                std::cout << "|.Test 5 failed: out of range"<<std::endl;
-            }
-            if(codeError == Exception::ETestFailed)
-            {
-                std::cout << "|.Test 5 failed"<<std::endl;
-            }
+            print("|.Test 5 failed. \n/#", error);
         }
     }
     //-----------------------------------
@@ -299,25 +261,13 @@ public:
             //then
             if ((*array)[defaultSize] != static_cast<Type>(defaultSize))
             {
-                throw Exception::ETestFailed;
+                throw ETestFailed(__FL__);
             }
 
         }
-        catch (int codeError)
+        catch (Exception error)
         {
-
-            if(codeError == Exception::EMemAllocError)
-            {
-                std::cout << "|.Test 6 failed: memory allocation error"<<std::endl;
-            }
-            if(codeError == Exception::EIndexOutOfRange)
-            {
-                std::cout << "|.Test 6 failed: out of range"<<std::endl;
-            }
-            if(codeError == Exception::ETestFailed)
-            {
-                std::cout << "|.Test 6 failed"<<std::endl;
-            }
+            print("|.Test 6 failed. \n/#", error);
         }
     }
     //-----------------------------------
@@ -338,52 +288,40 @@ public:
             //then
             if ( (*testobj)[defaultSize - 1] != static_cast<Type>(defaultSize) || (*testobj).Size() != defaultSize + 1 )
             {
-                throw Exception::ETestFailed;
+                throw ETestFailed(__FL__);
             }
 
             if((*testobj)[(*testobj).Size() -1 ] != static_cast<Type>(defaultSize - 1))
             {
-                throw Exception::ETestFailed;
+                throw ETestFailed(__FL__);
             }
             //when
             (*testobj).Insert(defaultSize/2,static_cast<Type>(defaultSize + 1));
             //then
             if ( (*testobj)[defaultSize/2] != static_cast<Type>(defaultSize + 1) || (*testobj).Size() != defaultSize + 2 )
             {
-                throw Exception::ETestFailed;
+                throw ETestFailed(__FL__);
             }
             if((*testobj)[defaultSize/2 + 1] != static_cast<Type>(defaultSize/2))
             {
-                throw Exception::ETestFailed;
+                throw ETestFailed(__FL__);
             }
             //when
             (*testobj).Insert(0,static_cast<Type>(defaultSize + 2));
             //then
             if ( (*testobj)[0] != static_cast<Type>(defaultSize + 2) || (*testobj).Size() != defaultSize + 3 )
             {
-                throw Exception::ETestFailed;
+                throw ETestFailed(__FL__);
             }
             if((*testobj)[1] != static_cast<Type>(0))
             {
-                throw Exception::ETestFailed;
+                throw ETestFailed(__FL__);
             }
 
         }
-        catch (int codeError)
+        catch (Exception error)
         {
-
-            if(codeError == Exception::EMemAllocError)
-            {
-                std::cout << "|.Test 7 failed: memory allocation error"<<std::endl;
-            }
-            if(codeError == Exception::EIndexOutOfRange)
-            {
-                std::cout << "|.Test 7 failed: out of range"<<std::endl;
-            }
-            if(codeError == Exception::ETestFailed)
-            {
-                std::cout << "|.Test 7 failed"<<std::endl;
-            }
+            print("|.Test 7 failed. \n/#", error);
         }
     }
     //-----------------------------------
@@ -407,30 +345,19 @@ public:
             //then
             if ( (*testobj)[0] != static_cast<Type>(defaultSize-1) || testobj->Size() != 1 )
             {
-                throw Exception::ETestFailed;
+                throw ETestFailed(__FL__);
             }
             //when
             testobj->Erase(0);
             //then
             if( testobj->GetData() != nullptr || testobj->Size() != 0)
             {
-                throw Exception::ETestFailed;
+                throw ETestFailed(__FL__);
             }
         }
-        catch(int codeError)
+        catch (Exception error)
         {
-            if(codeError == Exception::EMemAllocError)
-            {
-                std::cout << "|.Test 8 failed: memory allocation error"<<std::endl;
-            }
-            if(codeError == Exception::EIndexOutOfRange)
-            {
-                std::cout << "|.Test 8 failed: out of range"<<std::endl;
-            }
-            if(codeError == Exception::ETestFailed)
-            {
-                std::cout << "|.Test 8 failed"<<std::endl;
-            }
+            print("|.Test 8 failed. \n/#", error);
         }
     }
     //-----------------------------------
@@ -453,24 +380,13 @@ public:
             {
                 if ( (*testobj)[i] != static_cast<Type>(0))
                 {
-                    throw Exception::ETestFailed;
+                    throw ETestFailed(__FL__);
                 }
             }
         }
-        catch(int codeError)
+        catch (Exception error)
         {
-            if(codeError == Exception::EMemAllocError)
-            {
-                std::cout << "|.Test 9 failed: memory allocation error"<<std::endl;
-            }
-            if(codeError == Exception::EIndexOutOfRange)
-            {
-                std::cout << "|.Test 9 failed: out of range"<<std::endl;
-            }
-            if(codeError == Exception::ETestFailed)
-            {
-                std::cout << "|.Test 9 failed"<<std::endl;
-            }
+            print("|.Test 9 failed. \n/#", error);
         }
     }
     //-----------------------------------
@@ -491,34 +407,19 @@ public:
             }
             if ( (*testobj)[defaultSize - 1] != static_cast<Type>(defaultSize - 1) || testobj->Size() != defaultSize)
             {
-                throw Exception::ETestFailed;
+                throw ETestFailed(__FL__);
             }
             //when
             testobj->Resize(1);
             //then
             if ( (*testobj)[0] != static_cast<Type>(0) || testobj->Size() != 1)
             {
-                throw Exception::ETestFailed;
+                throw ETestFailed(__FL__);
             }
         }
-        catch(int codeError)
+        catch (Exception error)
         {
-            if(codeError == Exception::EMemAllocError)
-            {
-                std::cout << "|.Test 10 failed: memory allocation error"<<std::endl;
-            }
-            if(codeError == Exception::EIndexOutOfRange)
-            {
-                std::cout << "|.Test 10 failed: out of range"<<std::endl;
-            }
-            if(codeError == Exception::EBadSize)
-            {
-                std::cout << "|.Test 10 failed: badsize in argument"<<std::endl;
-            }
-            if(codeError == Exception::ETestFailed)
-            {
-                std::cout << "|.Test 10 failed"<<std::endl;
-            }
+            print("|.Test 10 failed. \n/#", error);
         }
     }
     //-----------------------------------
@@ -538,10 +439,9 @@ public:
             testobj->Dump();
         }
         //then
-        catch (int errorCode)
+        catch (Exception error)
         {
-            if (errorCode == Exception::EFileCreationError)
-                std::cout << "Test 11 failed: got file creation error" << std::endl;
+            print("|.Test 11 failed. \n/#", error);
         }
     }
     //-----------------------------------
@@ -559,12 +459,12 @@ public:
             for (int i = 0; i < 10; i++)
             {
                 if (test[i] != 0)
-                    throw Exception::ETestFailed;
+                    throw ETestFailed(__FL__);
             }
         }
-        catch (int errorCode)
+        catch (Exception error)
         {
-            std::cout << "Test 12 failed" << std::endl;
+            print("|.Test 12 failed. \n/#", error);
         }
 
     }
