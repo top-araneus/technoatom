@@ -1,6 +1,6 @@
-//-----------------------------------
-//! @file smart_ptr.h
-//! Implements custom Auto_ptr, Unique_ptr and Smart_ptr classes.
+//-----------------------------------//FIXME: вопрос на засыпку: а если новый тип будет массивом? 
+//! @file smart_ptr.h		     //       auto_ptr<int[]> p1 ( new int[3] {10, 20, 30} );// к примеру так, случится ли весь тот
+//! Implements custom Auto_ptr, Unique_ptr and Smart_ptr classes. //ужас, который описывал Дед на лекции?
 //!
 //! team araneus, 2017
 //-----------------------------------
