@@ -30,7 +30,7 @@ int main()
 {
 
 
-   /* ArrayTest<double>* tests = new ArrayTest<double>;
+    ArrayTest<double>* tests = new ArrayTest<double>;
     tests->TestAll();
     delete tests;
 
@@ -43,7 +43,7 @@ int main()
 
     std::cout << std::endl;
 
-	test<double>();*/
+    test<double>();
 
 //	test_auto_ptr();
     Test_auto_ptr<int> test_auto;
@@ -63,11 +63,9 @@ test_shared.CountIncrease();
 test_shared.CountDecreaseDelete();
 test_shared.CountDecreaseAssignment();
 test_shared.CountMove();*/
-/*    test_auto.TestAll();
+    test_auto.TestAll();
     test_unique.TestAll();
-    test_shared.TestAll();*/
-    while (1)
-        test_shared.CountDecreaseDelete();
+    test_shared.TestAll();
     getchar();
     return 0;
 }

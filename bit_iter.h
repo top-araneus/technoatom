@@ -38,7 +38,7 @@ public:
    {
        if( number >= BLOCK_SIZE)
 	   {
-		   throw Exception::EIndexOutOfRange;
+           throw EIndexOutOfRange(__FL__);
 	   }
 	   ptr_to_block = ptr;
 	   number_of_bit = number;

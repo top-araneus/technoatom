@@ -305,7 +305,7 @@ void Array<Type>::Erase(int index)
 	if ( size_ == 0)
 		return;
     if (index < 0 || index >= size_)
-        throw Exception::EIndexOutOfRange;
+        throw EIndexOutOfRange(__FL__);
     else
     {
         Type* newData = nullptr;
@@ -331,7 +331,7 @@ template <typename Type>
 void Array<Type>::Insert(int index, Type element)
 {
 	if (index < 0 || index > size_)
-        throw Exception::EIndexOutOfRange;
+        throw EIndexOutOfRange(__FL__);
     else
     {
         Type* newData = new Type[size_ + 1];
@@ -356,7 +356,7 @@ Type& Array<Type>::operator [](int index) const
 {
     if (index < 0 || index >= size_)
     {
-        throw Exception::EIndexOutOfRange;
+        throw EIndexOutOfRange(__FL__);
     }
     return data_[index];
 }
@@ -458,7 +458,7 @@ void Array<Type>::Dump()
     time_t t = time(NULL);                      //!< current system time
     std::ofstream dumpfile(DUMP_FILENAME, std::ofstream::app);
     if (dumpfile.fail())
-        throw Exception::EFileCreationError;
+        throw EFileCreationError(__FL__);
     dumpfile << "====== ARRAY DUMP ======" << endl;
     dumpfile << asctime(localtime(&t));
     dumpfile << "ARRAY " << "addr " << data_ << endl;
@@ -473,7 +473,7 @@ template <typename Type>
 inline void Array<Type>::Resize(int newsize)
 {   if( newsize < 0 )
     {
-        throw Exception::EBadSize;
+        throw EBadSize(__FL__);
     }
     if( newsize == 0 )
     {
@@ -699,7 +699,7 @@ void Array<bool>::Dump()
     time_t t = time(NULL);                      //!< current system time
     std::ofstream dumpfile(DUMP_FILENAME, std::ofstream::app);
     if (dumpfile.fail())
-        throw Exception::EFileCreationError;
+        throw EFileCreationError(__FL__);
     dumpfile << "====== ARRAY DUMP ======" << endl;
     dumpfile << asctime(localtime(&t));
     dumpfile << "ARRAY " << "addr " << data_ << endl;
@@ -726,7 +726,7 @@ BitReference& Array<bool>::operator[](int index)
 {
     if( index < 0 || index >= size_ )
     {
-        throw Exception::EIndexOutOfRange;
+        throw EIndexOutOfRange(__FL__);
     }
     BitReference* result = new BitReference( data_ + ( index / BLOCK_SIZE ), index % BLOCK_SIZE );
     return *result;
@@ -819,7 +819,7 @@ void Array<bool>::Erase(int index)
 void Array<bool>::Insert(int index, bool element)
 {
 	if (index < 0 || index > size_)
-		throw Exception::EIndexOutOfRange;
+        throw EIndexOutOfRange(__FL__);
     Resize(size_ + 1);
     for (int i = index+1; i < size_; i++)
     {

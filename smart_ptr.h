@@ -116,8 +116,8 @@ Type& Auto_ptr<Type>::operator*()
 {
 	if (IsEmpty())
 	{
-		throw Exception(Exception::ENullDereference, "Try to dereference nullptr", __FILE__, __LINE__, nullptr);
-	}
+        throw ENullDereference(__FL__);
+    }
 	return(*ptr_);
 }
 
@@ -126,8 +126,8 @@ Type* Auto_ptr<Type>::operator->()
 {
 	if (IsEmpty())
 	{
-		throw Exception(Exception::ENullDereference, "Try to dereference nullptr", __FILE__, __LINE__, nullptr);
-	}
+        throw ENullDereference(__FL__);
+    }
 	return(ptr_);
 }
 
@@ -249,7 +249,7 @@ Type& Unique_ptr<Type>::operator*()
 {
     if (IsEmpty())
     {
-        throw Exception(Exception::ENullDereference, "Try to dereference nullptr", __FILE__, __LINE__, nullptr);
+        throw ENullDereference(__FL__);
     }
     return(*ptr_);
 }
@@ -259,7 +259,7 @@ Type* Unique_ptr<Type>::operator->()
 {
     if (IsEmpty())
     {
-        throw Exception(Exception::ENullDereference, "Try to dereference nullptr", __FILE__, __LINE__, nullptr);
+        throw ENullDereference(__FL__);
     }
     return(ptr_);
 }
@@ -493,8 +493,8 @@ Type& Shared_ptr<Type>::operator*()
 {
 	if (IsEmpty())
 	{
-		throw Exception(Exception::ENullDereference, "Try to dereference nullptr", __FILE__, __LINE__, nullptr);
-	}
+        throw ENullDereference(__FL__);
+    }
 	return *(proxy_->GetPointer());
 }
 
@@ -503,8 +503,8 @@ Type* Shared_ptr<Type>::operator->()
 {
 	if (IsEmpty())
 	{
-		throw Exception(Exception::ENullDereference, "Try to dereference nullptr", __FILE__, __LINE__, nullptr);
-	}
+        throw ENullDereference(__FL__);
+    }
     return proxy_->pObject_;
 }
 

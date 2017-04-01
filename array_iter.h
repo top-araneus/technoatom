@@ -59,7 +59,7 @@ public:
     {
         if(pointer_ == nullptr)
         {
-            throw Exception::EMemAllocError;
+            throw EMemAllocError(__FL__);
         }
         return *pointer_;
 

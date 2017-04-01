@@ -46,13 +46,13 @@ public:
 			//then
 			if(*p2_auto != static_cast<Type>(TEST_VALUE))
 			{
-				throw EXCEPT(Exception::ETestFailed, "Wrong assignment", nullptr);
+                throw ETestFailed(__FL__);
 			}
 			*p1_auto;
 		}
 		catch(Exception err)
 		{
-			if(err.errcode_ != Exception::ENullDereference)
+            if(err != ENullDereference())
 				std::cout << err;
 		}
 	}
@@ -74,13 +74,13 @@ public:
 			//then
 			if(*p2_auto != static_cast<Type>(TEST_VALUE))
 			{
-				throw EXCEPT(Exception::ETestFailed, "Wrong assignment", nullptr);
-			}
+                throw ETestFailed(__FL__);
+            }
 			*p1_auto;
 		}
 		catch(Exception err)
 		{
-			if(err.errcode_ != Exception::ENullDereference)
+            if(err != ENullDereference())
 				std::cout << err;
 		}
 	}
@@ -102,7 +102,7 @@ public:
 			//then
 			if((*p_auto)[0] != static_cast<Type>(TEST_VALUE))
 			{
-				throw EXCEPT(Exception::ETestFailed, " incorrect value", nullptr);
+                throw ETestFailed(__FL__);
 			}
 		}
 		catch(Exception err)
@@ -149,8 +149,8 @@ public:
 			 p1_unique = Unique_ptr<Type>(obj);
 			//then
 			if(*p1_unique != static_cast<Type>(TEST_VALUE))
-			{
-				throw EXCEPT(Exception::ETestFailed, "Wrong assignment", nullptr);
+            {
+                throw ETestFailed(__FL__);
 			}
 		}
 		catch(Exception err)
@@ -174,8 +174,8 @@ public:
 			 Unique_ptr<Type> p1_unique = Unique_ptr<Type>(obj);
 			//then
 			if(*p1_unique != static_cast<Type>(TEST_VALUE) || *obj != static_cast<Type>(TEST_VALUE))
-			{
-				throw EXCEPT(Exception::ETestFailed, "Wrong assignment", nullptr);
+            {
+                throw ETestFailed(__FL__);
 			}
 		}
 		catch(Exception err)
@@ -199,8 +199,8 @@ public:
 			p_auto->PushBack(static_cast<Type>(TEST_VALUE));
 			//then
 			if((*p_auto)[0] != static_cast<Type>(TEST_VALUE))
-			{
-				throw EXCEPT(Exception::ETestFailed, " incorrect value", nullptr);
+            {
+                throw ETestFailed(__FL__);
 			}
 		}
 		catch(Exception err)
@@ -253,8 +253,8 @@ public:
             p2_shared = p1_shared;
 			//then
             if(*p1_shared != static_cast<Type>(TEST_VALUE) || *p2_shared != static_cast<Type>(TEST_VALUE) )
-			{
-				throw EXCEPT(Exception::ETestFailed, "Wrong assignment", nullptr);
+            {
+                throw ETestFailed(__FL__);
 			}
 
 		}
@@ -279,8 +279,8 @@ public:
 			Shared_ptr<Type> p2_shared(p1_shared);
 			//then
 			if(*p1_shared != static_cast<Type>(TEST_VALUE) || *p2_shared != static_cast<Type>(TEST_VALUE))
-			{
-				throw EXCEPT(Exception::ETestFailed, "Wrong assignment", nullptr);
+            {
+                throw ETestFailed(__FL__);
 			}
 		}
 		catch(Exception err)
@@ -304,8 +304,8 @@ public:
 			p_shared->PushBack(static_cast<Type>(TEST_VALUE));
 			//then
 			if((*p_shared)[0] != static_cast<Type>(TEST_VALUE))
-			{
-				throw EXCEPT(Exception::ETestFailed, " incorrect value", nullptr);
+            {
+                throw ETestFailed(__FL__);
 			}
 		}
 		catch(Exception err)
@@ -330,8 +330,8 @@ public:
 			Shared_ptr<Type> p2_shared = p1_shared;
 			//then
 			if(p2_shared.GetCount() != 2)
-			{
-				throw EXCEPT(Exception::ETestFailed, "count not increase", nullptr);
+            {
+                throw ETestFailed(__FL__);
 			}
 		}
 		catch(Exception err)
@@ -346,29 +346,23 @@ public:
     //-----------------------------------
 	void CountDecreaseDelete()
     {
-        print("/# \n", __PRETTY_FUNCTION__);
 		try
 		{
-			//given
-            print("/# \n", __LINE__);
+            //given
             Type* a = new Type;
             *a = 0;
             Shared_ptr<Type> p1_shared(a);
-            print("/# \n", __LINE__);
 			*p1_shared = static_cast<Type>(TEST_VALUE);
-			//when
-            print("/# \n", __LINE__);
+            //when
 
             {
                 Shared_ptr<Type> p2_shared = p1_shared;
-                print("/# \n", __LINE__);
             }
 
             //then
-            print("/# \n", __LINE__);
             if(p1_shared.GetCount() != 1 || *p1_shared != static_cast<Type>(TEST_VALUE) )
-			{
-				throw EXCEPT(Exception::ETestFailed, "count not decrease", nullptr);
+            {
+                throw ETestFailed(__FL__);
             }
 
 		}
@@ -397,8 +391,8 @@ public:
 			p2_shared = p3_shared;
 			//then
 			if(p1_shared.GetCount() != 1 || p3_shared.GetCount() != 2)
-			{
-				throw EXCEPT(Exception::ETestFailed, "count not decrease", nullptr);
+            {
+                throw ETestFailed(__FL__);
 			}
 
 		}
@@ -427,8 +421,8 @@ public:
 			p2_shared = Shared_ptr<Type>(obj);
 			//then
 			if(p1_shared.GetCount() != 1 || *p2_shared != TEST_VALUE_2)
-			{
-				throw EXCEPT(Exception::ETestFailed, "move works incorrect", nullptr);
+            {
+                throw ETestFailed(__FL__);
 			}
 		}
 		catch(Exception err)
