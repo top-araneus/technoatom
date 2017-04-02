@@ -1,0 +1,7 @@
+*.exe
+Translator/build-translator-Desktop_Qt_5_8_0_MinGW_32bit-Debug/debug/main.o
+*.stash
+Translator/build-translator-Desktop_Qt_5_8_0_MinGW_32bit-Debug/Makefile.Debug
+*.Release
+stack.pro.user.7bfe1ae
+stack.pro.user

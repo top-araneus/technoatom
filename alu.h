@@ -66,15 +66,42 @@ void ALU::Load(const char* filename)
 {
 
     /*! @brief 2+2 = 4 */
-    _code[0] = PUSH_VL;
+   /* _code[0] = PUSH_VL;
     _code[1] = 2;
     _code[2] = PUSH_VL;
     _code[3] = 2;
     _code[4] = ADD;
     _code[5] = POP;
     _code[6] = 0;
-    _code[7] = END;
+    _code[7] = END;*/
 
+       _code[0] = PUSH_VL;
+       _code[1] = 1;
+       _code[2] = PUSH_VL;
+       _code[3] = 5;
+       _code[4] = CALL;
+       _code[5] = 6+2;
+       _code[6] = JMP;
+       _code[7] = 21+2;
+       _code[8] = POP;
+       _code[9] = 0;
+       _code[10] = PUSH_RG;
+       _code[9+2] = 0;
+       _code[10+2] = PUSH_RG;
+       _code[11+2] = 0;
+       _code[12+2] = PUSH_VL;
+       _code[13+2] = 1;
+       _code[14+2] = JE;
+       _code[15+2] = 19+2;
+
+       _code[16+2] = SUB;
+       _code[17+2] = CALL;
+       _code[18+2]  = 6;
+       _code[19+2] = MUL;
+       _code[20+2] = RET;
+       _code[23] = POP;
+       _code[24] = 0;
+       _code[25] = END;
     /*! @brief (5+9)/2 = 7 */
 /*    _regs[1] = 5;
     _regs[2] = 9;
@@ -215,7 +242,7 @@ void ALU::Execute()
             break;
 
             case END:
-
+                print("/#", _regs[0]);
             break;
 
         }

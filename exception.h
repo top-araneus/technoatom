@@ -15,6 +15,7 @@ Exception(ERRCODE, DESC, __FILE__, __LINE__, PARENT) \
 
 #include <exception>
 #include <iomanip>
+#include "print.h"
 
 class Exception : public std::exception
 {
