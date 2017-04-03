@@ -4,9 +4,11 @@
 
 int main(int argc, char *argv[])
 {
-    std::string str = "1qwe";
-    str.erase(0,1);
-    std::cout << str;
+    print("ja rodilsja <3\n");
+    Translator("factorial.alu", "code.bin");
+    Disassembler("code.bin", "disassembled.alu");
+    //Translator(argv[1], argv[2]);
+    print("ja sdoh ._.");
 
     return 0;
 }

@@ -64,6 +64,15 @@ ALU::~ALU()
 
 void ALU::Load(const char* filename)
 {
+    std::ifstream fin(filename, std::ios_base::in | std::ios_base::binary);
+    int buff;
+    int cnt = 0;
+    while (!fin.eof())
+    {
+        fin.read((char*)&buff, sizeof(buff));
+        _code[cnt++] = buff;
+    }
+    fin.close();
 
     /*! @brief 2+2 = 4 */
    /* _code[0] = PUSH_VL;
@@ -74,7 +83,7 @@ void ALU::Load(const char* filename)
     _code[5] = POP;
     _code[6] = 0;
     _code[7] = END;*/
-
+/*
        _code[0] = PUSH_VL;
        _code[1] = 1;
        _code[2] = PUSH_VL;
@@ -101,7 +110,7 @@ void ALU::Load(const char* filename)
        _code[20+2] = RET;
        _code[23] = POP;
        _code[24] = 0;
-       _code[25] = END;
+       _code[25] = END;*/
     /*! @brief (5+9)/2 = 7 */
 /*    _regs[1] = 5;
     _regs[2] = 9;
