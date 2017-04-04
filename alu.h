@@ -52,8 +52,8 @@ ALU::ALU()
 {
     print("Hi!");
     _regs.Resize(256);
-    _code.Resize(1000);
-    Load("code.bin");
+	_code.Resize(5000);
+	Load("..\\technoatom\\Translator\\bin_code\\fact4.bin");
     Execute();
 }
 
@@ -66,10 +66,13 @@ void ALU::Load(const char* filename)
 {
     std::ifstream fin(filename, std::ios_base::in | std::ios_base::binary);
     int buff;
-    int cnt = 0;
-    while (!fin.eof())
-    {
-        fin.read((char*)&buff, sizeof(buff));
+	int cnt = 0;
+	while (fin.read((char*)&buff, sizeof(buff)))
+	{
+		if (cnt == 4999)
+		{
+			print("nepriyatno");
+		}
         _code[cnt++] = buff;
     }
     fin.close();
@@ -200,7 +203,7 @@ void ALU::Execute()
             break;
 
             case CALL:
-                _call.push(pos+1);
+				_call.push(pos+2);
                 pos = _code[pos+1];
             break;
 

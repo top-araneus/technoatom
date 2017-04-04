@@ -77,6 +77,10 @@ void Translator(const char* input, const char* output)
     }
     std::ifstream fin(input, std::ios_base::in);
     std::ofstream fout(output, std::ios_base::out | std::ios_base::binary);
+	if (!fin.is_open())
+	{
+		cout << "File don't opened" << endl;
+	}
     std::string current_cmd;
     int line_number = 0;
     while(!fin.eof())
