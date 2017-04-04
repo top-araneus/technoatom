@@ -14,12 +14,9 @@ SOURCES += main.cpp
 HEADERS += \
     stack.h \
     array.h \
-    exception.h \
     arraytest.h \
     array_iter.h \
     stacktest.h \
-    print.h \
     bit_iter.h \
     smart_ptr.h \
-    smart_ptr_test.h \
-    alu.h
+    smart_ptr_test.h

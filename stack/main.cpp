@@ -4,13 +4,12 @@
 #include <ctime>
 #include <new>
 #include <cstring>
-#include "print.h"
+#include "../utils/print.h"
 #include "stack.h"
 #include "arraytest.h"
 #include "stacktest.h"
 #include "smart_ptr.h"
 #include "smart_ptr_test.h"
-#include "alu.h"
 using namespace std;
 
 
@@ -31,7 +30,7 @@ Array<double> testfunc(Array<double> arr)
 int main()
 {
 
-/*    ArrayTest<double>* tests = new ArrayTest<double>;
+    ArrayTest<double>* tests = new ArrayTest<double>;
     tests->TestAll();
     delete tests;
     ArrayTest<bool>* testsBool = new ArrayTest<bool>;
@@ -48,9 +47,7 @@ int main()
     test_unique.TestAll();
     test_shared.TestAll();
 
-    hack_ptrs<int>();*/
-    ALU alu;
+    hack_ptrs<int>();
 
-    getchar();
     return 0;
 }

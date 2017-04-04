@@ -10,6 +10,7 @@
 #include <typeinfo>
 #include <cstdlib>
 #include <fstream>
+
 #include "array_iter.h"
 #include "bit_iter.h"
 using namespace std;

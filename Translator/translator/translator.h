@@ -3,8 +3,10 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
-#include "..\..\Array.h"
+#include "../../stack/array.h"
 
+
+/* Command codes for ALU */
 const int EXC = 0;
 const int PUSH_RG = 1;
 const int PUSH_VL = 2;
@@ -27,6 +29,7 @@ const int DIV = 23;
 
 const int END = 255;
 
+typedef int BlockType;
 
 template<typename T>
 T fromString(const std::string& s)
@@ -40,28 +43,28 @@ T fromString(const std::string& s)
 void Arithmetics(int code, std::ostream& fout)
 {
     cout << "Arithmetics: " << code << endl;
-    int buff = code;
+    BlockType buff = code;
     fout.write((char*)&buff, sizeof(buff));
 }
 
-void Push_Pop(std::string& current_cmd, int code, std::ostream& fout, bool isReg)
+void Push_Pop(std::string& current_cmd, BlockType code, std::ostream& fout, bool isReg)
 {
     cout << "Push_Pop: " << code << " " << current_cmd << endl;
-    int buff = code;
+    BlockType buff = code;
     fout.write((char*)&buff, sizeof(buff));
     if(isReg)
         current_cmd.erase(0,1);
-    buff = fromString<int>(current_cmd);
+    buff = fromString<BlockType>(current_cmd);
     fout.write((char*)&buff, sizeof(buff));
 }
 
-void Jmp_Call(std::string& current_cmd, int code, std::ostream& fout, Array<int>& marks)
+void Jmp_Call(std::string& current_cmd, BlockType code, std::ostream& fout, Array<BlockType>& marks)
 {
-    int buff = code;
+    BlockType buff = code;
     fout.write((char*)&buff, sizeof(buff));
     current_cmd.erase(0,1);
-    buff = marks[fromString<int>(current_cmd)];
-    cout << "Jmp_Call: " << code << " " << marks[fromString<int>(current_cmd)] << endl;
+    buff = marks[fromString<BlockType>(current_cmd)];
+    cout << "Jmp_Call: " << code << " " << marks[fromString<BlockType>(current_cmd)] << endl;
     fout.write((char*)&buff, sizeof(buff));
 }
 
@@ -70,7 +73,7 @@ const int default_value = -1;
 
 void Translator(const char* input, const char* output)
 {
-    Array<int> marks(default_size);
+    Array<BlockType> marks(default_size);
     for (int i = 0; i < default_size; ++i)
     {
         marks[i] = default_value;
@@ -79,10 +82,10 @@ void Translator(const char* input, const char* output)
     std::ofstream fout(output, std::ios_base::out | std::ios_base::binary);
 	if (!fin.is_open())
 	{
-		cout << "File don't opened" << endl;
+        cout << "File didn't open" << endl;
 	}
     std::string current_cmd;
-    int line_number = 0;
+    BlockType line_number = 0;
     while(!fin.eof())
     {
         fin >> current_cmd;
@@ -96,7 +99,7 @@ void Translator(const char* input, const char* output)
         {
             cout << current_cmd;
             current_cmd.erase(0,1);
-            marks[fromString<int>(current_cmd)] = line_number;
+            marks[fromString<BlockType>(current_cmd)] = line_number;
             cout << " " << line_number << endl;
             continue;
         }
@@ -107,8 +110,6 @@ void Translator(const char* input, const char* output)
     while(!fin.eof())
     {
         fin >> current_cmd;
-
-        /* may crash without if-else */
 
         if(current_cmd == "push")
         {
@@ -194,14 +195,14 @@ void Translator(const char* input, const char* output)
         }
         if(current_cmd == "ret")
         {
-            int buff = RET;
+            BlockType buff = RET;
             fout.write((char*)&buff, sizeof(buff));
             cout << "Ret: " << RET << endl;
         }
         if(current_cmd == "end")
         {
             cout << "End: " << END << endl;
-            int buff = END;
+            BlockType buff = END;
             fout.write((char*)&buff, sizeof(buff));
         }
     }
@@ -214,11 +215,10 @@ void Disassembler(const char* input, const char* output)
 {
     std::ifstream fin(input, std::ios_base::in | std::ios_base::binary);
     std::ofstream fout(output, std::ios_base::out);
-    int buff;
+    BlockType buff;
     int cnt = 0;
     while (fin.read((char*)&buff, sizeof(buff)))
     {
-        //fin.read((char*)&buff, sizeof(buff));
         switch(buff)
         {
             case EXC:

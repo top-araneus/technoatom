@@ -8,7 +8,7 @@
 #define SMART_PTR_H
 
 #include <cstdlib>
-#include "exception.h"
+#include "../utils/exception.h"
 //-----------------------------------
 //! @brief Auto_ptr class. Type is a type of element auto_ptr references to.
 //! Auto_ptr works as pointer, but copy and assignment works
