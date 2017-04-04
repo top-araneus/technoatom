@@ -8,39 +8,13 @@
 #define ALU_H
 #include "..\..\stack\array.h"
 #include "..\..\stack\stack.h"
-#include "..\..\exception.h"
-#include "..\..\print.h"
+#include "..\..\utils\exception.h"
+#include "..\..\utils\print.h"
+#include "..\..\utils\alupa.h"
 
-template <typename BlockType = int>
 class ALU
 {
     private:
-        static const int CODE_DEFAULT_SIZE = 1000;
-        static const int REGS_DEFAULT_SIZE = 16;
-        static const int STEP = 50;
-
-        static const BlockType EXC = 0;
-        static const BlockType PUSH_RG = 1;
-        static const BlockType PUSH_VL = 2;
-        static const BlockType POP = 3;
-
-        static const BlockType JMP = 10;
-        static const BlockType CALL = 11;
-        static const BlockType RET = 12;
-        static const BlockType JE = 13;
-        static const BlockType JNE = 14;
-        static const BlockType JL = 15;
-        static const BlockType JLE = 16;
-        static const BlockType JG = 17;
-        static const BlockType JGE = 18;
-
-        static const BlockType ADD = 20;
-        static const BlockType SUB = 21;
-        static const BlockType MUL = 22;
-        static const BlockType DIV = 23;
-
-        static const BlockType END = 255;
-
         Array<BlockType> regs_;
         Array<BlockType> code_;
         Stack<BlockType> stack_;
@@ -51,26 +25,25 @@ class ALU
         ALU(std::string filename);
         ~ALU();
         void Execute();
+        template <typename... Args>
+        void Execute(BlockType value, Args... args);
         BlockType GetRegister(int reg);
         void GetRegister(bool all);
         void SetRegister(int reg, BlockType value);
 };
 
-template <typename BlockType>
-ALU<BlockType>::ALU(std::string filename)
+ALU::ALU(std::string filename)
 {
     regs_.Resize(REGS_DEFAULT_SIZE);
     code_.Resize(CODE_DEFAULT_SIZE);
     Load("..\\..\\bin_code\\" + filename);
 }
 
-template <typename BlockType>
-ALU<BlockType>::~ALU()
+ALU::~ALU()
 {
 }
 
-template <typename BlockType>
-void ALU<BlockType>::Load(std::string filename)
+void ALU::Load(std::string filename)
 {
     std::ifstream fin(filename, std::ios_base::in | std::ios_base::binary);
     BlockType buff;
@@ -87,8 +60,7 @@ void ALU<BlockType>::Load(std::string filename)
 
 }
 
-template <typename BlockType>
-void ALU<BlockType>::Execute()
+void ALU::Execute()
 {
     int pos = 0;
     while (code_[pos] != END)
@@ -202,14 +174,19 @@ void ALU<BlockType>::Execute()
     }
 }
 
-template <typename BlockType>
-BlockType ALU<BlockType>::GetRegister(int reg)
+template <typename... Args>
+void ALU::Execute(BlockType value, Args... args)
+{
+    stack_.push(value);
+    Execute(args...);
+}
+
+BlockType ALU::GetRegister(int reg)
 {
     return regs_[reg];
 }
 
-template <typename BlockType>
-void ALU<BlockType>::GetRegister(bool all)
+void ALU::GetRegister(bool all)
 {
     if (all)
     {
@@ -217,8 +194,7 @@ void ALU<BlockType>::GetRegister(bool all)
     }
 }
 
-template <typename BlockType>
-void ALU<BlockType>::SetRegister(int reg, BlockType value)
+void ALU::SetRegister(int reg, BlockType value)
 {
     regs_[reg] = value;
 }

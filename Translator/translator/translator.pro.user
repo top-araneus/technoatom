@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 4.0.3, 2017-04-04T18:01:11. -->
+<!-- Written by QtCreator 4.0.3, 2017-04-04T18:28:34. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -290,7 +290,7 @@
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">translator2</value>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:D:/Dropbox/Coding/MailRu/technoatom/Translator/translator/translator.pro</value>
     <value type="bool" key="QmakeProjectManager.QmakeRunConfiguration.UseLibrarySearchPath">true</value>
-    <value type="QString" key="Qt4ProjectManager.Qt4RunConfiguration.CommandLineArguments"></value>
+    <value type="QString" key="Qt4ProjectManager.Qt4RunConfiguration.CommandLineArguments">for_asm.alu assembled.bin</value>
     <value type="QString" key="Qt4ProjectManager.Qt4RunConfiguration.ProFile">translator.pro</value>
     <value type="bool" key="Qt4ProjectManager.Qt4RunConfiguration.UseDyldImageSuffix">false</value>
     <value type="QString" key="Qt4ProjectManager.Qt4RunConfiguration.UserWorkingDirectory"></value>

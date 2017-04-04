@@ -10,3 +10,13 @@ Translator/translator/Makefile
 *.txt
 *.4bc11dd
 stack/stack.pro.user.lz6216
+*.exe
+Translator/translator/debug/main.o
+*.o
+Translator/translator/debug/translator.exe
+*.o
+ALU/alu_bin/debug/main.o
+*.exe
+*.o
+Translator/translator/debug/main.o
+*.o

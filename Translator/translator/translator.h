@@ -4,32 +4,7 @@
 #include <iostream>
 #include <sstream>
 #include "../../stack/array.h"
-
-
-/* Command codes for ALU */
-const int EXC = 0;
-const int PUSH_RG = 1;
-const int PUSH_VL = 2;
-const int POP = 3;
-
-const int JMP = 10;
-const int CALL = 11;
-const int RET = 12;
-const int JE = 13;
-const int JNE = 14;
-const int JL = 15;
-const int JLE = 16;
-const int JG = 17;
-const int JGE = 18;
-
-const int ADD = 20;
-const int SUB = 21;
-const int MUL = 22;
-const int DIV = 23;
-
-const int END = 255;
-
-typedef int BlockType;
+#include "../../utils/alupa.h"
 
 template<typename T>
 T fromString(const std::string& s)
@@ -71,15 +46,15 @@ void Jmp_Call(std::string& current_cmd, BlockType code, std::ostream& fout, Arra
 const int default_size = 200;
 const int default_value = -1;
 
-void Translator(const char* input, const char* output)
+void Translator(std::string input, std::string output)
 {
     Array<BlockType> marks(default_size);
     for (int i = 0; i < default_size; ++i)
     {
         marks[i] = default_value;
     }
-    std::ifstream fin(input, std::ios_base::in);
-    std::ofstream fout(output, std::ios_base::out | std::ios_base::binary);
+    std::ifstream fin(input.c_str(), std::ios_base::in);
+    std::ofstream fout(output.c_str(), std::ios_base::out | std::ios_base::binary);
 	if (!fin.is_open())
 	{
         cout << "File didn't open" << endl;
@@ -210,121 +185,5 @@ void Translator(const char* input, const char* output)
     fout.close();
 }
 
-
-void Disassembler(const char* input, const char* output)
-{
-    std::ifstream fin(input, std::ios_base::in | std::ios_base::binary);
-    std::ofstream fout(output, std::ios_base::out);
-    BlockType buff;
-    int cnt = 0;
-    while (fin.read((char*)&buff, sizeof(buff)))
-    {
-        switch(buff)
-        {
-            case EXC:
-                throw EALUBadInstruction(__FL__);
-            break;
-
-            case PUSH_RG:
-                fout << "push x";
-                fin.read((char*)&buff, sizeof(buff));
-                fout << buff << endl;
-            break;
-
-            case PUSH_VL:
-                fout << "push ";
-                fin.read((char*)&buff, sizeof(buff));
-                fout << buff << endl;
-            break;
-
-            case POP:
-                fout << "pop x";
-                fin.read((char*)&buff, sizeof(buff));
-                fout << buff << endl;
-            break;
-
-            case ADD:
-                fout << "add" << endl;
-            break;
-
-            case SUB:
-            {
-                fout << "sub" << endl;
-            }
-            break;
-
-            case MUL:
-                fout << "mul" << endl;
-            break;
-
-            case DIV:
-            {
-                fout << "div" << endl;
-            }
-            break;
-
-            case JMP:
-                fout << "jmp ";
-                fin.read((char*)&buff, sizeof(buff));
-                fout << buff << endl;
-            break;
-
-            case CALL:
-                fout << "call ";
-                fin.read((char*)&buff, sizeof(buff));
-                fout << buff << endl;
-            break;
-
-            case RET:
-                fout << "ret" << endl;
-            break;
-
-            case JE:
-                fout << "je ";
-                fin.read((char*)&buff, sizeof(buff));
-                fout << buff << endl;
-            break;
-
-            case JNE:
-                fout << "jne ";
-                fin.read((char*)&buff, sizeof(buff));
-                fout << buff << endl;
-            break;
-
-            case JL:
-                fout << "jl ";
-                fin.read((char*)&buff, sizeof(buff));
-                fout << buff << endl;
-            break;
-
-            case JLE:
-                fout << "jle ";
-                fin.read((char*)&buff, sizeof(buff));
-                fout << buff << endl;
-            break;
-
-            case JG:
-                fout << "jg ";
-                fin.read((char*)&buff, sizeof(buff));
-                fout << buff << endl;
-            break;
-
-            case JGE:
-                fout << "jge ";
-                fin.read((char*)&buff, sizeof(buff));
-                fout << buff << endl;
-            break;
-
-            case END:
-            {
-                fout << "end" << endl;
-            }
-            break;
-
-        }
-    }
-    fout.close();
-    fin.close();
-}
 
 #endif // TRANSLATOR_H
