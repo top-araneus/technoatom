@@ -1,7 +1,6 @@
 *.stash
 Translator/build-translator-Desktop_Qt_5_7_0_MinGW_32bit-Debug/debug/translator.exe
 Translator/build-translator-Desktop_Qt_5_7_0_MinGW_32bit-Debug/manyafib.alu
-*.alu
 Translator/build-translator-Desktop_Qt_5_7_0_MinGW_32bit-Debug/code.bin
 *.Debug
 Translator/translator/translator.pro.user.4bc11dd
