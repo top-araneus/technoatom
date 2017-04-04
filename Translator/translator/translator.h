@@ -3,8 +3,12 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
-#include "../../stack/array.h"
+#include "../../../technoatom/stack/stack/array.h"
 #include "../../utils/alupa.h"
+
+
+const int default_size = 200;
+const int default_value = -1;
 
 template<typename T>
 T fromString(const std::string& s)
@@ -43,9 +47,6 @@ void Jmp_Call(std::string& current_cmd, BlockType code, std::ostream& fout, Arra
     fout.write((char*)&buff, sizeof(buff));
 }
 
-const int default_size = 200;
-const int default_value = -1;
-
 void Translator(std::string input, std::string output)
 {
     Array<BlockType> marks(default_size);
@@ -58,6 +59,7 @@ void Translator(std::string input, std::string output)
 	if (!fin.is_open())
 	{
         cout << "File didn't open" << endl;
+		return;
 	}
     std::string current_cmd;
     BlockType line_number = 0;

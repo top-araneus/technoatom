@@ -6,8 +6,8 @@
 //-----------------------------------
 #ifndef ALU_H
 #define ALU_H
-#include "..\..\stack\array.h"
-#include "..\..\stack\stack.h"
+#include "..\..\stack/stack/array.h"
+#include "..\..\stack/stack/stack.h"
 #include "..\..\utils\exception.h"
 #include "..\..\utils\print.h"
 #include "..\..\utils\alupa.h"

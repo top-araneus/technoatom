@@ -7,9 +7,13 @@ using namespace std;
 void Disassembler(std::string input, std::string output)
 {
     std::ifstream fin(input.c_str(), std::ios_base::in | std::ios_base::binary);
+	if (!fin.is_open())
+	{
+		cout << "File didn't open" << endl;
+		return;
+	}
     std::ofstream fout(output.c_str(), std::ios_base::out);
-    BlockType buff;
-    int cnt = 0;
+	BlockType buff;
     while (fin.read((char*)&buff, sizeof(buff)))
     {
         switch(buff)
