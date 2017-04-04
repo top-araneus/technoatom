@@ -4,7 +4,7 @@
 #include <ctime>
 #include <new>
 #include <cstring>
-#include "../utils/print.h"
+#include "../../utils/print.h"
 #include "stack.h"
 #include "arraytest.h"
 #include "stacktest.h"

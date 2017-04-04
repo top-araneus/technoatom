@@ -1,0 +1,29 @@
+push x0
+call 6
+jmp 49
+pop x0
+push x0
+push x0
+push 0
+jne 21
+pop x0
+push 1
+ret
+pop x0
+push 1
+push x0
+call 30
+ret
+pop x0
+push x0
+push x0
+push 1
+jle 47
+push x0
+push 1
+sub
+call 30
+mul
+ret
+pop x0
+end

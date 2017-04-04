@@ -19,3 +19,11 @@ ALU/alu_bin/debug/main.o
 *.o
 Translator/translator/debug/main.o
 *.o
+Translator/build-translator-Desktop_Qt_5_7_0_MinGW_32bit-Debug/disassembled.alu
+Translator/build-translator-Desktop_Qt_5_7_0_MinGW_32bit-Debug/proga.alu
+Translator/build-translator-Desktop_Qt_5_7_0_MinGW_32bit-Debug/factorial.alu
+Translator/build-translator-Desktop_Qt_5_7_0_MinGW_32bit-Debug/fibb.alu
+Translator/translator/proga.alu
+Translator/build-translator-Desktop_Qt_5_7_0_MinGW_32bit-Debug/jump.alu
+stack/stack/stack.pro.user.lz6216
+*.o
