@@ -4,6 +4,9 @@
 #include <fstream>
 using namespace std;
 
+
+/*! @fn Disassembler(std::string input, std::string output)
+ * @brief Gets ALU bytecode from input file and returns assembler code in output file */
 void Disassembler(std::string input, std::string output)
 {
     std::ifstream fin(input.c_str(), std::ios_base::in | std::ios_base::binary);

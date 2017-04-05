@@ -10,6 +10,8 @@
 const int default_size = 200;
 const int default_value = -1;
 
+/*! @fn T fromString(const std::string& s)
+    @brief Converts string value to defined type and returns it */
 template<typename T>
 T fromString(const std::string& s)
 {
@@ -19,13 +21,24 @@ T fromString(const std::string& s)
     return res;
 }
 
-void Arithmetics(int code, std::ostream& fout)
+/*! @fn Arithmetics(int code, std::ostream& fout)
+    @brief Generates bytecode for arithmetical operations (add etc.)
+    @arg BlockType code is an operation code to write
+    @arg fout is a file to write */
+void Arithmetics(BlockType code, std::ostream& fout)
 {
     cout << "Arithmetics: " << code << endl;
     BlockType buff = code;
     fout.write((char*)&buff, sizeof(buff));
 }
 
+/*! @fn Push_Pop(std::string& current_cmd, BlockType code, std::ostream& fout, bool isReg)
+    @brief Generates bytecode for push and pop operations
+    @arg BlockType code is an operation code to write
+    @arg fout is a file to write
+    @arg isReg is a marker for push type
+    @arg current_cmd is a string with current command to translate
+    */
 void Push_Pop(std::string& current_cmd, BlockType code, std::ostream& fout, bool isReg)
 {
     cout << "Push_Pop: " << code << " " << current_cmd << endl;
@@ -37,6 +50,13 @@ void Push_Pop(std::string& current_cmd, BlockType code, std::ostream& fout, bool
     fout.write((char*)&buff, sizeof(buff));
 }
 
+/*! @fn Jmp_Call(std::string& current_cmd, BlockType code, std::ostream& fout, Array<BlockType>& marks)
+    @brief Generates bytecode for jump constructions
+    @arg BlockType code is an operation code to write
+    @arg fout is a file to write
+    @arg marks is an array with labels' addresses
+    @arg current_cmd is a string with current command to translate
+    */
 void Jmp_Call(std::string& current_cmd, BlockType code, std::ostream& fout, Array<BlockType>& marks)
 {
     BlockType buff = code;
@@ -47,6 +67,8 @@ void Jmp_Call(std::string& current_cmd, BlockType code, std::ostream& fout, Arra
     fout.write((char*)&buff, sizeof(buff));
 }
 
+/*! @fn Translator(std::string input, std::string output)
+    @brief Translates assembler code from input into ALU bytecode to output */
 void Translator(std::string input, std::string output)
 {
     Array<BlockType> marks(default_size);
