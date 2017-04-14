@@ -1,11 +1,13 @@
 # depslib dependency file v1.0
-1492170299 source:d:\projects\technoatom\game\main.cpp
+1492199860 source:d:\projects\technoatom\game\main.cpp
 	<SFML/Graphics.hpp>
 	<iostream>
 	<../../../utils/print.h>
 	<../../../ALU/ALU/alu.h>
 	<../../../stack/stack/stack.h>
 	<../../../stack/stack/smart_ptr.h>
+	<refpoint.h>
+	<GameObjects.h>
 
 1429780453 d:\projects\technoatom\game\sfml-2.3.2\include\sfml\graphics.hpp
 	<SFML/Window.hpp>
@@ -422,4 +424,10 @@
 1492169439 d:\projects\technoatom\stack\stack\smart_ptr.h
 	<cstdlib>
 	"../../utils/exception.h"
+
+1492198994 d:\projects\technoatom\game\\refpoint.h
+
+1492196773 d:\projects\technoatom\game\\gameobjects.h
+	"refpoint.h"
+	<../../../stack/stack/smart_ptr.h>
 

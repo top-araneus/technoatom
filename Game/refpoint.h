@@ -1,3 +1,6 @@
+#ifndef REFPOINT_H
+#define REFPOINT_H
+
 template <typename CoordType>
 class LinearVector
 {
@@ -22,8 +25,8 @@ LinearVector<CoordType>::LinearVector()
 template <typename CoordType>
 LinearVector<CoordType>::LinearVector(CoordType x, CoordType y)
 {
-    x_ = 0;
-    y_ = 0;
+    x_ = x;
+    y_ = y;
 }
 
 template <typename CoordType>
@@ -40,11 +43,8 @@ LinearVector<CoordType>& LinearVector<CoordType>::operator=(LinearVector<CoordTy
 template <typename CoordType>
 LinearVector<CoordType>& LinearVector<CoordType>::operator=(LinearVector<CoordType>&& that)
 {
-    if (this != &that)
-    {
-        x_ = that.x_;
-        y_ = that.y_;
-    }
+    x_ = that.x_;
+    y_ = that.y_;
     return *this;
 }
 
@@ -70,8 +70,8 @@ class ReferenceFrame
 {
 private:
     LinearVector<int> coords_;
-    LinearVector<int> size_;
 public:
+    LinearVector<int> size_;
     ReferenceFrame()
     {
         coords_ = LinearVector<int>(0,0);
@@ -91,4 +91,14 @@ public:
         coords_.y_ = y;
     }
 
+    int GetX()
+    {
+        return coords_.x_;
+    }
+    int GetY()
+    {
+        return coords_.y_;
+    }
 };
+
+#endif
