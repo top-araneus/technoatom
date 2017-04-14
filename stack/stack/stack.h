@@ -16,7 +16,7 @@ template<typename value_type>
 class Stack
 {
 public:
-    static const size_t POISON_INT = 0xBADA558D;        //!< Number for detecting zombie objects after destruction
+   static const size_t POISON_INT = 0xBADA558D;        //!< Number for detecting zombie objects after destruction
 
     Stack();
     //----------------------------------
@@ -94,7 +94,7 @@ public:
 
 
 private:
-    static const size_t SIZE_STEP = 5;   //!< When stack is full, its capacity will be increased to this value
+    static const size_t SIZE_STEP = 42;   //!< When stack is full, its capacity will be increased to this value
     size_t capacity_;                     //!< Max number of elements stack can contain without enlarging
     size_t size_;                   //!< Number of elements in a stack now
     Array<value_type>* data_;

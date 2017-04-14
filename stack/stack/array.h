@@ -10,6 +10,7 @@
 #include <typeinfo>
 #include <cstdlib>
 #include <fstream>
+
 #include "array_iter.h"
 #include "bit_iter.h"
 using namespace std;
@@ -777,7 +778,7 @@ void Array<bool>::Resize(size_t size)
         block_type* newdata = new block_type[size / BLOCK_SIZE + 1];
         if (data_ != nullptr)
         {
-            for (int i = 0; i <= (size > size_ ? size_/BLOCK_SIZE : size/BLOCK_SIZE); ++i)
+            for (size_t i = 0; i <= (size > size_ ? size_/BLOCK_SIZE : size/BLOCK_SIZE); ++i)
             {
                 newdata[i] = data_[i];
             }
@@ -790,7 +791,7 @@ void Array<bool>::Resize(size_t size)
 
 void Array<bool>::Clear()
 {
-    for (int i = 0; i <= size_/BLOCK_SIZE; ++i)
+    for (size_t i = 0; i <= size_/BLOCK_SIZE; ++i)
         {
             data_[i] = 0;
         }
@@ -804,7 +805,7 @@ inline void Array<bool>::Swap(Array<bool> &that)
 
 void Array<bool>::Erase(int index)
 {
-    for (int i = index; i < size_-1; ++i)
+    for (size_t i = index; i < size_-1; ++i)
     {
         (*this)[i] = (*this)[i+1];
     }

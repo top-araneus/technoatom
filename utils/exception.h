@@ -15,6 +15,7 @@ Exception(ERRCODE, DESC, __FILE__, __LINE__, PARENT) \
 
 #include <exception>
 #include <iomanip>
+#include "print.h"
 
 class Exception : public std::exception
 {
@@ -90,7 +91,7 @@ public:
 
 protected:
     int errcode_;
-    char* description_;
+    const char* description_;
     char* file_;
     int line_;
     Exception* parent_;
@@ -142,7 +143,7 @@ public:
         Exception(0xDC, "Data is corrupted", "", -1, nullptr)    {    }
 
     EDataCorrupted(char* file, int line, Exception* parent = nullptr) throw():
-        Exception(0xDC, "Data is corrupted", file, line, nullptr)    {    }
+        Exception(0xDC, "Data is corrupted", file, line, parent)    {    }
 };
 
 class EFileCreationError : public Exception
@@ -154,7 +155,7 @@ public:
         Exception(0xFC, "File creation error", "", -1, nullptr)    {    }
 
     EFileCreationError(char* file, int line, Exception* parent = nullptr) throw():
-        Exception(0xFC, "File creation error", file, line, nullptr)    {    }
+        Exception(0xFC, "File creation error", file, line, parent)    {    }
 };
 
 class EBadSize : public Exception
@@ -166,7 +167,7 @@ public:
         Exception(0xB5, "Bad size. Check index", "", -1, nullptr)    {    }
 
     EBadSize(char* file, int line, Exception* parent = nullptr) throw():
-        Exception(0xB5, "Bad size. Check index", file, line, nullptr)    {    }
+        Exception(0xB5, "Bad size. Check index", file, line, parent)    {    }
 };
 
 class EIndexOutOfRange : public Exception
@@ -178,7 +179,7 @@ public:
         Exception(0x10, "Index is out of range", "", -1, nullptr)    {    }
 
     EIndexOutOfRange(char* file, int line, Exception* parent = nullptr) throw():
-        Exception(0x10, "Index is out of range", file, line, nullptr)    {    }
+        Exception(0x10, "Index is out of range", file, line, parent)    {    }
 };
 
 class ETestFailed : public Exception
@@ -190,7 +191,7 @@ public:
         Exception(0x7F, "Unit test failed", "", -1, nullptr)    {    }
 
     ETestFailed(char* file, int line, Exception* parent = nullptr) throw():
-        Exception(0x7F, "Unit test failed", file, line, nullptr)    {    }
+        Exception(0x7F, "Unit test failed", file, line, parent)    {    }
 };
 
 class EIterHasNoArray : public Exception
@@ -202,7 +203,7 @@ public:
         Exception(0x1A, "Tried to initialize iterator without array", "", -1, nullptr)    {    }
 
     EIterHasNoArray(char* file, int line, Exception* parent = nullptr) throw():
-        Exception(0x1A, "Tried to initialize iterator without array", file, line, nullptr)    {    }
+        Exception(0x1A, "Tried to initialize iterator without array", file, line, parent)    {    }
 };
 
 class EDullException : public Exception
@@ -214,7 +215,7 @@ public:
         Exception(0xDE, "Dull user-generated exception", "", -1, nullptr)    {    }
 
     EDullException(char* file, int line, Exception* parent = nullptr) throw():
-        Exception(0xDE, "Dull user-generated exception", file, line, nullptr)    {    }
+        Exception(0xDE, "Dull user-generated exception", file, line, parent)    {    }
 };
 
 class ENullDereference : public Exception
@@ -226,8 +227,19 @@ public:
         Exception(0x0D, "Tried to dereference null pointer", "", -1, nullptr)    {    }
 
     ENullDereference(char* file, int line, Exception* parent = nullptr) throw():
-        Exception(0x0D, "Tried to dereference null pointer", file, line, nullptr)    {    }
+        Exception(0x0D, "Tried to dereference null pointer", file, line, parent)    {    }
 };
 
+class EALUBadInstruction : public Exception
+{
+public:
+    using Exception::operator ==;
+    using Exception::operator !=;
+    EALUBadInstruction() throw():
+        Exception(0xAB, "Bad instruction in ALU code", "", -1, nullptr)    {    }
+
+    EALUBadInstruction(char* file, int line, Exception* parent = nullptr) throw():
+        Exception(0xAB, "Bad instruction in ALU code", file, line, parent)    {    }
+};
 
 #endif // EXCEPTION_H
