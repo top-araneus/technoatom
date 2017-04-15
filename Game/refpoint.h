@@ -1,5 +1,6 @@
 #ifndef REFPOINT_H
 #define REFPOINT_H
+#include <math.h>
 
 template <typename CoordType>
 class LinearVector
@@ -9,10 +10,17 @@ class LinearVector
         CoordType y_;
         LinearVector();
         LinearVector(CoordType x, CoordType y);
+        LinearVector(LinearVector& that);
+        LinearVector(LinearVector&& that);
         LinearVector& operator=(LinearVector& that);
         LinearVector& operator=(LinearVector&& that);
         LinearVector& operator-(LinearVector& that) const;
         LinearVector& operator+(LinearVector& that) const;
+        bool operator==(LinearVector& that) const;
+        bool operator!=(LinearVector& that) const;
+        bool operator==(LinearVector&& that) const;
+        bool operator!=(LinearVector&& that) const;
+        double GetAbs();
 };
 
 template <typename CoordType>
@@ -27,6 +35,20 @@ LinearVector<CoordType>::LinearVector(CoordType x, CoordType y)
 {
     x_ = x;
     y_ = y;
+}
+
+template <typename CoordType>
+LinearVector<CoordType>::LinearVector(LinearVector& that)
+{
+    x_ = that.x_;
+    y_ = that.y_;
+}
+
+template <typename CoordType>
+LinearVector<CoordType>::LinearVector(LinearVector&& that)
+{
+    x_ = that.x_;
+    y_ = that.y_;
 }
 
 template <typename CoordType>
@@ -51,19 +73,49 @@ LinearVector<CoordType>& LinearVector<CoordType>::operator=(LinearVector<CoordTy
 template <typename CoordType>
 LinearVector<CoordType>& LinearVector<CoordType>::operator-(LinearVector<CoordType>& that) const
 {
-    LinearVector<CoordType> v = LinearVector<CoordType>(x_, y_);
-    v.x_ = v.x_ - that.x_;
-    v.y_ = v.y_ - that.y_;
-    return v;
+    LinearVector<CoordType> res = LinearVector<CoordType>(x_, y_);
+    res.x_ = res.x_ - that.x_;
+    res.y_ = res.y_ - that.y_;
+    return res;
 }
 
 template <typename CoordType>
 LinearVector<CoordType>& LinearVector<CoordType>::operator+(LinearVector<CoordType>& that) const
 {
-    LinearVector<CoordType> v = LinearVector<CoordType>(x_, y_);
-    v.x_ = v.x_ + that.x_;
-    v.y_ = v.y_ + that.y_;
-    return v;
+    LinearVector<CoordType> res = LinearVector<CoordType>(x_, y_);
+    res.x_ = res.x_ + that.x_;
+    res.y_ = res.y_ + that.y_;
+    return res;
+}
+
+template <typename CoordType>
+double LinearVector<CoordType>::GetAbs()
+{
+    return sqrt(x_*x_ + y_*y_);
+}
+
+template <typename CoordType>
+bool LinearVector<CoordType>::operator==(LinearVector& that) const
+{
+    return (x_ == that.x_ && y_ == that.y_);
+}
+
+template <typename CoordType>
+bool LinearVector<CoordType>::operator!=(LinearVector& that) const
+{
+    return !((*this) == that);
+}
+
+template <typename CoordType>
+bool LinearVector<CoordType>::operator==(LinearVector&& that) const
+{
+    return (x_ == that.x_ && y_ == that.y_);
+}
+
+template <typename CoordType>
+bool LinearVector<CoordType>::operator!=(LinearVector&& that) const
+{
+    return !((*this) == that);
 }
 
 class ReferenceFrame
