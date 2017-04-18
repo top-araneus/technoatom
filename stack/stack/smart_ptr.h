@@ -184,6 +184,11 @@ class Unique_ptr
         Unique_ptr& operator=(Unique_ptr&& that);
 
         //-----------------------------------
+        //! @fn Unique_ptr& operator==(Type* that)
+        //-----------------------------------
+        bool operator==(Type* that);
+
+        //-----------------------------------
         //! @fn Type& operator*()
         //! @brief Depointing operator
         //! @return reference to value of object
@@ -242,6 +247,12 @@ Unique_ptr<Type>& Unique_ptr<Type>::operator=(Unique_ptr&& that)
 {
 	std::swap(this->ptr_, that.ptr_);
     return *this;
+}
+
+template <typename Type>
+bool Unique_ptr<Type>::operator==(Type* that)
+{
+	return (this->ptr_ == that);
 }
 
 template <typename Type>

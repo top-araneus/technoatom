@@ -2,10 +2,10 @@ using namespace std;
 #include <SFML/Graphics.hpp>
 using namespace sf;
 #include <iostream>
-#include <../../../utils/print.h>
-#include <../../../ALU/ALU/alu.h>
-#include <../../../stack/stack/stack.h>
-#include <../../../stack/stack/smart_ptr.h>
+#include <../utils/print.h>
+#include <../ALU/ALU/alu.h>
+#include <../stack/stack/stack.h>
+#include <../stack/stack/smart_ptr.h>
 #include <refpoint.h>
 #include <GameObjects.h>
 

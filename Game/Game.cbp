@@ -14,7 +14,25 @@
 				<Compiler>
 					<Add option="-std=c++11" />
 					<Add option="-g" />
+					<Add directory="C:/SFML-2.3.2/include" />
+					<Add directory="D:/Dropbox/Coding/MailRu/technoatom/Game/" />
+					<Add directory="C:/SFML-2.3.2/lib" />
 				</Compiler>
+				<Linker>
+					<Add library="C:/SFML-2.3.2/lib/libopenal32.a" />
+					<Add library="C:/SFML-2.3.2/lib/libsfml-audio.a" />
+					<Add library="C:/SFML-2.3.2/lib/libsfml-audio-d.a" />
+					<Add library="C:/SFML-2.3.2/lib/libsfml-graphics.a" />
+					<Add library="C:/SFML-2.3.2/lib/libsfml-graphics-d.a" />
+					<Add library="C:/SFML-2.3.2/lib/libsfml-main.a" />
+					<Add library="C:/SFML-2.3.2/lib/libsfml-main-d.a" />
+					<Add library="C:/SFML-2.3.2/lib/libsfml-system.a" />
+					<Add library="C:/SFML-2.3.2/lib/libsfml-system-d.a" />
+					<Add library="C:/SFML-2.3.2/lib/libsfml-window.a" />
+					<Add library="C:/SFML-2.3.2/lib/libsfml-window-d.a" />
+					<Add library="C:/SFML-2.3.2/lib/libjpeg.a" />
+					<Add directory="C:/SFML-2.3.2/lib" />
+				</Linker>
 			</Target>
 			<Target title="Release">
 				<Option output="bin/Release/Please" prefix_auto="1" extension_auto="1" />
@@ -33,7 +51,6 @@
 			<Add option="-Wall" />
 			<Add option="-std=c++11" />
 			<Add directory="SFML-2.3.2/include" />
-			<Add directory="D:/projects/technoatom/Game/" />
 		</Compiler>
 		<Linker>
 			<Add library="SFML-2.3.2/lib/libFLAC.a" />
@@ -48,7 +65,6 @@
 			<Add library="SFML-2.3.2/lib/libsfml-system-d.a" />
 			<Add library="SFML-2.3.2/lib/libsfml-window.a" />
 			<Add library="SFML-2.3.2/lib/libsfml-window-d.a" />
-			<Add directory="SFML-2.3.2/lib" />
 		</Linker>
 		<Unit filename="../ALU/ALU/alu.h" />
 		<Unit filename="../stack/stack/array.h" />
@@ -62,6 +78,7 @@
 		<Extensions>
 			<code_completion />
 			<debugger />
+			<envvars />
 		</Extensions>
 	</Project>
 </CodeBlocks_project_file>
