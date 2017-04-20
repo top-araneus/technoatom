@@ -19,6 +19,10 @@ class GameObject
         {
             return objectCode_;
         }
+        void SetFrame(unsigned char frame)
+        {
+            curFrame_ = frame % numOfFrames_;
+        }
     protected:
         LinearVector<int> refCoords_;
         LinearVector<int> cellCenter_;
@@ -284,10 +288,11 @@ class Player: public Mortal
         {
             Sprite playerSprite;
             playerSprite.setTexture(texture_);
-            playerSprite.setTextureRect(IntRect(curState_ * spriteSize_.x_, curFrame_ * spriteSize_.y_,
-                                                (curState_ + 1) * spriteSize_.x_, (curFrame_ + 1) * spriteSize_.y_));
-            playerSprite.setOrigin(Vector2f(spriteSize_.x_ / 2, spriteSize_.y_ - 32));
+            playerSprite.setTextureRect(IntRect(curFrame_ * spriteSize_.x_, curState_ * spriteSize_.y_,
+                                                (curFrame_ + 1) * spriteSize_.x_, (curState_ + 1) * spriteSize_.y_));
+            playerSprite.setOrigin(Vector2f(spriteSize_.x_ / 2, spriteSize_.y_ - CellHeight / 2));
             playerSprite.setPosition(refFrame_->GetX() + refCoords_.x_, refFrame_->GetY() + refCoords_.y_);
+            //curState_ = (curState_+1)%numOfState_;
             window_->draw(playerSprite);
         }
         void Interact() { }
@@ -305,6 +310,21 @@ class Player: public Mortal
             numOfFrames_ = 1;
             curFrame_ = 0;
             numOfState_ = 1;
+            curState_ = 0;
+            objectCode_ = 0;
+        }
+        Player(RenderWindow* window, LinearVector<int> spriteSize, Texture& texture, LinearVector<int> gridCoords, ReferenceFrame* refFrame, int numOfFrames, int numOfStates)
+        {
+            window_ = window;
+            refFrame_ = refFrame;
+            spriteSize_ = spriteSize;
+            texture_ = texture;
+            gridCoords_ = gridCoords;
+            refCoords_ = GetCoordsFromCell(gridCoords);
+            cellCenter_ = refCoords_;
+            numOfFrames_ = numOfFrames;
+            curFrame_ = 0;
+            numOfState_ = numOfStates;
             curState_ = 0;
             objectCode_ = 0;
         }

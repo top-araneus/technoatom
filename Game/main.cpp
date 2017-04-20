@@ -12,7 +12,7 @@ using namespace sf;
 
 int main()
 {
-	RenderWindow window(sf::VideoMode(800, 600), "Lev hodit po trave");
+	RenderWindow window(sf::VideoMode(800, 600), "Proekt Lev Protiv");
     ReferenceFrame mainFrame(-((TILES_AT_LINE + 1) * CellWidth / 4),-((TILES_AT_LINE + 1) * CellHeight / 4),800,600);
 
         print("frame width: /#, frame height: /#", mainFrame.size_.x_, mainFrame.size_.y_);
@@ -41,7 +41,10 @@ int main()
 	Texture herotexture;
 	herotexture.loadFromFile("images/hero.png");
 
-	Player player(&window, LinearVector<int>(192,96), herotexture, LinearVector<int>(5,5), &mainFrame);
+	Texture goptexture;
+	goptexture.loadFromFile("images/gopnik1.png");
+
+	Player player(&window, LinearVector<int>(128,224), goptexture, LinearVector<int>(10,23), &mainFrame, 2, 1);
 
 	Sprite herosprite;
 	herosprite.setTexture(herotexture);
@@ -53,7 +56,7 @@ int main()
 
 	while (window.isOpen())
 	{
-
+        int cnt = 0;
         isosprite.setPosition(mainFrame.GetX(), mainFrame.GetY() + (CellHeight / 2) * TILES_AT_LINE);
         //grassSprite.setPosition(mainFrame.GetX(), mainFrame.GetY()+16*10);
 		float time = clock.getElapsedTime().asMicroseconds();
@@ -158,6 +161,13 @@ int main()
        // window.draw(grassSprite);
 		window.draw(herosprite);
         player.Draw();
+
+		if (Keyboard::isKeyPressed(Keyboard::K)) {
+			CurrentFrame += 0.0025*time; //служит для прохождения по "кадрам". переменная доходит до трех суммируя произведение времени и скорости. изменив 0.005 можно изменить скорость анимации
+			if (CurrentFrame >= 2) CurrentFrame -= 2; //проходимся по кадрам с первого по третий включительно. если пришли к третьему кадру - откидываемся назад.
+            player.SetFrame((int)CurrentFrame);
+		}
+
 		window.display();
 	}
 
