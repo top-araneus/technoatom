@@ -41,6 +41,8 @@ int main()
 	Texture herotexture;
 	herotexture.loadFromFile("images/hero.png");
 
+	Player player(&window, LinearVector<int>(192,96), herotexture, LinearVector<int>(5,5), &mainFrame);
+
 	Sprite herosprite;
 	herosprite.setTexture(herotexture);
 	herosprite.setTextureRect(IntRect(0, 192, 96, 96));
@@ -155,6 +157,7 @@ int main()
         }
        // window.draw(grassSprite);
 		window.draw(herosprite);
+        player.Draw();
 		window.display();
 	}
 

@@ -2,7 +2,8 @@
 #define GAMEOBJECTS_H
 #include "refpoint.h"
 #include <../stack/stack/smart_ptr.h>
-
+#include <../utils/print.h>
+using namespace sf;
 const int CellWidth = 128;
 const int CellHeight = 64;
 const int TILES_AT_LINE = 50;
@@ -12,8 +13,12 @@ class GameObject
         virtual void Draw() = 0;
         virtual void Interact() = 0;
         virtual void Move() = 0;
-        GameObject();
-        virtual ~GameObject() = 0;
+        GameObject() { }
+        virtual ~GameObject() { }
+        unsigned char GetCode()
+        {
+            return objectCode_;
+        }
     protected:
         LinearVector<int> refCoords_;
         LinearVector<int> cellCenter_;
@@ -22,10 +27,21 @@ class GameObject
         unsigned char curFrame_;
         unsigned char numOfState_;
         unsigned char curState_;
+        unsigned char objectCode_;
         Texture texture_;
-        LinearVector<unsigned char> spriteSize_; //!< width and height of sprites is in tile count
-        static Unique_ptr<Array<Array<Unique_ptr<GameObject>>>> map_;
-        static Unique_ptr<ReferenceFrame> refFrame_;
+        RenderWindow* window_;
+        LinearVector<int> spriteSize_; //!< width and height of sprite
+        Unique_ptr<Array<Array<Unique_ptr<GameObject>>>> map_;
+        Unique_ptr<ReferenceFrame> refFrame_;
+        LinearVector<int> GetCoordsFromCell(LinearVector<int> cell)
+        {
+            print("Frame: /# /# \n", refFrame_->GetX(), refFrame_->GetY());
+            LinearVector<int> result;
+            result.x_ = cell.x_ * CellWidth / 2 + cell.y_ * CellWidth / 2 + CellWidth / 2;
+            result.y_ = TILES_AT_LINE * CellHeight / 2 + cell.x_ * CellHeight / 2 - cell.y_ * CellHeight / 2 + CellHeight / 2;
+            print("Lion: /# /# \n", result.x_, result.y_);
+            return result;
+        }
 };
 
 class StaticObject :public GameObject
@@ -36,9 +52,9 @@ class StaticObject :public GameObject
             refCoords_ = refCoords;
         }
         virtual ~StaticObject() = 0;
-        virtual void Draw()  override = 0;
-        virtual void Interact() override = 0;
-        virtual void Move() override = 0;
+        virtual void Draw()= 0;
+        virtual void Interact() = 0;
+        virtual void Move() = 0;
 
 };
 
@@ -46,7 +62,20 @@ class MovingObject :public GameObject
 {
     protected:
         LinearVector<int> velocity_;
+        void GoToCellIfEmpty(LinearVector<int> cell, LinearVector<int> coords)
+        {
+            if ((*map_)[cell.x_][cell.y_] == nullptr)
+            {
+                gridCoords_ = cell;
+                refCoords_ = coords;
+            }
+        }
+        bool InMap(LinearVector<int> newCoords)
+        {
+            return (!(newCoords.y_ < 0 || newCoords.x_ < 0 || newCoords.y_ >= TILES_AT_LINE || newCoords.x_  >= TILES_AT_LINE));
+        }
     public:
+        MovingObject(){ }
         MovingObject(LinearVector<int> refCoords)
         {
             refCoords_ = refCoords;
@@ -57,169 +86,228 @@ class MovingObject :public GameObject
             refCoords_ = refCoords;
             velocity_ = velocity;
         }
-        virtual ~MovingObject();
-        virtual void Draw() override = 0;
-        virtual void Interact() override = 0;
+        virtual ~MovingObject() { }
+        virtual void Draw() = 0;
+        virtual void Interact() = 0;
         virtual void Move()
         {
             if(velocity_ != LinearVector<int>(0,0))
             {
-                if(velocity_.x_ + refCoords_.x_ > 0 &&
-                   velocity_.x_ + refCoords_.x_ < refFrame_->size_.x_ &&
-                   velocity_.y_ + refCoords_.y_ > 0 &&
-                   velocity_.y_ + refCoords_.y_ < refFrame_->size_.y_)
-                   {    //!Нужно много проверок, проверки занятости клетки, проверки выхода за границу клетки
-
-                       LinearVector<int> tmp = refCoords_ + velocity_;
-
+                LinearVector<int> tmp = refCoords_ + velocity_;
+                if(tmp.x_ > 0 && tmp.x_ < refFrame_->size_.x_
+                && tmp.y_ > 0 && tmp.y_ < refFrame_->size_.y_)
+                   {
+                        LinearVector<int> newCell = gridCoords_;
+                        //!< объект движется в точку справа от центра клетки
                         if (tmp.x_ > cellCenter_.x_)
                         {
+                            //!< вылез за границу справа вверху
                             if ((tmp.y_ - cellCenter_.y_) < -0.5 * (tmp.x_ - (cellCenter_.x_ + CellWidth / 2)))
                             {
-                                LinearVector<int> newCell = gridCoords_;
                                 newCell.y_ += 1;
-
-                                if (newCell.y_ < 0 || newCell.x_ < 0) //! TODO: ограничение размера шириной и длиной карты в клетках
+                                //!< не вылезает за край карты
+                                if (InMap(newCell))
                                 {
-                                    //нельзя! не пущать!
+                                    GoToCellIfEmpty(newCell, tmp);
                                 }
-                                else if ((*map_)[newCell.x_][newCell.y_] == nullptr)
-                                {
-                                    gridCoords_ = newCell;
-                                    refCoords_ = tmp;
-                                }
-
-                                //вылез за границу справа вверху
                             }
+                            //!< вылез за границу справа внизу
                             else if ((tmp.y_ - cellCenter_.y_) > 0.5 * (tmp.x_ - (cellCenter_.x_ + CellWidth / 2)))
                             {
-                                LinearVector<int> newCell = gridCoords_;
                                 newCell.x_ += 1;
-
-                                if (newCell.y_ < 0 || newCell.x_ < 0) //! TODO: ограничение размера шириной и длиной карты в клетках
+                                if (InMap(newCell))
                                 {
-                                    //нельзя! не пущать!
+                                    GoToCellIfEmpty(newCell, tmp);
                                 }
-                                else if ((*map_)[newCell.x_][newCell.y_] == nullptr)
-                                {
-                                    gridCoords_ = newCell;
-                                    refCoords_ = tmp;
-                                }
-                                //вылез за границу справа внизу
                             }
+                            //!< вылез за границу справа строго
                             else if ((tmp.y_ == cellCenter_.y_) && (tmp.x_ > (cellCenter_.x_ + CellWidth / 2)))
                             {
-                                LinearVector<int> newCell = gridCoords_;
                                 newCell.x_ += 1;
                                 newCell.y_ += 1;
-
-                                if (newCell.y_ < 0 || newCell.x_ < 0) //! TODO: ограничение размера шириной и длиной карты в клетках
+                                if (InMap(newCell))
                                 {
-                                    //нельзя! не пущать!
+                                    GoToCellIfEmpty(newCell, tmp);
                                 }
-                                else if ((*map_)[newCell.x_][newCell.y_] == nullptr)
-                                {
-                                    gridCoords_ = newCell;
-                                    refCoords_ = tmp;
-                                }
-                                    //вылез за границу строго справа
+                            }
+                            else
+                            {
+                                refCoords_ = tmp;
                             }
                         }
+                        //!< объект движется в точку слева от центра клетки
                         else if (tmp.x_ < cellCenter_.x_)
                         {
+                            //!< вылез за границу слева внизу
                             if ((tmp.y_ - cellCenter_.y_) < -0.5 * (tmp.x_ - (cellCenter_.x_ - CellWidth / 2)))
                             {
-                                LinearVector<int> newCell = gridCoords_;
                                 newCell.y_ -= 1;
-
-                                if (newCell.y_ < 0 || newCell.x_ < 0) //! TODO: ограничение размера шириной и длиной карты в клетках
+                                if (InMap(newCell))
                                 {
-                                    //нельзя! не пущать!
+                                    GoToCellIfEmpty(newCell, tmp);
                                 }
-                                else if ((*map_)[newCell.x_][newCell.y_] == nullptr)
-                                {
-                                    gridCoords_ = newCell;
-                                    refCoords_ = tmp;
-                                }
-                                //вылез за границу слева внизу
                             }
+                            //!< вылез за границу слева вверху
                             else if ((tmp.y_ - cellCenter_.y_) > 0.5 * (tmp.x_ - (cellCenter_.x_ - CellWidth / 2)))
                             {
-                                LinearVector<int> newCell = gridCoords_;
                                 newCell.x_ -= 1;
-
-                                if (newCell.y_ < 0 || newCell.x_ < 0) //! TODO: ограничение размера шириной и длиной карты в клетках
+                                if (InMap(newCell))
                                 {
-                                    //нельзя! не пущать!
+                                    GoToCellIfEmpty(newCell, tmp);
                                 }
-                                else if ((*map_)[newCell.x_][newCell.y_] == nullptr)
-                                {
-                                    gridCoords_ = newCell;
-                                    refCoords_ = tmp;
-                                }
-                                //вылез за границу слева вверху
                             }
+                            //!< вылез за границу слева строго
                             else if ((tmp.y_ == cellCenter_.y_) && (tmp.x_ < (cellCenter_.x_-CellWidth / 2)))
                             {
-                                LinearVector<int> newCell = gridCoords_;
                                 newCell.x_ -= 1;
                                 newCell.y_ -= 1;
-
-                                if (newCell.y_ < 0 || newCell.x_ < 0) //! TODO: ограничение размера шириной и длиной карты в клетках
+                                if (InMap(newCell))
                                 {
-                                    //нельзя! не пущать!
+                                    GoToCellIfEmpty(newCell, tmp);
                                 }
-                                else if ((*map_)[newCell.x_][newCell.y_] == nullptr)
-                                {
-                                    gridCoords_ = newCell;
-                                    refCoords_ = tmp;
-                                }
-                                    //вылез за границу строго слева
+                            }
+                            else
+                            {
+                                refCoords_ = tmp;
                             }
                         }
+                        //!< объект движется вверх или вниз от центра клетки
                         else if (tmp.x_ == cellCenter_.x_)
                         {
-
+                            //!< вылез за границу внизу
                             if ((tmp.y_ - cellCenter_.y_) > CellHeight / 2)
                             {
-                                LinearVector<int> newCell = gridCoords_;
                                 newCell.x_ += 1;
                                 newCell.y_ -= 1;
-
-                                if (newCell.y_ < 0 || newCell.x_ < 0) //! TODO: ограничение размера шириной и длиной карты в клетках
+                                if (InMap(newCell))
                                 {
-                                    //нельзя! не пущать!
+                                    GoToCellIfEmpty(newCell, tmp);
                                 }
-                                else if ((*map_)[newCell.x_][newCell.y_] == nullptr)
-                                {
-                                    gridCoords_ = newCell;
-                                    refCoords_ = tmp;
-                                }
-                                //вылез за границу внизу
                             }
+                            //!< вылез за границу вверху
                             else if ((tmp.y_ - cellCenter_.y_) < -(CellHeight / 2))
                             {
-                                LinearVector<int> newCell = gridCoords_;
                                 newCell.x_ -= 1;
                                 newCell.y_ += 1;
-
-                                if (newCell.y_ < 0 || newCell.x_ < 0) //! TODO: ограничение размера шириной и длиной карты в клетках
+                                if (InMap(newCell))
                                 {
-                                    //нельзя! не пущать!
+                                    GoToCellIfEmpty(newCell, tmp);
                                 }
-                                else if ((*map_)[newCell.x_][newCell.y_] == nullptr)
-                                {
-                                    gridCoords_ = newCell;
-                                    refCoords_ = tmp;
-                                }
-                                //вылез за границу вверху
+                            }
+                            else
+                            {
+                                refCoords_ = tmp;
                             }
                         }
-
-                        refCoords_ = refCoords_ + velocity_;
                    }
             }
         }
+
 };
 
+class Immortal: public MovingObject
+{
+    public:
+    virtual void Draw() = 0;
+    virtual void Interact() = 0;
+    virtual void Move();
+    Immortal();
+    virtual ~Immortal();
+};
+
+
+//!< TODO: ammo actions
+class Ammo: public Immortal
+{
+    public:
+    virtual void Draw();
+    virtual void Interact();
+    virtual void Move();
+    Ammo();
+    ~Ammo();
+};
+
+//!<TODO: citizen features and inventory
+class Citizen: public Immortal
+{
+    public:
+    virtual void Draw();
+    virtual void Interact();
+    virtual void Move();
+    Citizen();
+    ~Citizen();
+};
+
+//!<TODO: merchant features and inventory
+class Merchant: public Immortal
+{
+    public:
+    virtual void Draw();
+    virtual void Interact();
+    virtual void Move();
+    Merchant();
+    ~Merchant();
+};
+
+
+class Mortal: public MovingObject
+{
+    public:
+        virtual void Draw()=0;
+        virtual void Interact()=0;
+        virtual void Move()=0;
+        Mortal() { }
+        virtual ~Mortal()=0;
+        void ChangeHp(int diff)
+        {
+            hp_ += diff;
+            if (!(CheckAlive()))
+            {
+                delete this;
+            }
+        }
+    protected:
+        int hp_;
+        int cooldown_; //!< cooldown will be in milliseconds
+        bool CheckAlive()
+        {
+            return (hp_ > 0);
+        }
+};
+
+Mortal::~Mortal() { }
+
+class Player: public Mortal
+{
+    public:
+        void Draw()
+        {
+            Sprite playerSprite;
+            playerSprite.setTexture(texture_);
+            playerSprite.setTextureRect(IntRect(curState_ * spriteSize_.x_, curFrame_ * spriteSize_.y_,
+                                                (curState_ + 1) * spriteSize_.x_, (curFrame_ + 1) * spriteSize_.y_));
+            playerSprite.setOrigin(Vector2f(spriteSize_.x_ / 2, spriteSize_.y_ - 32));
+            playerSprite.setPosition(refFrame_->GetX() + refCoords_.x_, refFrame_->GetY() + refCoords_.y_);
+            window_->draw(playerSprite);
+        }
+        void Interact() { }
+        void Move() { }
+        Player();
+        Player(RenderWindow* window, LinearVector<int> spriteSize, Texture& texture, LinearVector<int> gridCoords, ReferenceFrame* refFrame)
+        {
+            window_ = window;
+            refFrame_ = refFrame;
+            spriteSize_ = spriteSize;
+            texture_ = texture;
+            gridCoords_ = gridCoords;
+            refCoords_ = GetCoordsFromCell(gridCoords);
+            cellCenter_ = refCoords_;
+            numOfFrames_ = 1;
+            curFrame_ = 0;
+            numOfState_ = 1;
+            curState_ = 0;
+            objectCode_ = 0;
+        }
+        ~Player() { }
+};
 #endif

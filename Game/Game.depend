@@ -431,7 +431,7 @@
 	"refpoint.h"
 	<../../../stack/stack/smart_ptr.h>
 
-1492685652 source:d:\dropbox\coding\mailru\technoatom\game\main.cpp
+1492720038 source:d:\dropbox\coding\mailru\technoatom\game\main.cpp
 	<SFML/Graphics.hpp>
 	<SFML/Audio.hpp>
 	<iostream>
@@ -820,12 +820,13 @@
 	<string>
 	<vector>
 
-1492540647 d:\dropbox\coding\mailru\technoatom\game\\refpoint.h
+1492717636 d:\dropbox\coding\mailru\technoatom\game\\refpoint.h
 	<math.h>
 
-1492685656 d:\dropbox\coding\mailru\technoatom\game\\gameobjects.h
+1492720419 d:\dropbox\coding\mailru\technoatom\game\\gameobjects.h
 	"refpoint.h"
 	<../stack/stack/smart_ptr.h>
+	<../utils/print.h>
 
 1429780453 d:\dropbox\coding\mailru\technoatom\game\sfml-2.3.2\include\sfml\graphics.hpp
 	<SFML/Window.hpp>

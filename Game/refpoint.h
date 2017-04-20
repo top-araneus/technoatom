@@ -1,7 +1,6 @@
 #ifndef REFPOINT_H
 #define REFPOINT_H
 #include <math.h>
-
 template <typename CoordType>
 class LinearVector
 {
@@ -20,6 +19,7 @@ class LinearVector
         bool operator!=(LinearVector& that) const;
         bool operator==(LinearVector&& that) const;
         bool operator!=(LinearVector&& that) const;
+        operator sf::Vector2f();
         double GetAbs();
 };
 
@@ -116,6 +116,15 @@ template <typename CoordType>
 bool LinearVector<CoordType>::operator!=(LinearVector&& that) const
 {
     return !((*this) == that);
+}
+
+template <typename CoordType>
+LinearVector<CoordType>::operator sf::Vector2f()
+{
+    sf::Vector2f result;
+    result.x = this->x_;
+    result.y = this->y_;
+    return result;
 }
 
 class ReferenceFrame
