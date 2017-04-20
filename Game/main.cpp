@@ -12,16 +12,23 @@ using namespace sf;
 int main()
 {
 	RenderWindow window(sf::VideoMode(800, 600), "Lev hodit po trave");
-    ReferenceFrame mainFrame(0,0,800,600);
+    ReferenceFrame mainFrame(-((TILES_AT_LINE + 1) * CellWidth / 4),-((TILES_AT_LINE + 1) * CellHeight / 4),800,600);
 
         print("frame width: /#, frame height: /#", mainFrame.size_.x_, mainFrame.size_.y_);
-    Texture grass;
+  /*  Texture grass;
     grass.loadFromFile("images/grass.png");
-
+*/
+    Texture isograss;
+    isograss.loadFromFile("images/isograss.png");
+    Sprite isosprite;
+    isosprite.setTexture(isograss);
+    isosprite.setTextureRect(IntRect(0,0,CellWidth,CellHeight));
+    isosprite.setPosition(mainFrame.GetX(), mainFrame.GetY());
+    /*
     Sprite grassSprite;
     grassSprite.setTexture(grass);
     grassSprite.setTextureRect(IntRect(0, 0, 128, 128));
-	grassSprite.setPosition(mainFrame.GetX(), mainFrame.GetY());
+	grassSprite.setPosition(mainFrame.GetX(), mainFrame.GetY());*/
 
 
 	Texture herotexture;
@@ -38,7 +45,8 @@ int main()
 	while (window.isOpen())
 	{
 
-        grassSprite.setPosition(mainFrame.GetX(), mainFrame.GetY());
+        isosprite.setPosition(mainFrame.GetX(), mainFrame.GetY() + (CellHeight / 2) * TILES_AT_LINE);
+        //grassSprite.setPosition(mainFrame.GetX(), mainFrame.GetY()+16*10);
 		float time = clock.getElapsedTime().asMicroseconds();
 		clock.restart();
 		time = time / 800;
@@ -118,7 +126,7 @@ int main()
 		}
 
 		window.clear();
-
+/*
 		while (grassSprite.getPosition().y < mainFrame.GetY()+mainFrame.size_.y_)
         {
             while (grassSprite.getPosition().x < mainFrame.GetX()+mainFrame.size_.x_)
@@ -127,6 +135,16 @@ int main()
                 grassSprite.setPosition(grassSprite.getPosition().x+128, grassSprite.getPosition().y);
             }
             grassSprite.setPosition(mainFrame.GetX(), grassSprite.getPosition().y+128);
+        }*/
+
+        for (int i=0; i<TILES_AT_LINE; ++i)
+        {
+            for (int j=0; j<TILES_AT_LINE; ++j)
+                {
+                    window.draw(isosprite);
+                    isosprite.setPosition(isosprite.getPosition().x + CellWidth / 2, isosprite.getPosition().y - CellHeight / 2);
+                }
+            isosprite.setPosition(mainFrame.GetX() + (CellWidth / 2) * i, mainFrame.GetY() + (CellHeight / 2) * (TILES_AT_LINE + i));
         }
        // window.draw(grassSprite);
 		window.draw(herosprite);

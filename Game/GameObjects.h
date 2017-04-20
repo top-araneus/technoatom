@@ -5,7 +5,7 @@
 
 const int CellWidth = 64;
 const int CellHeight = 32;
-
+const int TILES_AT_LINE = 50;
 class GameObject
 {
     public:
