@@ -1,5 +1,6 @@
 using namespace std;
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 using namespace sf;
 #include <iostream>
 #include <../utils/print.h>
@@ -18,6 +19,12 @@ int main()
   /*  Texture grass;
     grass.loadFromFile("images/grass.png");
 */
+
+    Music backgroundMusic;
+    backgroundMusic.openFromFile("sound/background.ogg");
+    backgroundMusic.setLoop(true);
+    backgroundMusic.play();
+
     Texture isograss;
     isograss.loadFromFile("images/grass2.png");
     Sprite isosprite;
