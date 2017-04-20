@@ -3,8 +3,8 @@
 #include "refpoint.h"
 #include <../stack/stack/smart_ptr.h>
 
-const int CellWidth = 64;
-const int CellHeight = 32;
+const int CellWidth = 128;
+const int CellHeight = 64;
 const int TILES_AT_LINE = 50;
 class GameObject
 {
@@ -77,11 +77,7 @@ class MovingObject :public GameObject
                             if ((tmp.y_ - cellCenter_.y_) < -0.5 * (tmp.x_ - (cellCenter_.x_ + CellWidth / 2)))
                             {
                                 LinearVector<int> newCell = gridCoords_;
-                                if (gridCoords_.y_ % 2 == 1)
-                                {
-                                    newCell.x_ += 1;
-                                }
-                                newCell.y_ -= 1;
+                                newCell.y_ += 1;
 
                                 if (newCell.y_ < 0 || newCell.x_ < 0) //! TODO: ограничение размера шириной и длиной карты в клетках
                                 {
@@ -98,11 +94,7 @@ class MovingObject :public GameObject
                             else if ((tmp.y_ - cellCenter_.y_) > 0.5 * (tmp.x_ - (cellCenter_.x_ + CellWidth / 2)))
                             {
                                 LinearVector<int> newCell = gridCoords_;
-                                if (gridCoords_.y_ % 2 == 1)
-                                {
-                                    newCell.x_ += 1;
-                                }
-                                newCell.y_ += 1;
+                                newCell.x_ += 1;
 
                                 if (newCell.y_ < 0 || newCell.x_ < 0) //! TODO: ограничение размера шириной и длиной карты в клетках
                                 {
@@ -118,7 +110,8 @@ class MovingObject :public GameObject
                             else if ((tmp.y_ == cellCenter_.y_) && (tmp.x_ > (cellCenter_.x_ + CellWidth / 2)))
                             {
                                 LinearVector<int> newCell = gridCoords_;
-                                    newCell.x_ += 1;
+                                newCell.x_ += 1;
+                                newCell.y_ += 1;
 
                                 if (newCell.y_ < 0 || newCell.x_ < 0) //! TODO: ограничение размера шириной и длиной карты в клетках
                                 {
@@ -137,10 +130,6 @@ class MovingObject :public GameObject
                             if ((tmp.y_ - cellCenter_.y_) < -0.5 * (tmp.x_ - (cellCenter_.x_ - CellWidth / 2)))
                             {
                                 LinearVector<int> newCell = gridCoords_;
-                                if (gridCoords_.y_ % 2 == 0)
-                                {
-                                    newCell.x_ -= 1;
-                                }
                                 newCell.y_ -= 1;
 
                                 if (newCell.y_ < 0 || newCell.x_ < 0) //! TODO: ограничение размера шириной и длиной карты в клетках
@@ -157,11 +146,7 @@ class MovingObject :public GameObject
                             else if ((tmp.y_ - cellCenter_.y_) > 0.5 * (tmp.x_ - (cellCenter_.x_ - CellWidth / 2)))
                             {
                                 LinearVector<int> newCell = gridCoords_;
-                                if (gridCoords_.y_ % 2 == 0)
-                                {
-                                    newCell.x_ -= 1;
-                                }
-                                newCell.y_ += 1;
+                                newCell.x_ -= 1;
 
                                 if (newCell.y_ < 0 || newCell.x_ < 0) //! TODO: ограничение размера шириной и длиной карты в клетках
                                 {
@@ -177,7 +162,8 @@ class MovingObject :public GameObject
                             else if ((tmp.y_ == cellCenter_.y_) && (tmp.x_ < (cellCenter_.x_-CellWidth / 2)))
                             {
                                 LinearVector<int> newCell = gridCoords_;
-                                    newCell.x_ -= 1;
+                                newCell.x_ -= 1;
+                                newCell.y_ -= 1;
 
                                 if (newCell.y_ < 0 || newCell.x_ < 0) //! TODO: ограничение размера шириной и длиной карты в клетках
                                 {
@@ -197,7 +183,8 @@ class MovingObject :public GameObject
                             if ((tmp.y_ - cellCenter_.y_) > CellHeight / 2)
                             {
                                 LinearVector<int> newCell = gridCoords_;
-                                    newCell.y_ += 1;
+                                newCell.x_ += 1;
+                                newCell.y_ -= 1;
 
                                 if (newCell.y_ < 0 || newCell.x_ < 0) //! TODO: ограничение размера шириной и длиной карты в клетках
                                 {
@@ -213,7 +200,8 @@ class MovingObject :public GameObject
                             else if ((tmp.y_ - cellCenter_.y_) < -(CellHeight / 2))
                             {
                                 LinearVector<int> newCell = gridCoords_;
-                                    newCell.y_ -= 1;
+                                newCell.x_ -= 1;
+                                newCell.y_ += 1;
 
                                 if (newCell.y_ < 0 || newCell.x_ < 0) //! TODO: ограничение размера шириной и длиной карты в клетках
                                 {

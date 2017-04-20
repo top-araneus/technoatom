@@ -19,7 +19,7 @@ int main()
     grass.loadFromFile("images/grass.png");
 */
     Texture isograss;
-    isograss.loadFromFile("images/isograss.png");
+    isograss.loadFromFile("images/grass2.png");
     Sprite isosprite;
     isosprite.setTexture(isograss);
     isosprite.setTextureRect(IntRect(0,0,CellWidth,CellHeight));
