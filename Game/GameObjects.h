@@ -7,6 +7,7 @@ using namespace sf;
 const int CellWidth = 128;
 const int CellHeight = 64;
 const int TILES_AT_LINE = 50;
+
 class GameObject
 {
     public:
@@ -35,18 +36,35 @@ class GameObject
         Texture texture_;
         RenderWindow* window_;
         LinearVector<int> spriteSize_; //!< width and height of sprite
-        Unique_ptr<Array<Array<Unique_ptr<GameObject>>>> map_;
+        Shared_ptr<Array<Array<Shared_ptr<GameObject>>>> map_;
         Unique_ptr<ReferenceFrame> refFrame_;
         LinearVector<int> GetCoordsFromCell(LinearVector<int> cell)
         {
             print("Frame: /# /# \n", refFrame_->GetX(), refFrame_->GetY());
             LinearVector<int> result;
             result.x_ = cell.x_ * CellWidth / 2 + cell.y_ * CellWidth / 2 + CellWidth / 2;
-            result.y_ = TILES_AT_LINE * CellHeight / 2 + cell.x_ * CellHeight / 2 - cell.y_ * CellHeight / 2 + CellHeight / 2;
+            result.y_ = TILES_AT_LINE * CellHeight / 2 + cell.x_ * CellHeight / 2 - cell.y_ * CellHeight / 2 - CellHeight / 2;
             print("Lion: /# /# \n", result.x_, result.y_);
             return result;
         }
 };
+
+typedef Array<Array<Shared_ptr<GameObject>>> MapType;
+
+
+Shared_ptr<MapType> InitializeMap()
+{
+    Shared_ptr<MapType> mapArray = new MapType(TILES_AT_LINE);
+    for(int i=0; i<TILES_AT_LINE; ++i)
+    {
+        (*mapArray)[i] = Array<Shared_ptr<GameObject>>(TILES_AT_LINE);
+        for (int j=0; j<TILES_AT_LINE; ++j)
+        {
+            (*mapArray)[i][j] = nullptr;
+        }
+    }
+    return mapArray;
+}
 
 class StaticObject :public GameObject
 {
@@ -298,7 +316,7 @@ class Player: public Mortal
         void Interact() { }
         void Move() { }
         Player();
-        Player(RenderWindow* window, LinearVector<int> spriteSize, Texture& texture, LinearVector<int> gridCoords, ReferenceFrame* refFrame)
+        Player(RenderWindow* window, Shared_ptr<MapType> pMap, LinearVector<int> spriteSize, Texture& texture, LinearVector<int> gridCoords, ReferenceFrame* refFrame)
         {
             window_ = window;
             refFrame_ = refFrame;
@@ -312,8 +330,10 @@ class Player: public Mortal
             numOfState_ = 1;
             curState_ = 0;
             objectCode_ = 0;
+            map_ = pMap;
+            (*map_)[gridCoords_.x_][gridCoords_.y_] = this;
         }
-        Player(RenderWindow* window, LinearVector<int> spriteSize, Texture& texture, LinearVector<int> gridCoords, ReferenceFrame* refFrame, int numOfFrames, int numOfStates)
+        Player(RenderWindow* window, Shared_ptr<MapType> pMap, LinearVector<int> spriteSize, Texture& texture, LinearVector<int> gridCoords, ReferenceFrame* refFrame, int numOfFrames, int numOfStates)
         {
             window_ = window;
             refFrame_ = refFrame;
@@ -327,6 +347,8 @@ class Player: public Mortal
             numOfState_ = numOfStates;
             curState_ = 0;
             objectCode_ = 0;
+            map_ = pMap;
+            (*map_)[gridCoords_.x_][gridCoords_.y_] = this;
         }
         ~Player() { }
 };

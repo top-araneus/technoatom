@@ -341,6 +341,11 @@ public:
     Shared_ptr& operator=(Shared_ptr&& that);
 
     //-----------------------------------
+    //! @fn Shared_ptr& operator==(Type* that)
+    //-----------------------------------
+    bool operator==(Type* that);
+
+    //-----------------------------------
     //! @fn size_t GetCount()
     //! @return number of references from proxy shared_ptr is connected with
     //-----------------------------------
@@ -532,6 +537,12 @@ template <typename Type>
 size_t Shared_ptr<Type>::GetCount()
 {
 	return proxy_->GetCount();
+}
+
+template <typename Type>
+bool Shared_ptr<Type>::operator==(Type* that)
+{
+	return (proxy_->GetPointer() == that);
 }
 
 template <typename Type>
