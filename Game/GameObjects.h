@@ -6,7 +6,7 @@
 using namespace sf;
 const int CellWidth = 128;
 const int CellHeight = 64;
-const int TILES_AT_LINE = 50;
+const int TILES_AT_LINE = 20;
 
 class GameObject
 {
@@ -36,7 +36,7 @@ class GameObject
         Texture texture_;
         RenderWindow* window_;
         LinearVector<int> spriteSize_; //!< width and height of sprite
-        Shared_ptr<Array<Array<Shared_ptr<GameObject>>>> map_;
+        Array<Array<GameObject*>>* map_; //! TODO: weak_ptr
         Unique_ptr<ReferenceFrame> refFrame_;
         LinearVector<int> GetCoordsFromCell(LinearVector<int> cell)
         {
@@ -49,18 +49,19 @@ class GameObject
         }
 };
 
-typedef Array<Array<Shared_ptr<GameObject>>> MapType;
+typedef Array<Array<GameObject*>> MapType;
 
 
-Shared_ptr<MapType> InitializeMap()
+MapType InitializeMap()
 {
-    Shared_ptr<MapType> mapArray = new MapType(TILES_AT_LINE);
+    //Unique_ptr<MapType> mapArray = new MapType(TILES_AT_LINE);
+    MapType mapArray(TILES_AT_LINE);
     for(int i=0; i<TILES_AT_LINE; ++i)
     {
-        (*mapArray)[i] = Array<Shared_ptr<GameObject>>(TILES_AT_LINE);
+        mapArray[i] = Array<GameObject*>(TILES_AT_LINE);
         for (int j=0; j<TILES_AT_LINE; ++j)
         {
-            (*mapArray)[i][j] = nullptr;
+            mapArray[i][j] = nullptr;
         }
     }
     return mapArray;
@@ -316,7 +317,8 @@ class Player: public Mortal
         void Interact() { }
         void Move() { }
         Player();
-        Player(RenderWindow* window, Shared_ptr<MapType> pMap, LinearVector<int> spriteSize, Texture& texture, LinearVector<int> gridCoords, ReferenceFrame* refFrame)
+        Player(RenderWindow* window, MapType* pMap, LinearVector<int> spriteSize, Texture& texture,
+               LinearVector<int> gridCoords, ReferenceFrame* refFrame)
         {
             window_ = window;
             refFrame_ = refFrame;
@@ -333,7 +335,8 @@ class Player: public Mortal
             map_ = pMap;
             (*map_)[gridCoords_.x_][gridCoords_.y_] = this;
         }
-        Player(RenderWindow* window, Shared_ptr<MapType> pMap, LinearVector<int> spriteSize, Texture& texture, LinearVector<int> gridCoords, ReferenceFrame* refFrame, int numOfFrames, int numOfStates)
+        Player(RenderWindow* window, MapType* pMap, LinearVector<int> spriteSize, Texture& texture,
+               LinearVector<int> gridCoords, ReferenceFrame* refFrame, int numOfFrames, int numOfStates)
         {
             window_ = window;
             refFrame_ = refFrame;
@@ -350,6 +353,8 @@ class Player: public Mortal
             map_ = pMap;
             (*map_)[gridCoords_.x_][gridCoords_.y_] = this;
         }
-        ~Player() { }
+        ~Player() {
+    map_ = nullptr;
+     }
 };
 #endif

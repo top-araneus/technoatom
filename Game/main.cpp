@@ -20,7 +20,7 @@ int main()
     grass.loadFromFile("images/grass.png");
 */
 
-    Shared_ptr<MapType> mapArray = InitializeMap();
+    MapType mapArray = InitializeMap();
 
     Music backgroundMusic;
     backgroundMusic.openFromFile("sound/background.ogg");
@@ -46,13 +46,13 @@ int main()
 	Texture goptexture;
 	goptexture.loadFromFile("images/gopnik1.png");
 
-	Player player(&window, mapArray, LinearVector<int>(128,224), goptexture, LinearVector<int>(10,23), &mainFrame, 2, 1);
 
 
 	Texture kisatexture;
 	kisatexture.loadFromFile("images/kisa.png");
 
-	Player kisa(&window, mapArray, LinearVector<int>(128,64), kisatexture, LinearVector<int>(5,25), &mainFrame, 1, 1);
+	Player kisa(&window, &mapArray, LinearVector<int>(128,64), kisatexture, LinearVector<int>(10,8), &mainFrame, 1, 1);
+	Player player(&window, &mapArray, LinearVector<int>(128,224), goptexture, LinearVector<int>(8,10), &mainFrame, 2, 1);
 
 	Sprite herosprite;
 	herosprite.setTexture(herotexture);
@@ -159,20 +159,20 @@ int main()
 
         for (int i=0; i<TILES_AT_LINE; ++i)
         {
+            isosprite.setPosition(mainFrame.GetX() + (CellWidth / 2) * i, mainFrame.GetY() + (CellHeight / 2) * (TILES_AT_LINE + i));
             for (int j=0; j<TILES_AT_LINE; ++j)
                 {
                     window.draw(isosprite);
                     isosprite.setPosition(isosprite.getPosition().x + CellWidth / 2, isosprite.getPosition().y - CellHeight / 2);
                 }
-            isosprite.setPosition(mainFrame.GetX() + (CellWidth / 2) * i, mainFrame.GetY() + (CellHeight / 2) * (TILES_AT_LINE + i));
         }
        // window.draw(grassSprite);
 		window.draw(herosprite);
         //player.Draw();
         for (int i=0; i<TILES_AT_LINE; ++i)
             for (int j=0; j<TILES_AT_LINE; ++j)
-                if (!((( (*mapArray)[i])[j]) == nullptr ))
-                    (*(((*mapArray)[i])[j])).Draw();
+                if (!(mapArray[i][j] == nullptr ))
+                    mapArray[i][j]->Draw();
 
 		if (Keyboard::isKeyPressed(Keyboard::K)) {
 			CurrentFrame += 0.0025*time; //служит для прохождения по "кадрам". переменная доходит до трех суммируя произведение времени и скорости. изменив 0.005 можно изменить скорость анимации
@@ -182,6 +182,5 @@ int main()
 
 		window.display();
 	}
-	delete &mapArray;
 	return 0;
 }

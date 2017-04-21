@@ -455,6 +455,7 @@ Shared_ptr<Type>::Shared_ptr()
 template <typename Type>
 Shared_ptr<Type>::~Shared_ptr()
 {
+    cout << "~Shared_ptr called\n" << endl;
     if (proxy_)
     {
         if (proxy_->GetCount() > 1)
@@ -524,7 +525,7 @@ Type* Shared_ptr<Type>::operator->()
 	{
         throw ENullDereference(__FL__);
     }
-    return proxy_->pObject_;
+    return proxy_->GetPointer();
 }
 
 template <typename Type>
