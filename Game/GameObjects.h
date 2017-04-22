@@ -6,7 +6,8 @@
 using namespace sf;
 const int CellWidth = 128;
 const int CellHeight = 64;
-const int TILES_AT_LINE = 20;
+const int TILES_AT_LINE = 10;
+
 
 class GameObject
 {
@@ -24,6 +25,10 @@ class GameObject
         {
             curFrame_ = frame % numOfFrames_;
         }
+        LinearVector<int> GetGridCoords()
+        {
+            return gridCoords_;
+        }
     protected:
         LinearVector<int> refCoords_;
         LinearVector<int> cellCenter_;
@@ -40,18 +45,15 @@ class GameObject
         Unique_ptr<ReferenceFrame> refFrame_;
         LinearVector<int> GetCoordsFromCell(LinearVector<int> cell)
         {
-            print("Frame: /# /# \n", refFrame_->GetX(), refFrame_->GetY());
+            //print("Frame: /# /# \n", refFrame_->GetX(), refFrame_->GetY());
             LinearVector<int> result;
             result.x_ = cell.x_ * CellWidth / 2 + cell.y_ * CellWidth / 2 + CellWidth / 2;
-            result.y_ = TILES_AT_LINE * CellHeight / 2 + cell.x_ * CellHeight / 2 - cell.y_ * CellHeight / 2 - CellHeight / 2;
-            print("Lion: /# /# \n", result.x_, result.y_);
+            result.y_ = TILES_AT_LINE * CellHeight / 2 + cell.x_ * CellHeight / 2 - cell.y_ * CellHeight / 2 + CellHeight / 2;
             return result;
         }
 };
 
 typedef Array<Array<GameObject*>> MapType;
-
-
 MapType InitializeMap()
 {
     //Unique_ptr<MapType> mapArray = new MapType(TILES_AT_LINE);
@@ -85,12 +87,15 @@ class MovingObject :public GameObject
 {
     protected:
         LinearVector<int> velocity_;
-        void GoToCellIfEmpty(LinearVector<int> cell, LinearVector<int> coords)
+        void GoToCellIfEmpty(LinearVector<int> oldCell, LinearVector<int> cell, LinearVector<int> coords)
         {
             if ((*map_)[cell.x_][cell.y_] == nullptr)
             {
                 gridCoords_ = cell;
                 refCoords_ = coords;
+                cellCenter_ = GetCoordsFromCell(gridCoords_);
+                (*map_)[cell.x_][cell.y_] = this;
+                (*map_)[oldCell.x_][oldCell.y_] = nullptr;
             }
         }
         bool InMap(LinearVector<int> newCoords)
@@ -109,6 +114,10 @@ class MovingObject :public GameObject
             refCoords_ = refCoords;
             velocity_ = velocity;
         }
+        void SetVelocity(LinearVector<int> velocity)
+        {
+            velocity_ = velocity;
+        }
         virtual ~MovingObject() { }
         virtual void Draw() = 0;
         virtual void Interact() = 0;
@@ -116,11 +125,20 @@ class MovingObject :public GameObject
         {
             if(velocity_ != LinearVector<int>(0,0))
             {
-                LinearVector<int> tmp = refCoords_ + velocity_;
-                if(tmp.x_ > 0 && tmp.x_ < refFrame_->size_.x_
+                LinearVector<int> tmp;// = refCoords_ + velocity_;
+                tmp.x_ = refCoords_.x_ + velocity_.x_;
+                tmp.y_ = refCoords_.y_ + velocity_.y_;
+                print("tmp: /# /# \n", tmp.x_, tmp.y_);
+                print("refcoords: /# /# \n", refCoords_.x_, refCoords_.y_);
+                print("velocity: /# /# \n", velocity_.x_, velocity_.y_);
+               /* print("Coords: /# /# \n", tmp.x_, cellCenter_.x_);
+                print("Refframe: /# /# \n", refFrame_->size_.x_, refFrame_->size_.y_);*/
+             /*   if(tmp.x_ > 0 && tmp.x_ < refFrame_->size_.x_
                 && tmp.y_ > 0 && tmp.y_ < refFrame_->size_.y_)
-                   {
+                   {*/
+
                         LinearVector<int> newCell = gridCoords_;
+                        LinearVector<int> oldCell = gridCoords_;
                         //!< объект движется в точку справа от центра клетки
                         if (tmp.x_ > cellCenter_.x_)
                         {
@@ -131,16 +149,17 @@ class MovingObject :public GameObject
                                 //!< не вылезает за край карты
                                 if (InMap(newCell))
                                 {
-                                    GoToCellIfEmpty(newCell, tmp);
+                                    GoToCellIfEmpty(oldCell, newCell, tmp);
                                 }
                             }
                             //!< вылез за границу справа внизу
                             else if ((tmp.y_ - cellCenter_.y_) > 0.5 * (tmp.x_ - (cellCenter_.x_ + CellWidth / 2)))
                             {
+                               // print("Right down: /# /# \n", tmp.y_ - cellCenter_.y_, 0.5 * (tmp.x_ - (cellCenter_.x_ + CellWidth / 2)));
                                 newCell.x_ += 1;
                                 if (InMap(newCell))
                                 {
-                                    GoToCellIfEmpty(newCell, tmp);
+                                    GoToCellIfEmpty(oldCell, newCell, tmp);
                                 }
                             }
                             //!< вылез за границу справа строго
@@ -150,7 +169,7 @@ class MovingObject :public GameObject
                                 newCell.y_ += 1;
                                 if (InMap(newCell))
                                 {
-                                    GoToCellIfEmpty(newCell, tmp);
+                                    GoToCellIfEmpty(oldCell, newCell, tmp);
                                 }
                             }
                             else
@@ -167,7 +186,7 @@ class MovingObject :public GameObject
                                 newCell.y_ -= 1;
                                 if (InMap(newCell))
                                 {
-                                    GoToCellIfEmpty(newCell, tmp);
+                                    GoToCellIfEmpty(oldCell, newCell, tmp);
                                 }
                             }
                             //!< вылез за границу слева вверху
@@ -176,7 +195,7 @@ class MovingObject :public GameObject
                                 newCell.x_ -= 1;
                                 if (InMap(newCell))
                                 {
-                                    GoToCellIfEmpty(newCell, tmp);
+                                    GoToCellIfEmpty(oldCell, newCell, tmp);
                                 }
                             }
                             //!< вылез за границу слева строго
@@ -186,7 +205,7 @@ class MovingObject :public GameObject
                                 newCell.y_ -= 1;
                                 if (InMap(newCell))
                                 {
-                                    GoToCellIfEmpty(newCell, tmp);
+                                    GoToCellIfEmpty(oldCell, newCell, tmp);
                                 }
                             }
                             else
@@ -204,7 +223,7 @@ class MovingObject :public GameObject
                                 newCell.y_ -= 1;
                                 if (InMap(newCell))
                                 {
-                                    GoToCellIfEmpty(newCell, tmp);
+                                    GoToCellIfEmpty(oldCell, newCell, tmp);
                                 }
                             }
                             //!< вылез за границу вверху
@@ -214,7 +233,7 @@ class MovingObject :public GameObject
                                 newCell.y_ += 1;
                                 if (InMap(newCell))
                                 {
-                                    GoToCellIfEmpty(newCell, tmp);
+                                    GoToCellIfEmpty(oldCell, newCell, tmp);
                                 }
                             }
                             else
@@ -222,8 +241,10 @@ class MovingObject :public GameObject
                                 refCoords_ = tmp;
                             }
                         }
+                    print("New cell: /# /# \n", newCell.x_, newCell.y_);
                    }
-            }
+
+            //}
         }
 
 };
@@ -303,6 +324,7 @@ Mortal::~Mortal() { }
 class Player: public Mortal
 {
     public:
+        //using MovingObject::Move;
         void Draw()
         {
             Sprite playerSprite;
@@ -315,7 +337,10 @@ class Player: public Mortal
             window_->draw(playerSprite);
         }
         void Interact() { }
-        void Move() { }
+        void Move()
+        {
+            MovingObject::Move();
+        }
         Player();
         Player(RenderWindow* window, MapType* pMap, LinearVector<int> spriteSize, Texture& texture,
                LinearVector<int> gridCoords, ReferenceFrame* refFrame)
@@ -333,7 +358,7 @@ class Player: public Mortal
             curState_ = 0;
             objectCode_ = 0;
             map_ = pMap;
-            (*map_)[gridCoords_.x_][gridCoords_.y_] = this;
+            velocity_ = LinearVector<int>(0,0);
         }
         Player(RenderWindow* window, MapType* pMap, LinearVector<int> spriteSize, Texture& texture,
                LinearVector<int> gridCoords, ReferenceFrame* refFrame, int numOfFrames, int numOfStates)
@@ -351,10 +376,10 @@ class Player: public Mortal
             curState_ = 0;
             objectCode_ = 0;
             map_ = pMap;
-            (*map_)[gridCoords_.x_][gridCoords_.y_] = this;
+            velocity_ = LinearVector<int>(0,0);
         }
         ~Player() {
-    map_ = nullptr;
+            (*map_)[gridCoords_.x_][gridCoords_.y_] = nullptr;
      }
 };
 #endif
