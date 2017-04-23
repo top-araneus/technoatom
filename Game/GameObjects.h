@@ -3,6 +3,7 @@
 #include "refpoint.h"
 #include <../stack/stack/smart_ptr.h>
 #include <../utils/print.h>
+#include <math.h>
 using namespace sf;
 const int CellWidth = 128;
 const int CellHeight = 64;
@@ -51,6 +52,14 @@ class GameObject
             result.y_ = TILES_AT_LINE * CellHeight / 2 + cell.x_ * CellHeight / 2 - cell.y_ * CellHeight / 2 + CellHeight / 2;
             return result;
         }
+        LinearVector<int> GetCellFromCoords(LinearVector<int> coords)
+        {
+            LinearVector<int> result(0,0);
+            result.x_ = roundl((coords.x_ + CellWidth/2) / CellWidth) + roundl((coords.y_ - (CellHeight * TILES_AT_LINE / 2) - CellHeight/2)/ CellHeight);
+            result.y_ = roundl(coords.x_ / CellWidth) - roundl((coords.y_ - (CellHeight * TILES_AT_LINE / 2) - CellHeight/2)/ CellHeight);
+            print("Got /# /#, calculated /# /# \n", coords.x_, coords.y_, result.x_, result.y_);
+            return result;
+        }
 };
 
 typedef Array<Array<GameObject*>> MapType;
@@ -89,13 +98,20 @@ class MovingObject :public GameObject
         LinearVector<int> velocity_;
         void GoToCellIfEmpty(LinearVector<int> oldCell, LinearVector<int> cell, LinearVector<int> coords)
         {
-            if ((*map_)[cell.x_][cell.y_] == nullptr)
+            if ((oldCell != cell) && InMap(cell))
             {
-                gridCoords_ = cell;
+                if ((*map_)[cell.x_][cell.y_] == nullptr)
+                {
+                    gridCoords_ = cell;
+                    refCoords_ = coords;
+                    cellCenter_ = GetCoordsFromCell(gridCoords_);
+                    (*map_)[cell.x_][cell.y_] = this;
+                    (*map_)[oldCell.x_][oldCell.y_] = nullptr;
+                }
+            }
+            else
+            {
                 refCoords_ = coords;
-                cellCenter_ = GetCoordsFromCell(gridCoords_);
-                (*map_)[cell.x_][cell.y_] = this;
-                (*map_)[oldCell.x_][oldCell.y_] = nullptr;
             }
         }
         bool InMap(LinearVector<int> newCoords)
@@ -128,18 +144,20 @@ class MovingObject :public GameObject
                 LinearVector<int> tmp;// = refCoords_ + velocity_;
                 tmp.x_ = refCoords_.x_ + velocity_.x_;
                 tmp.y_ = refCoords_.y_ + velocity_.y_;
-                print("tmp: /# /# \n", tmp.x_, tmp.y_);
+              //  print("tmp: /# /# \n", tmp.x_, tmp.y_);
                 print("refcoords: /# /# \n", refCoords_.x_, refCoords_.y_);
-                print("velocity: /# /# \n", velocity_.x_, velocity_.y_);
+                print("gridcoords: /# /# \n", gridCoords_.x_, gridCoords_.y_);
+               // print("velocity: /# /# \n", velocity_.x_, velocity_.y_);
                /* print("Coords: /# /# \n", tmp.x_, cellCenter_.x_);
                 print("Refframe: /# /# \n", refFrame_->size_.x_, refFrame_->size_.y_);*/
              /*   if(tmp.x_ > 0 && tmp.x_ < refFrame_->size_.x_
                 && tmp.y_ > 0 && tmp.y_ < refFrame_->size_.y_)
                    {*/
 
-                        LinearVector<int> newCell = gridCoords_;
+                        LinearVector<int> newCell = GetCellFromCoords(tmp);
                         LinearVector<int> oldCell = gridCoords_;
-                        //!< объект движется в точку справа от центра клетки
+                        GoToCellIfEmpty(oldCell, newCell, tmp);
+                     /*   //!< объект движется в точку справа от центра клетки
                         if (tmp.x_ > cellCenter_.x_)
                         {
                             //!< вылез за границу справа вверху
@@ -240,7 +258,8 @@ class MovingObject :public GameObject
                             {
                                 refCoords_ = tmp;
                             }
-                        }
+                        }*/
+
                     print("New cell: /# /# \n", newCell.x_, newCell.y_);
                    }
 
@@ -330,7 +349,7 @@ class Player: public Mortal
             Sprite playerSprite;
             playerSprite.setTexture(texture_);
             playerSprite.setTextureRect(IntRect(curFrame_ * spriteSize_.x_, curState_ * spriteSize_.y_,
-                                                (curFrame_ + 1) * spriteSize_.x_, (curState_ + 1) * spriteSize_.y_));
+                                                spriteSize_.x_, spriteSize_.y_));
             playerSprite.setOrigin(Vector2f(spriteSize_.x_ / 2, spriteSize_.y_ - CellHeight / 2));
             playerSprite.setPosition(refFrame_->GetX() + refCoords_.x_, refFrame_->GetY() + refCoords_.y_);
             //curState_ = (curState_+1)%numOfState_;

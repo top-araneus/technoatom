@@ -59,7 +59,7 @@ public:
             groundSprite_.setPosition(mainFrame_.GetX() + (CellWidth / 2) * i, mainFrame_.GetY() + (CellHeight / 2) * (TILES_AT_LINE + i));
             for (int j=0; j<TILES_AT_LINE; ++j)
                 {
-                    groundSprite_.setTextureRect(IntRect(CellWidth*ground_[i][j],0,CellWidth*(ground_[i][j] + 1), CellHeight));
+                    groundSprite_.setTextureRect(IntRect(CellWidth*ground_[i][j],0,CellWidth, CellHeight));
                     window_->draw(groundSprite_);
                     groundSprite_.setPosition(groundSprite_.getPosition().x + CellWidth / 2, groundSprite_.getPosition().y - CellHeight / 2);
                 }
