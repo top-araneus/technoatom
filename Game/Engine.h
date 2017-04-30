@@ -12,7 +12,7 @@ public:
         mainFrame_ = ReferenceFrame(-((TILES_AT_LINE + 1) * CellWidth / 4),-((TILES_AT_LINE + 1) * CellHeight / 4),800,600);
         map_ = InitializeMap();
         ground_ = InitializeGround();
-        groundTexture_.loadFromFile("images/ground.png");
+        groundTexture_.loadFromFile("images/debuggrid.png");
         numOfGrounds_ = groundTexture_.getSize().x / CellWidth;
         groundSprite_.setTexture(groundTexture_);
         groundSprite_.setTextureRect(IntRect(0, 0, CellWidth, CellHeight));

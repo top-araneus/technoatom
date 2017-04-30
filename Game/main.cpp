@@ -50,7 +50,7 @@ int main()
 	herotexture.loadFromFile("images/hero.png");
 
 	Texture goptexture;
-	goptexture.loadFromFile("images/gopnik1.png");
+	goptexture.loadFromFile("images/debughero.png");
 
 
 
