@@ -58,9 +58,11 @@ class GameObject
             /*result.x_ = roundl((coords.x_ + CellWidth/2) / CellWidth) + roundl((coords.y_ - (CellHeight * TILES_AT_LINE / 2) - CellHeight/2)/ CellHeight);
             result.y_ = roundl(coords.x_ / CellWidth) - roundl((coords.y_ - (CellHeight * TILES_AT_LINE / 2) - CellHeight/2)/ CellHeight);
             print("Got /# /#, calculated /# /# \n", coords.x_, coords.y_, result.x_, result.y_);*/
-            int tmp = CellHeight * TILES_AT_LINE / 2;
-            result.y_ = roundl((sqrt((coords.x_ / 2)*(coords.x_ / 2) + (coords.x_ / 4)*(coords.x_ / 4)) - sqrt(((coords.y_ - tmp) / 2)*((coords.y_ - tmp) / 2) + (coords.y_ - tmp)*(coords.y_ - tmp)))  / sqrt(CellHeight*CellHeight/4 + CellWidth*CellWidth/4));
-            result.x_ = roundl((sqrt(((coords.y_ - tmp) / 2)*((coords.y_ - tmp) / 2) + (coords.y_ - tmp)*(coords.y_ - tmp)) + sqrt((coords.x_ / 2)*(coords.x_ / 2) + (coords.x_ / 4)*(coords.x_ / 4)))  / sqrt(CellHeight*CellHeight/4 + CellWidth*CellWidth/4)) -1;
+            //int tmp = CellHeight * TILES_AT_LINE / 2;
+            int tmp = 350;
+            //!нужно понять, как это адекватно расчитывать
+                result.y_ = roundl((sqrt((coords.x_ / 2)*(coords.x_ / 2) + (coords.x_ / 4)*(coords.x_ / 4)) - sqrt(((coords.y_ - tmp) / 2)*((coords.y_ - tmp) / 2) + (coords.y_ - tmp)*(coords.y_ - tmp))))  / roundl(sqrt(CellHeight*CellHeight/4 + CellWidth*CellWidth/4));
+                result.x_ = roundl((sqrt(((coords.y_ - tmp) / 2)*((coords.y_ - tmp) / 2) + (coords.y_ - tmp)*(coords.y_ - tmp)) + sqrt((coords.x_ / 2)*(coords.x_ / 2) + (coords.x_ / 4)*(coords.x_ / 4))))  / roundl(sqrt(CellHeight*CellHeight/4 + CellWidth*CellWidth/4));
             print("Got /# /#, calculated /# /#  center /#\n", coords.x_, coords.y_, result.x_, result.y_, tmp);
             return result;
         }
