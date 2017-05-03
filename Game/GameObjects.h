@@ -7,7 +7,7 @@
 using namespace sf;
 const int kCellWidth = 128;
 const int kCellHeight = 64;
-const int kTilesAtLine = 10;
+const int kTilesAtLine = 40;
 
 
 class GameObject
@@ -59,10 +59,18 @@ class GameObject
             result.y_ = roundl(coords.x_ / kCellWidth) - roundl((coords.y_ - (kCellHeight * kTilesAtLine / 2) - kCellHeight/2)/ kCellHeight);
             print("Got /# /#, calculated /# /# \n", coords.x_, coords.y_, result.x_, result.y_);*/
             //int tmp = kCellHeight * kTilesAtLine / 2;
-            int tmp = 350;
+            int tmp = 1310;
             //!нужно понять, как это адекватно расчитывать
-                result.y_ = roundl((sqrt((coords.x_ / 2)*(coords.x_ / 2) + (coords.x_ / 4)*(coords.x_ / 4)) - sqrt(((coords.y_ - tmp) / 2)*((coords.y_ - tmp) / 2) + (coords.y_ - tmp)*(coords.y_ - tmp))))  / roundl(sqrt(kCellHeight*kCellHeight/4 + kCellWidth*kCellWidth/4));
-                result.x_ = roundl((sqrt(((coords.y_ - tmp) / 2)*((coords.y_ - tmp) / 2) + (coords.y_ - tmp)*(coords.y_ - tmp)) + sqrt((coords.x_ / 2)*(coords.x_ / 2) + (coords.x_ / 4)*(coords.x_ / 4))))  / roundl(sqrt(kCellHeight*kCellHeight/4 + kCellWidth*kCellWidth/4));
+            if((coords.y_ - 1310 ) >=0)
+            {
+                result.y_ = roundl(sqrt((coords.x_ / 2)*(coords.x_ / 2) + (coords.x_ / 4)*(coords.x_ / 4)) - sqrt(((coords.y_ - tmp) / 2)*((coords.y_ - tmp) / 2) + (coords.y_ - tmp)*(coords.y_ - tmp)))  / roundl(sqrt(kCellHeight*kCellHeight/4 + kCellWidth*kCellWidth/4));
+                result.x_ = roundl(sqrt(((coords.y_ - tmp) / 2)*((coords.y_ - tmp) / 2) + (coords.y_ - tmp)*(coords.y_ - tmp)) + sqrt((coords.x_ / 2)*(coords.x_ / 2) + (coords.x_ / 4)*(coords.x_ / 4)))  / roundl(sqrt(kCellHeight*kCellHeight/4 + kCellWidth*kCellWidth/4));
+            }
+            else
+            {
+                result.y_ = roundl(sqrt((coords.x_ / 2)*(coords.x_ / 2) + (coords.x_ / 4)*(coords.x_ / 4)) + sqrt(((coords.y_ - tmp) / 2)*((coords.y_ - tmp) / 2) + (coords.y_ - tmp)*(coords.y_ - tmp)))  / roundl(sqrt(kCellHeight*kCellHeight/4 + kCellWidth*kCellWidth/4));
+                result.x_ = roundl((sqrt((coords.x_ / 2)*(coords.x_ / 2) + (coords.x_ / 4)*(coords.x_ / 4))) - sqrt(((coords.y_ - tmp) / 2)*((coords.y_ - tmp) / 2) + (coords.y_ - tmp)*(coords.y_ - tmp)))  / roundl(sqrt(kCellHeight*kCellHeight/4 + kCellWidth*kCellWidth/4));
+            }
             print("Got /# /#, calculated /# /#  center /#\n", coords.x_, coords.y_, result.x_, result.y_, tmp);
             return result;
         }
