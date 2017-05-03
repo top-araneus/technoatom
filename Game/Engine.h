@@ -3,141 +3,142 @@
 
 #include "GameObjects.h"
 using namespace sf;
+
+typedef Array<Array<unsigned char>> GroundType;
+typedef Array<Array<GameObject*>> AirType;  //TODO: make weak_ptr
+
 class Engine
 {
-public:
-    Engine(RenderWindow* window)
+  public:
+    Engine(RenderWindow* window);
+    ~Engine() { }
+    SurfaceType InitializeMap();
+    Array<Array<unsigned char>> InitializeGround();
+    void DrawGround();
+    void DrawObjects();
+    void MoveObjects();
+    void AddObject(GameObject* obj)
     {
-        window_ = window;
-        mainFrame_ = ReferenceFrame(-((TILES_AT_LINE + 1) * CellWidth / 4),-((TILES_AT_LINE + 1) * CellHeight / 4),800,600);
-        map_ = InitializeMap();
-        ground_ = InitializeGround();
-        groundTexture_.loadFromFile("images/debuggrid.png");
-        numOfGrounds_ = groundTexture_.getSize().x / CellWidth;
-        groundSprite_.setTexture(groundTexture_);
-        groundSprite_.setTextureRect(IntRect(0, 0, CellWidth, CellHeight));
-       // groundSprite_.setOrigin(CellWidth/2, CellHeight/2);
-    }
-    ~Engine()
-    {
-
+      surface_[obj->GetGridCoords().x_][obj->GetGridCoords().y_] = obj;
     }
 
-    MapType InitializeMap()
+    SurfaceType& getMap()
     {
-        //Unique_ptr<MapType> mapArray = new MapType(TILES_AT_LINE);
-        MapType mapArray(TILES_AT_LINE);
-        for(int i=0; i<TILES_AT_LINE; ++i)
-        {
-            mapArray[i] = Array<GameObject*>(TILES_AT_LINE);
-            for (int j=0; j<TILES_AT_LINE; ++j)
-            {
-                mapArray[i][j] = nullptr;
-            }
-        }
-        return mapArray;
-    }
-
-    Array<Array<unsigned char>> InitializeGround()
-    {
-        Array<Array<unsigned char>> groundArray(TILES_AT_LINE);
-        for(int i=0; i<TILES_AT_LINE; ++i)
-        {
-            groundArray[i] = Array<unsigned char>(TILES_AT_LINE);
-            for (int j=0; j<TILES_AT_LINE; ++j)
-            {
-                groundArray[i][j] = rand()%2;
-            }
-        }
-        return groundArray;
-    }
-
-    void DrawGround()
-    {
-        for (int i=0; i<TILES_AT_LINE; ++i)
-        {
-            groundSprite_.setPosition(mainFrame_.GetX() + (CellWidth / 2) * i, mainFrame_.GetY() + (CellHeight / 2) * (TILES_AT_LINE + i));
-            for (int j=0; j<TILES_AT_LINE; ++j)
-                {
-                    groundSprite_.setTextureRect(IntRect(CellWidth*ground_[i][j],0,CellWidth, CellHeight));
-                    window_->draw(groundSprite_);
-                    groundSprite_.setPosition(groundSprite_.getPosition().x + CellWidth / 2, groundSprite_.getPosition().y - CellHeight / 2);
-                }
-        }
-    }
-
-    void DrawObjects()
-    {
-        int i=0;
-        int cnt=TILES_AT_LINE-1;
-        int j = cnt;
-        while (j>=0)
-        {
-            while (j<TILES_AT_LINE)
-            {
-                if (map_[i][j] != nullptr)
-                    map_[i][j]->Draw();
-                i++;
-                j++;
-            }
-            i=0;
-            cnt--;
-            j = cnt;
-        }
-        cnt = 1;
-        i = 1;
-        j = 0;
-        while (i<TILES_AT_LINE)
-        {
-            int endNum = i;
-            while (j<TILES_AT_LINE-endNum)
-            {
-                if (map_[i][j] != nullptr)
-                    map_[i][j]->Draw();
-                i++;
-                j++;
-            }
-            j=0;
-            cnt++;
-            i = cnt;
-        }
-     }
-
-    void MoveObjects()
-    {
-
-        for (int i=0; i<TILES_AT_LINE; ++i)
-        {
-            for (int j=0; j<TILES_AT_LINE; ++j)
-                {
-                    if (map_[i][j] != nullptr)
-                        map_[i][j]->Move();
-                }
-        }
-    }
-
-     void AddObject(GameObject* obj)
-     {
-         map_[obj->GetGridCoords().x_][obj->GetGridCoords().y_] = obj;
-     }
-
-    MapType& getMap()
-    {
-        return map_;
+      return surface_;
     }
 
     ReferenceFrame& getFrame()
     {
-        return mainFrame_;
+      return frame_;
     }
-    private:
-        MapType map_;
-        Array<Array<unsigned char>> ground_;
-        Texture groundTexture_;
-        Sprite groundSprite_;
-        int numOfGrounds_;
-        ReferenceFrame mainFrame_;
-        RenderWindow* window_;
+
+  private:
+    SurfaceType surface_;
+    GroundType ground_;
+    AirType air_;
+    Texture ground_texture_;
+    Sprite ground_sprite_;
+    int num_of_grounds_;
+    ReferenceFrame frame_;
+    RenderWindow* window_;
 };
 
+Engine::Engine(RenderWindow* window)
+{
+  window_ = window;
+  frame_ = ReferenceFrame(-((kTilesAtLine + 1) * kCellWidth / 4), -((kTilesAtLine + 1) * kCellHeight / 4), 800, 600);
+  surface_ = InitializeMap();
+  ground_ = InitializeGround();
+  ground_texture_.loadFromFile("images/debuggrid.png");
+  num_of_grounds_ = ground_texture_.getSize().x / kCellWidth;
+  ground_sprite_.setTexture(ground_texture_);
+  ground_sprite_.setTextureRect(IntRect(0, 0, kCellWidth, kCellHeight));
+}
+
+SurfaceType Engine::InitializeMap()
+{
+  SurfaceType map_array(kTilesAtLine);
+  for (int i = 0; i < kTilesAtLine; ++i)
+  {
+    map_array[i] = Array<GameObject*>(kTilesAtLine);
+    for (int j = 0; j < kTilesAtLine; ++j)
+    {
+      map_array[i][j] = nullptr;
+    }
+  }
+  return map_array;
+}
+
+Array<Array<unsigned char>> Engine::InitializeGround()
+{
+  Array<Array<unsigned char>> ground_array(kTilesAtLine);
+  srand(time(nullptr));
+  for (int i = 0; i < kTilesAtLine; ++i)
+  {
+    ground_array[i] = Array<unsigned char>(kTilesAtLine);
+    for (int j = 0; j < kTilesAtLine; ++j)
+    {
+      ground_array[i][j] = rand()%2;
+    }
+  }
+  return ground_array;
+}
+
+// TODO: perspective for ground drawing
+void Engine::DrawGround()
+{
+  for (int i = 0; i < kTilesAtLine; ++i)
+  {
+    ground_sprite_.setPosition(frame_.GetX() + (kCellWidth / 2) * i, frame_.GetY() + (kCellHeight / 2) * (kTilesAtLine + i));
+    for (int j = 0; j < kTilesAtLine; ++j)
+      {
+        ground_sprite_.setTextureRect(IntRect(kCellWidth*ground_[i][j], 0, kCellWidth, kCellHeight));
+        window_->draw(ground_sprite_);
+        ground_sprite_.setPosition(ground_sprite_.getPosition().x + kCellWidth / 2, ground_sprite_.getPosition().y - kCellHeight / 2);
+      }
+  }
+}
+
+void Engine::DrawObjects()
+{
+  LinearVector<int> cell_coords (0, kTilesAtLine-1);
+  int last_x_index = kTilesAtLine-1;
+  while (cell_coords.y_ >= 0)
+  {
+    while (cell_coords.y_ < kTilesAtLine)
+    {
+      if (surface_[cell_coords.x_][cell_coords.y_] != nullptr)
+        surface_[cell_coords.x_][cell_coords.y_]->Draw();
+      cell_coords = cell_coords + LinearVector<int>(1,1);
+    }
+    last_x_index -= 1;
+    cell_coords = LinearVector<int>(0, last_x_index);
+  }
+  cell_coords = LinearVector<int>(1, 0);
+  last_x_index = 1;
+  while (cell_coords.x_ < kTilesAtLine)
+  {
+    int last_y_index = kTilesAtLine - cell_coords.x_;
+    while (cell_coords.y_ < last_y_index)
+    {
+      if (surface_[cell_coords.x_][cell_coords.y_] != nullptr)
+        surface_[cell_coords.x_][cell_coords.y_]->Draw();
+      cell_coords = cell_coords + LinearVector<int>(1, 1);
+    }
+    last_x_index += 1;
+    cell_coords = LinearVector<int>(last_x_index, 0);
+  }
+}
+
+void Engine::MoveObjects()
+{
+  for (int i = 0; i < kTilesAtLine; ++i)
+  {
+    for (int j = 0; j < kTilesAtLine; ++j)
+      {
+        if (surface_[i][j] != nullptr)
+          surface_[i][j]->Move();
+      }
+  }
+}
 #endif // ENGINE_H

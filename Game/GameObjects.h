@@ -5,9 +5,9 @@
 #include <../utils/print.h>
 #include <math.h>
 using namespace sf;
-const int CellWidth = 128;
-const int CellHeight = 64;
-const int TILES_AT_LINE = 10;
+const int kCellWidth = 128;
+const int kCellHeight = 64;
+const int kTilesAtLine = 10;
 
 
 class GameObject
@@ -48,35 +48,35 @@ class GameObject
         {
             //print("Frame: /# /# \n", refFrame_->GetX(), refFrame_->GetY());
             LinearVector<int> result;
-            result.x_ = cell.x_ * CellWidth / 2 + cell.y_ * CellWidth / 2 + CellWidth / 2;
-            result.y_ = TILES_AT_LINE * CellHeight / 2 + cell.x_ * CellHeight / 2 - cell.y_ * CellHeight / 2 + CellHeight / 2;
+            result.x_ = cell.x_ * kCellWidth / 2 + cell.y_ * kCellWidth / 2 + kCellWidth / 2;
+            result.y_ = kTilesAtLine * kCellHeight / 2 + cell.x_ * kCellHeight / 2 - cell.y_ * kCellHeight / 2 + kCellHeight / 2;
             return result;
         }
         LinearVector<int> GetCellFromCoords(LinearVector<int> coords)
         {
             LinearVector<int> result(0,0);
-            /*result.x_ = roundl((coords.x_ + CellWidth/2) / CellWidth) + roundl((coords.y_ - (CellHeight * TILES_AT_LINE / 2) - CellHeight/2)/ CellHeight);
-            result.y_ = roundl(coords.x_ / CellWidth) - roundl((coords.y_ - (CellHeight * TILES_AT_LINE / 2) - CellHeight/2)/ CellHeight);
+            /*result.x_ = roundl((coords.x_ + kCellWidth/2) / kCellWidth) + roundl((coords.y_ - (kCellHeight * kTilesAtLine / 2) - kCellHeight/2)/ kCellHeight);
+            result.y_ = roundl(coords.x_ / kCellWidth) - roundl((coords.y_ - (kCellHeight * kTilesAtLine / 2) - kCellHeight/2)/ kCellHeight);
             print("Got /# /#, calculated /# /# \n", coords.x_, coords.y_, result.x_, result.y_);*/
-            //int tmp = CellHeight * TILES_AT_LINE / 2;
+            //int tmp = kCellHeight * kTilesAtLine / 2;
             int tmp = 350;
             //!нужно понять, как это адекватно расчитывать
-                result.y_ = roundl((sqrt((coords.x_ / 2)*(coords.x_ / 2) + (coords.x_ / 4)*(coords.x_ / 4)) - sqrt(((coords.y_ - tmp) / 2)*((coords.y_ - tmp) / 2) + (coords.y_ - tmp)*(coords.y_ - tmp))))  / roundl(sqrt(CellHeight*CellHeight/4 + CellWidth*CellWidth/4));
-                result.x_ = roundl((sqrt(((coords.y_ - tmp) / 2)*((coords.y_ - tmp) / 2) + (coords.y_ - tmp)*(coords.y_ - tmp)) + sqrt((coords.x_ / 2)*(coords.x_ / 2) + (coords.x_ / 4)*(coords.x_ / 4))))  / roundl(sqrt(CellHeight*CellHeight/4 + CellWidth*CellWidth/4));
+                result.y_ = roundl((sqrt((coords.x_ / 2)*(coords.x_ / 2) + (coords.x_ / 4)*(coords.x_ / 4)) - sqrt(((coords.y_ - tmp) / 2)*((coords.y_ - tmp) / 2) + (coords.y_ - tmp)*(coords.y_ - tmp))))  / roundl(sqrt(kCellHeight*kCellHeight/4 + kCellWidth*kCellWidth/4));
+                result.x_ = roundl((sqrt(((coords.y_ - tmp) / 2)*((coords.y_ - tmp) / 2) + (coords.y_ - tmp)*(coords.y_ - tmp)) + sqrt((coords.x_ / 2)*(coords.x_ / 2) + (coords.x_ / 4)*(coords.x_ / 4))))  / roundl(sqrt(kCellHeight*kCellHeight/4 + kCellWidth*kCellWidth/4));
             print("Got /# /#, calculated /# /#  center /#\n", coords.x_, coords.y_, result.x_, result.y_, tmp);
             return result;
         }
 };
 
-typedef Array<Array<GameObject*>> MapType;
-MapType InitializeMap()
+typedef Array<Array<GameObject*>> SurfaceType;
+SurfaceType InitializeMap()
 {
-    //Unique_ptr<MapType> mapArray = new MapType(TILES_AT_LINE);
-    MapType mapArray(TILES_AT_LINE);
-    for(int i=0; i<TILES_AT_LINE; ++i)
+    //Unique_ptr<SurfaceType> mapArray = new SurfaceType(kTilesAtLine);
+    SurfaceType mapArray(kTilesAtLine);
+    for (int i=0; i<kTilesAtLine; ++i)
     {
-        mapArray[i] = Array<GameObject*>(TILES_AT_LINE);
-        for (int j=0; j<TILES_AT_LINE; ++j)
+        mapArray[i] = Array<GameObject*>(kTilesAtLine);
+        for (int j=0; j<kTilesAtLine; ++j)
         {
             mapArray[i][j] = nullptr;
         }
@@ -122,7 +122,7 @@ class MovingObject :public GameObject
         }
         bool InMap(LinearVector<int> newCoords)
         {
-            return (!(newCoords.y_ < 0 || newCoords.x_ < 0 || newCoords.y_ >= TILES_AT_LINE || newCoords.x_  >= TILES_AT_LINE));
+            return (!(newCoords.y_ < 0 || newCoords.x_ < 0 || newCoords.y_ >= kTilesAtLine || newCoords.x_  >= kTilesAtLine));
         }
     public:
         MovingObject(){ }
@@ -167,7 +167,7 @@ class MovingObject :public GameObject
                         if (tmp.x_ > cellCenter_.x_)
                         {
                             //!< вылез за границу справа вверху
-                            if ((tmp.y_ - cellCenter_.y_) < -0.5 * (tmp.x_ - (cellCenter_.x_ + CellWidth / 2)))
+                            if ((tmp.y_ - cellCenter_.y_) < -0.5 * (tmp.x_ - (cellCenter_.x_ + kCellWidth / 2)))
                             {
                                 newCell.y_ += 1;
                                 //!< не вылезает за край карты
@@ -177,9 +177,9 @@ class MovingObject :public GameObject
                                 }
                             }
                             //!< вылез за границу справа внизу
-                            else if ((tmp.y_ - cellCenter_.y_) > 0.5 * (tmp.x_ - (cellCenter_.x_ + CellWidth / 2)))
+                            else if ((tmp.y_ - cellCenter_.y_) > 0.5 * (tmp.x_ - (cellCenter_.x_ + kCellWidth / 2)))
                             {
-                               // print("Right down: /# /# \n", tmp.y_ - cellCenter_.y_, 0.5 * (tmp.x_ - (cellCenter_.x_ + CellWidth / 2)));
+                               // print("Right down: /# /# \n", tmp.y_ - cellCenter_.y_, 0.5 * (tmp.x_ - (cellCenter_.x_ + kCellWidth / 2)));
                                 newCell.x_ += 1;
                                 if (InMap(newCell))
                                 {
@@ -187,7 +187,7 @@ class MovingObject :public GameObject
                                 }
                             }
                             //!< вылез за границу справа строго
-                            else if ((tmp.y_ == cellCenter_.y_) && (tmp.x_ > (cellCenter_.x_ + CellWidth / 2)))
+                            else if ((tmp.y_ == cellCenter_.y_) && (tmp.x_ > (cellCenter_.x_ + kCellWidth / 2)))
                             {
                                 newCell.x_ += 1;
                                 newCell.y_ += 1;
@@ -205,7 +205,7 @@ class MovingObject :public GameObject
                         else if (tmp.x_ < cellCenter_.x_)
                         {
                             //!< вылез за границу слева внизу
-                            if ((tmp.y_ - cellCenter_.y_) < -0.5 * (tmp.x_ - (cellCenter_.x_ - CellWidth / 2)))
+                            if ((tmp.y_ - cellCenter_.y_) < -0.5 * (tmp.x_ - (cellCenter_.x_ - kCellWidth / 2)))
                             {
                                 newCell.y_ -= 1;
                                 if (InMap(newCell))
@@ -214,7 +214,7 @@ class MovingObject :public GameObject
                                 }
                             }
                             //!< вылез за границу слева вверху
-                            else if ((tmp.y_ - cellCenter_.y_) > 0.5 * (tmp.x_ - (cellCenter_.x_ - CellWidth / 2)))
+                            else if ((tmp.y_ - cellCenter_.y_) > 0.5 * (tmp.x_ - (cellCenter_.x_ - kCellWidth / 2)))
                             {
                                 newCell.x_ -= 1;
                                 if (InMap(newCell))
@@ -223,7 +223,7 @@ class MovingObject :public GameObject
                                 }
                             }
                             //!< вылез за границу слева строго
-                            else if ((tmp.y_ == cellCenter_.y_) && (tmp.x_ < (cellCenter_.x_-CellWidth / 2)))
+                            else if ((tmp.y_ == cellCenter_.y_) && (tmp.x_ < (cellCenter_.x_-kCellWidth / 2)))
                             {
                                 newCell.x_ -= 1;
                                 newCell.y_ -= 1;
@@ -241,7 +241,7 @@ class MovingObject :public GameObject
                         else if (tmp.x_ == cellCenter_.x_)
                         {
                             //!< вылез за границу внизу
-                            if ((tmp.y_ - cellCenter_.y_) > CellHeight / 2)
+                            if ((tmp.y_ - cellCenter_.y_) > kCellHeight / 2)
                             {
                                 newCell.x_ += 1;
                                 newCell.y_ -= 1;
@@ -251,7 +251,7 @@ class MovingObject :public GameObject
                                 }
                             }
                             //!< вылез за границу вверху
-                            else if ((tmp.y_ - cellCenter_.y_) < -(CellHeight / 2))
+                            else if ((tmp.y_ - cellCenter_.y_) < -(kCellHeight / 2))
                             {
                                 newCell.x_ -= 1;
                                 newCell.y_ += 1;
@@ -356,7 +356,7 @@ class Player: public Mortal
             playerSprite.setTexture(texture_);
             playerSprite.setTextureRect(IntRect(curFrame_ * spriteSize_.x_, curState_ * spriteSize_.y_,
                                                 spriteSize_.x_, spriteSize_.y_));
-            playerSprite.setOrigin(Vector2f(spriteSize_.x_ / 2, spriteSize_.y_ - CellHeight / 2));
+            playerSprite.setOrigin(Vector2f(spriteSize_.x_ / 2, spriteSize_.y_ - kCellHeight / 2));
             playerSprite.setPosition(refFrame_->GetX() + refCoords_.x_, refFrame_->GetY() + refCoords_.y_);
             //curState_ = (curState_+1)%numOfState_;
             window_->draw(playerSprite);
@@ -367,7 +367,7 @@ class Player: public Mortal
             MovingObject::Move();
         }
         Player();
-        Player(RenderWindow* window, MapType* pMap, LinearVector<int> spriteSize, Texture& texture,
+        Player(RenderWindow* window, SurfaceType* pMap, LinearVector<int> spriteSize, Texture& texture,
                LinearVector<int> gridCoords, ReferenceFrame* refFrame)
         {
             window_ = window;
@@ -385,7 +385,7 @@ class Player: public Mortal
             map_ = pMap;
             velocity_ = LinearVector<int>(0,0);
         }
-        Player(RenderWindow* window, MapType* pMap, LinearVector<int> spriteSize, Texture& texture,
+        Player(RenderWindow* window, SurfaceType* pMap, LinearVector<int> spriteSize, Texture& texture,
                LinearVector<int> gridCoords, ReferenceFrame* refFrame, int numOfFrames, int numOfStates)
         {
             window_ = window;

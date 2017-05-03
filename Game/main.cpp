@@ -9,7 +9,7 @@ using namespace sf;
 #include <../ALU/ALU/alu.h>
 #include <../stack/stack/stack.h>
 #include <../stack/stack/smart_ptr.h>
-#include <refpoint.h>
+#include <refframe.h>
 #include <GameObjects.h>
 #include <Engine.h>
 
@@ -17,7 +17,7 @@ int main()
 {
 	RenderWindow window(sf::VideoMode(800, 600), "Proekt Lev Protiv");
     Engine engine(&window);
-    //ReferenceFrame mainFrame(-((TILES_AT_LINE + 1) * CellWidth / 4),-((TILES_AT_LINE + 1) * CellHeight / 4),800,600);
+    //ReferenceFrame mainFrame(-((kTilesAtLine + 1) * kCellWidth / 4),-((kTilesAtLine + 1) * kCellHeight / 4),800,600);
     window.setFramerateLimit(30);
     window.setVerticalSyncEnabled(true);
         //print("frame width: /#, frame height: /#", engine.getFrame().size_.x_, engine.getFrame().size_.y_);
@@ -37,7 +37,7 @@ int main()
     isograss.loadFromFile("images/grass2.png");
     Sprite isosprite;
     isosprite.setTexture(isograss);
-    isosprite.setTextureRect(IntRect(0,0,CellWidth,CellHeight));
+    isosprite.setTextureRect(IntRect(0,0,kCellWidth,kCellHeight));
     isosprite.setPosition(mainFrame.GetX(), mainFrame.GetY());*/
     /*
     Sprite grassSprite;
@@ -77,12 +77,12 @@ int main()
 	engine.AddObject(&kisa3);
 	engine.AddObject(&player3);*/
 
-	Array<Player*> gops(TILES_AT_LINE*TILES_AT_LINE);
-	for (int i=0; i<TILES_AT_LINE*TILES_AT_LINE; ++i)
+	Array<Player*> gops(kTilesAtLine*kTilesAtLine);
+	for (int i=0; i<kTilesAtLine*kTilesAtLine; ++i)
     {
-        if ((i/TILES_AT_LINE == 5) || (i%TILES_AT_LINE == 5))
+        if ((i/kTilesAtLine == 5) || (i%kTilesAtLine == 5))
         {gops[i] = new Player(&window, &(engine.getMap()), LinearVector<int>(128,192), goptexture,
-             LinearVector<int>(i/TILES_AT_LINE,i%TILES_AT_LINE), &(engine.getFrame()), 2, 1);
+             LinearVector<int>(i/kTilesAtLine,i%kTilesAtLine), &(engine.getFrame()), 2, 1);
 
         engine.AddObject(gops[i]);}
         else gops[i] = nullptr;
@@ -101,7 +101,7 @@ int main()
 	while (window.isOpen())
 	{
         int cnt = 0;
-        //isosprite.setPosition(engine.getFrame().GetX(), engine.getFrame().GetY() + (CellHeight / 2) * TILES_AT_LINE);
+        //isosprite.setPosition(engine.getFrame().GetX(), engine.getFrame().GetY() + (kCellHeight / 2) * kTilesAtLine);
         //grassSprite.setPosition(mainFrame.GetX(), mainFrame.GetY()+16*10);
 		float time = clock.getElapsedTime().asMicroseconds();
 		clock.restart();
@@ -183,7 +183,7 @@ int main()
 			//if (CurrentFrame > 3) CurrentFrame -= 3; //проходимся по кадрам с первого по третий включительно. если пришли к третьему кадру - откидываемся назад.
 			herosprite.setTextureRect(IntRect(96 * (int(CurrentFrame)%3), 96, 96, 96)); //проходимся по координатам Х. получается 96,96*2,96*3 и опять 96
 			herosprite.move(-0.1*time, 0);//происходит само движение персонажа влево
-			//mainFrame.SetX(-((TILES_AT_LINE + 1) * CellWidth / 4)+herosprite.getPosition().x-0.1*time);
+			//mainFrame.SetX(-((kTilesAtLine + 1) * kCellWidth / 4)+herosprite.getPosition().x-0.1*time);
 		}
 
 		if (Keyboard::isKeyPressed(Keyboard::D)) {
@@ -192,7 +192,7 @@ int main()
 			herosprite.setTextureRect(IntRect(96 * (int(CurrentFrame)%3), 192, 96, 96)); //проходимся по координатам Х. получается 96,96*2,96*3 и опять 96
 
 			herosprite.move(0.1*time, 0);//происходит само движение персонажа вправо
-			//mainFrame.SetX(-((TILES_AT_LINE + 1) * CellWidth / 4)+herosprite.getPosition().x+0.1*time);
+			//mainFrame.SetX(-((kTilesAtLine + 1) * kCellWidth / 4)+herosprite.getPosition().x+0.1*time);
 
 		}
 
@@ -202,7 +202,7 @@ int main()
 			//if (CurrentFrame > 3) CurrentFrame -= 3; //проходимся по кадрам с первого по третий включительно. если пришли к третьему кадру - откидываемся назад.
 			herosprite.setTextureRect(IntRect(96 * (int(CurrentFrame)%3), 288, 96, 96)); //проходимся по координатам Х. получается 96,96*2,96*3 и опять 96
 			herosprite.move(0, -0.1*time);//происходит само движение персонажа вверх
-			//mainFrame.SetY(-((TILES_AT_LINE + 1) * CellHeight / 4)+herosprite.getPosition().y-0.1*time);
+			//mainFrame.SetY(-((kTilesAtLine + 1) * kCellHeight / 4)+herosprite.getPosition().y-0.1*time);
 		}
 
 		if (Keyboard::isKeyPressed(Keyboard::S)) {
@@ -210,7 +210,7 @@ int main()
 			//if (CurrentFrame > 3) CurrentFrame -= 3; //проходимся по кадрам с первого по третий включительно. если пришли к третьему кадру - откидываемся назад.
 			herosprite.setTextureRect(IntRect(96 * (int(CurrentFrame)%3), 0, 96, 96)); //проходимся по координатам Х. получается 96,96*2,96*3 и опять 96
 			herosprite.move(0, 0.1*time);//происходит само движение персонажа вниз
-			//mainFrame.SetY(-((TILES_AT_LINE + 1) * CellHeight / 4)+herosprite.getPosition().y+0.1*time);
+			//mainFrame.SetY(-((kTilesAtLine + 1) * kCellHeight / 4)+herosprite.getPosition().y+0.1*time);
 		}
 
 		window.clear();
@@ -227,20 +227,20 @@ int main()
         engine.MoveObjects();
         engine.DrawGround();
 
-  /*      for (int i=0; i<TILES_AT_LINE; ++i)
+  /*      for (int i=0; i<kTilesAtLine; ++i)
         {
-            isosprite.setPosition(mainFrame.GetX() + (CellWidth / 2) * i, mainFrame.GetY() + (CellHeight / 2) * (TILES_AT_LINE + i));
-            for (int j=0; j<TILES_AT_LINE; ++j)
+            isosprite.setPosition(mainFrame.GetX() + (kCellWidth / 2) * i, mainFrame.GetY() + (kCellHeight / 2) * (kTilesAtLine + i));
+            for (int j=0; j<kTilesAtLine; ++j)
                 {
                     window.draw(isosprite);
-                    isosprite.setPosition(isosprite.getPosition().x + CellWidth / 2, isosprite.getPosition().y - CellHeight / 2);
+                    isosprite.setPosition(isosprite.getPosition().x + kCellWidth / 2, isosprite.getPosition().y - kCellHeight / 2);
                 }
         }*/
        // window.draw(grassSprite);
 		window.draw(herosprite);
         //player.Draw();
-        for (int i=0; i<TILES_AT_LINE; ++i)
-            for (int j=0; j<TILES_AT_LINE; ++j)
+        for (int i=0; i<kTilesAtLine; ++i)
+            for (int j=0; j<kTilesAtLine; ++j)
                 if (!(engine.getMap()[i][j] == nullptr ))
                     engine.getMap()[i][j]->Draw();
 
@@ -248,7 +248,7 @@ int main()
 	//	if (Keyboard::isKeyPressed(Keyboard::K)) {
 
 
-   /*     for (int i=0; i<TILES_AT_LINE*TILES_AT_LINE; ++i)
+   /*     for (int i=0; i<kTilesAtLine*kTilesAtLine; ++i)
         {
             if (gops[i] != nullptr)
                 gops[i]->SetFrame((int)CurrentFrame % 2);

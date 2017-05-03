@@ -316,11 +316,11 @@ void Array<Type>::Erase(int index)
         if (size_ > 1)
         {
             newData = new Type[size_-1];
-            for(int i=0; i<index; ++i)
+            for (int i=0; i<index; ++i)
             {
                 newData[i] = data_[i];
             }
-            for(int i=index+1; i<size_; ++i)
+            for (int i=index+1; i<size_; ++i)
             {
                 newData[i-1] = data_[i];
             }
@@ -339,12 +339,12 @@ void Array<Type>::Insert(int index, Type element)
     else
     {
         Type* newData = new Type[size_ + 1];
-        for( int i = 0; i < index; ++i )
+        for (int i = 0; i < index; ++i)
         {
             newData[i] = data_[i];
         }
         newData[index] = element;
-        for( int i = index + 1; i < size_ + 1; ++i)
+        for (int i = index + 1; i < size_ + 1; ++i)
         {
             newData[i] = data_[i-1];
         }
