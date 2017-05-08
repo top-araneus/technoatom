@@ -2,9 +2,6 @@
 #define TRANSFORMATION_H
 #include "linearvector.h"
 #include <math.h>
-const int kCellWidth = 128;
-const int kCellHeight = 64;
-const int kTilesAtLine = 10;
 
 double Pythagor(double x, double y)
 {

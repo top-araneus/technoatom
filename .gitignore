@@ -43,3 +43,5 @@ Game/SFML*
 *.pro.use*
 *.cbp
 *.depend
+*.cbp
+*.depend

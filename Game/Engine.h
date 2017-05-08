@@ -109,9 +109,14 @@ void Engine::DrawAll()
   {
     while (cell_coords.y_ < kTilesAtLine)
     {
+     // print("took /# /#\n", cell_coords.x_, cell_coords.y_);
       if (surface_[cell_coords.x_][cell_coords.y_] != nullptr)
+      {
         surface_[cell_coords.x_][cell_coords.y_]->Draw();
+   //     print("drawn /# /#\n", cell_coords.x_, cell_coords.y_);
+      }
       cell_coords = cell_coords + LinearVector<int>(1,1);
+  //    print("new /# /#\n", cell_coords.x_, cell_coords.y_);
     }
     last_x_index -= 1;
     cell_coords = LinearVector<int>(0, last_x_index);
@@ -123,8 +128,13 @@ void Engine::DrawAll()
     int last_y_index = kTilesAtLine - cell_coords.x_;
     while (cell_coords.y_ < last_y_index)
     {
+   //   print("took /# /#\n", cell_coords.x_, cell_coords.y_);
       if (surface_[cell_coords.x_][cell_coords.y_] != nullptr)
+      {
+
         surface_[cell_coords.x_][cell_coords.y_]->Draw();
+    //    print("drawn /# /#\n", cell_coords.x_, cell_coords.y_);
+      }
       cell_coords = cell_coords + LinearVector<int>(1, 1);
     }
     last_x_index += 1;
@@ -160,12 +170,9 @@ void Engine::InteractAll()
           if (clock() >= surface_[i][j]->GetAttackEndingTime())
           {
             surface_[i][j]->SetInAttack(false);
-            surface_[i][j]->SetAimOfInteract(nullptr);
+            //surface_[i][j]->SetAimOfInteract(nullptr);
           }
-          else
-          {
-            surface_[i][j]->Interact();
-          }
+          surface_[i][j]->Interact();
         }
       }
   }

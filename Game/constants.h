@@ -1,0 +1,11 @@
+const int kCellWidth = 128;
+const int kCellHeight = 64;
+const int kTilesAtLine = 30;
+const int kFrameRate = 30;
+const int kWindowWidth = 2732;
+const int kWindowHeight = 1536;
+const int kPlayerVelocity = 6;
+const int kCameraVelocity = 10;
+const unsigned char kEnemyId = 148;
+const unsigned char kPlayerId = 161;
+const time_t kCoolDown = 250;
