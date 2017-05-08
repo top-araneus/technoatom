@@ -1,14 +1,11 @@
 #ifndef GAMEOBJECTS_H
 #define GAMEOBJECTS_H
 #include "refpoint.h"
+#include "Transformation.h"
 #include <../stack/stack/smart_ptr.h>
 #include <../utils/print.h>
-#include <math.h>
-using namespace sf;
-const int kCellWidth = 128;
-const int kCellHeight = 64;
-const int kTilesAtLine = 40;
 
+using namespace sf;
 
 class GameObject
 {
@@ -44,36 +41,7 @@ class GameObject
         LinearVector<int> spriteSize_; //!< width and height of sprite
         Array<Array<GameObject*>>* map_; //! TODO: weak_ptr
         Unique_ptr<ReferenceFrame> refFrame_;
-        LinearVector<int> GetCoordsFromCell(LinearVector<int> cell)
-        {
-            //print("Frame: /# /# \n", refFrame_->GetX(), refFrame_->GetY());
-            LinearVector<int> result;
-            result.x_ = cell.x_ * kCellWidth / 2 + cell.y_ * kCellWidth / 2 + kCellWidth / 2;
-            result.y_ = kTilesAtLine * kCellHeight / 2 + cell.x_ * kCellHeight / 2 - cell.y_ * kCellHeight / 2 + kCellHeight / 2;
-            return result;
-        }
-        LinearVector<int> GetCellFromCoords(LinearVector<int> coords)
-        {
-            LinearVector<int> result(0,0);
-            /*result.x_ = roundl((coords.x_ + kCellWidth/2) / kCellWidth) + roundl((coords.y_ - (kCellHeight * kTilesAtLine / 2) - kCellHeight/2)/ kCellHeight);
-            result.y_ = roundl(coords.x_ / kCellWidth) - roundl((coords.y_ - (kCellHeight * kTilesAtLine / 2) - kCellHeight/2)/ kCellHeight);
-            print("Got /# /#, calculated /# /# \n", coords.x_, coords.y_, result.x_, result.y_);*/
-            //int tmp = kCellHeight * kTilesAtLine / 2;
-            int tmp = 1310;
-            //!нужно понять, как это адекватно расчитывать
-            if((coords.y_ - 1310 ) >=0)
-            {
-                result.y_ = roundl(sqrt((coords.x_ / 2)*(coords.x_ / 2) + (coords.x_ / 4)*(coords.x_ / 4)) - sqrt(((coords.y_ - tmp) / 2)*((coords.y_ - tmp) / 2) + (coords.y_ - tmp)*(coords.y_ - tmp)))  / roundl(sqrt(kCellHeight*kCellHeight/4 + kCellWidth*kCellWidth/4));
-                result.x_ = roundl(sqrt(((coords.y_ - tmp) / 2)*((coords.y_ - tmp) / 2) + (coords.y_ - tmp)*(coords.y_ - tmp)) + sqrt((coords.x_ / 2)*(coords.x_ / 2) + (coords.x_ / 4)*(coords.x_ / 4)))  / roundl(sqrt(kCellHeight*kCellHeight/4 + kCellWidth*kCellWidth/4));
-            }
-            else
-            {
-                result.y_ = roundl(sqrt((coords.x_ / 2)*(coords.x_ / 2) + (coords.x_ / 4)*(coords.x_ / 4)) + sqrt(((coords.y_ - tmp) / 2)*((coords.y_ - tmp) / 2) + (coords.y_ - tmp)*(coords.y_ - tmp)))  / roundl(sqrt(kCellHeight*kCellHeight/4 + kCellWidth*kCellWidth/4));
-                result.x_ = roundl((sqrt((coords.x_ / 2)*(coords.x_ / 2) + (coords.x_ / 4)*(coords.x_ / 4))) - sqrt(((coords.y_ - tmp) / 2)*((coords.y_ - tmp) / 2) + (coords.y_ - tmp)*(coords.y_ - tmp)))  / roundl(sqrt(kCellHeight*kCellHeight/4 + kCellWidth*kCellWidth/4));
-            }
-            print("Got /# /#, calculated /# /#  center /#\n", coords.x_, coords.y_, result.x_, result.y_, tmp);
-            return result;
-        }
+
 };
 
 typedef Array<Array<GameObject*>> SurfaceType;
