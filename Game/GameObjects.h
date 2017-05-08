@@ -13,36 +13,100 @@ class GameObject
         virtual void Draw() = 0;
         virtual void Interact() = 0;
         virtual void Move() = 0;
+        virtual void DecreaseHp(int diff)=0;
         GameObject() { }
         virtual ~GameObject() { }
         unsigned char GetCode()
         {
-            return objectCode_;
+            return object_code_;
         }
         void SetFrame(unsigned char frame)
         {
-            curFrame_ = frame % numOfFrames_;
+            current_frame_ = frame % num_of_frames_;
+        }
+        void SetState(unsigned char state)
+        {
+            current_state_ = state;
+        }
+        void SetDamageEndingTime(time_t time)
+        {
+            damage_ending_time_ = time;
+        }
+        void SetAttackEndingTime(time_t time)
+        {
+            attack_ending_time_ = time;
+        }
+        void SetAimOfInteract(GameObject* aim)
+        {
+            aim_of_interact_ = aim;
+        }
+        GameObject* GetAimOfInteract()
+        {
+            return aim_of_interact_;
+        }
+        time_t GetDamageEndingTime()
+        {
+            return damage_ending_time_;
+        }
+        time_t GetAttackEndingTime()
+        {
+            return attack_ending_time_;
         }
         LinearVector<int> GetGridCoords()
         {
-            return gridCoords_;
+            return grid_coords_;
+        }
+        int GetObjectCode()
+        {
+            return object_code_;
+        }
+        void SetInAttack(bool value)
+        {
+            in_attack_ = value;
+        }
+        void SetUnderAttack(bool value)
+        {
+            under_attack_ = value;
+        }
+        bool GetInAttack()
+        {
+            return in_attack_;
+        }
+        bool GetUnderAttack()
+        {
+            return under_attack_;
         }
     protected:
-        LinearVector<int> refCoords_;
-        LinearVector<int> cellCenter_;
-        LinearVector<int> gridCoords_;
-        unsigned char numOfFrames_;
-        unsigned char curFrame_;
-        unsigned char numOfState_;
-        unsigned char curState_;
-        unsigned char objectCode_;
+        LinearVector<char> GiveDirection();
+        LinearVector<int> ref_coords_;
+        LinearVector<int> cell_center_;
+        LinearVector<int> grid_coords_; //get
+        LinearVector<char> direction_;
+        unsigned char num_of_frames_;
+        unsigned char current_frame_; //set
+        unsigned char num_of_state_;
+        unsigned char current_state_; //set
+        unsigned char object_code_; //get
+        int applied_damage_;
+        time_t attack_ending_time_ = 0; //get, set
+        time_t damage_ending_time_ = 0; //get, set
+        bool in_attack_ = false; //get, set
+        bool under_attack_ = false; //get, set
+        const time_t kCoolDown = 250;
+        const int kEnemyId = 1488;
         Texture texture_;
         RenderWindow* window_;
-        LinearVector<int> spriteSize_; //!< width and height of sprite
+        LinearVector<int> sprite_size_; //!< width and height of sprite
         Array<Array<GameObject*>>* map_; //! TODO: weak_ptr
-        Unique_ptr<ReferenceFrame> refFrame_;
+        Unique_ptr<ReferenceFrame> ref_frame_;
+        GameObject* aim_of_interact_; //set, get
 
 };
+
+LinearVector<char> GameObject::GiveDirection()
+{
+    return LinearVector<char>(1,-1);
+}
 
 typedef Array<Array<GameObject*>> SurfaceType;
 SurfaceType InitializeMap()
@@ -65,7 +129,7 @@ class StaticObject :public GameObject
     public:
         StaticObject(LinearVector<int> refCoords)
         {
-            refCoords_ = refCoords;
+            ref_coords_ = refCoords;
         }
         virtual ~StaticObject() = 0;
         virtual void Draw()= 0;
@@ -84,16 +148,16 @@ class MovingObject :public GameObject
             {
                 if ((*map_)[cell.x_][cell.y_] == nullptr)
                 {
-                    gridCoords_ = cell;
-                    refCoords_ = coords;
-                    cellCenter_ = GetCoordsFromCell(gridCoords_);
+                    grid_coords_ = cell;
+                    ref_coords_ = coords;
+                    cell_center_ = GetCoordsFromCell(grid_coords_);
                     (*map_)[cell.x_][cell.y_] = this;
                     (*map_)[oldCell.x_][oldCell.y_] = nullptr;
                 }
             }
             else
             {
-                refCoords_ = coords;
+                ref_coords_ = coords;
             }
         }
         bool InMap(LinearVector<int> newCoords)
@@ -104,12 +168,12 @@ class MovingObject :public GameObject
         MovingObject(){ }
         MovingObject(LinearVector<int> refCoords)
         {
-            refCoords_ = refCoords;
+            ref_coords_ = refCoords;
             velocity_ = LinearVector<int>(0,0);
         }
         MovingObject(LinearVector<int> refCoords, LinearVector<int> velocity)
         {
-            refCoords_ = refCoords;
+            ref_coords_ = refCoords;
             velocity_ = velocity;
         }
         void SetVelocity(LinearVector<int> velocity)
@@ -123,129 +187,16 @@ class MovingObject :public GameObject
         {
             if(velocity_ != LinearVector<int>(0,0))
             {
-                LinearVector<int> tmp;// = refCoords_ + velocity_;
-                tmp.x_ = refCoords_.x_ + velocity_.x_;
-                tmp.y_ = refCoords_.y_ + velocity_.y_;
-              //  print("tmp: /# /# \n", tmp.x_, tmp.y_);
-                print("refcoords: /# /# \n", refCoords_.x_, refCoords_.y_);
-                print("gridcoords: /# /# \n", gridCoords_.x_, gridCoords_.y_);
-               // print("velocity: /# /# \n", velocity_.x_, velocity_.y_);
-               /* print("Coords: /# /# \n", tmp.x_, cellCenter_.x_);
-                print("Refframe: /# /# \n", refFrame_->size_.x_, refFrame_->size_.y_);*/
-             /*   if(tmp.x_ > 0 && tmp.x_ < refFrame_->size_.x_
-                && tmp.y_ > 0 && tmp.y_ < refFrame_->size_.y_)
-                   {*/
-
-                        LinearVector<int> newCell = GetCellFromCoords(tmp);
-                        LinearVector<int> oldCell = gridCoords_;
-                        GoToCellIfEmpty(oldCell, newCell, tmp);
-                     /*   //!< объект движется в точку справа от центра клетки
-                        if (tmp.x_ > cellCenter_.x_)
-                        {
-                            //!< вылез за границу справа вверху
-                            if ((tmp.y_ - cellCenter_.y_) < -0.5 * (tmp.x_ - (cellCenter_.x_ + kCellWidth / 2)))
-                            {
-                                newCell.y_ += 1;
-                                //!< не вылезает за край карты
-                                if (InMap(newCell))
-                                {
-                                    GoToCellIfEmpty(oldCell, newCell, tmp);
-                                }
-                            }
-                            //!< вылез за границу справа внизу
-                            else if ((tmp.y_ - cellCenter_.y_) > 0.5 * (tmp.x_ - (cellCenter_.x_ + kCellWidth / 2)))
-                            {
-                               // print("Right down: /# /# \n", tmp.y_ - cellCenter_.y_, 0.5 * (tmp.x_ - (cellCenter_.x_ + kCellWidth / 2)));
-                                newCell.x_ += 1;
-                                if (InMap(newCell))
-                                {
-                                    GoToCellIfEmpty(oldCell, newCell, tmp);
-                                }
-                            }
-                            //!< вылез за границу справа строго
-                            else if ((tmp.y_ == cellCenter_.y_) && (tmp.x_ > (cellCenter_.x_ + kCellWidth / 2)))
-                            {
-                                newCell.x_ += 1;
-                                newCell.y_ += 1;
-                                if (InMap(newCell))
-                                {
-                                    GoToCellIfEmpty(oldCell, newCell, tmp);
-                                }
-                            }
-                            else
-                            {
-                                refCoords_ = tmp;
-                            }
-                        }
-                        //!< объект движется в точку слева от центра клетки
-                        else if (tmp.x_ < cellCenter_.x_)
-                        {
-                            //!< вылез за границу слева внизу
-                            if ((tmp.y_ - cellCenter_.y_) < -0.5 * (tmp.x_ - (cellCenter_.x_ - kCellWidth / 2)))
-                            {
-                                newCell.y_ -= 1;
-                                if (InMap(newCell))
-                                {
-                                    GoToCellIfEmpty(oldCell, newCell, tmp);
-                                }
-                            }
-                            //!< вылез за границу слева вверху
-                            else if ((tmp.y_ - cellCenter_.y_) > 0.5 * (tmp.x_ - (cellCenter_.x_ - kCellWidth / 2)))
-                            {
-                                newCell.x_ -= 1;
-                                if (InMap(newCell))
-                                {
-                                    GoToCellIfEmpty(oldCell, newCell, tmp);
-                                }
-                            }
-                            //!< вылез за границу слева строго
-                            else if ((tmp.y_ == cellCenter_.y_) && (tmp.x_ < (cellCenter_.x_-kCellWidth / 2)))
-                            {
-                                newCell.x_ -= 1;
-                                newCell.y_ -= 1;
-                                if (InMap(newCell))
-                                {
-                                    GoToCellIfEmpty(oldCell, newCell, tmp);
-                                }
-                            }
-                            else
-                            {
-                                refCoords_ = tmp;
-                            }
-                        }
-                        //!< объект движется вверх или вниз от центра клетки
-                        else if (tmp.x_ == cellCenter_.x_)
-                        {
-                            //!< вылез за границу внизу
-                            if ((tmp.y_ - cellCenter_.y_) > kCellHeight / 2)
-                            {
-                                newCell.x_ += 1;
-                                newCell.y_ -= 1;
-                                if (InMap(newCell))
-                                {
-                                    GoToCellIfEmpty(oldCell, newCell, tmp);
-                                }
-                            }
-                            //!< вылез за границу вверху
-                            else if ((tmp.y_ - cellCenter_.y_) < -(kCellHeight / 2))
-                            {
-                                newCell.x_ -= 1;
-                                newCell.y_ += 1;
-                                if (InMap(newCell))
-                                {
-                                    GoToCellIfEmpty(oldCell, newCell, tmp);
-                                }
-                            }
-                            else
-                            {
-                                refCoords_ = tmp;
-                            }
-                        }*/
-
-                    print("New cell: /# /# \n", newCell.x_, newCell.y_);
-                   }
-
-            //}
+                LinearVector<int> tmp;
+                tmp.x_ = ref_coords_.x_ + velocity_.x_;
+                tmp.y_ = ref_coords_.y_ + velocity_.y_;
+               // print("refcoords: /# /# \n", ref_coords_.x_, ref_coords_.y_);
+                //print("gridcoords: /# /# \n", grid_coords_.x_, grid_coords_.y_);
+                LinearVector<int> newCell = GetCellFromCoords(tmp);
+                LinearVector<int> oldCell = grid_coords_;
+                GoToCellIfEmpty(oldCell, newCell, tmp);
+                //print("New cell: /# /# \n", newCell.x_, newCell.y_);
+            }
         }
 
 };
@@ -303,9 +254,9 @@ class Mortal: public MovingObject
         virtual void Move()=0;
         Mortal() { }
         virtual ~Mortal()=0;
-        void ChangeHp(int diff)
+        void DecreaseHp(int damage)
         {
-            hp_ += diff;
+            hp_ -= damage;
             if (!(CheckAlive()))
             {
                 delete this;
@@ -330,57 +281,86 @@ class Player: public Mortal
         {
             Sprite playerSprite;
             playerSprite.setTexture(texture_);
-            playerSprite.setTextureRect(IntRect(curFrame_ * spriteSize_.x_, curState_ * spriteSize_.y_,
-                                                spriteSize_.x_, spriteSize_.y_));
-            playerSprite.setOrigin(Vector2f(spriteSize_.x_ / 2, spriteSize_.y_ - kCellHeight / 2));
-            playerSprite.setPosition(refFrame_->GetX() + refCoords_.x_, refFrame_->GetY() + refCoords_.y_);
-            //curState_ = (curState_+1)%numOfState_;
+            playerSprite.setTextureRect(IntRect(current_frame_ * sprite_size_.x_, current_state_ * sprite_size_.y_,
+                                                sprite_size_.x_, sprite_size_.y_));
+            playerSprite.setOrigin(Vector2f(sprite_size_.x_ / 2, sprite_size_.y_ - kCellHeight / 2));
+            playerSprite.setPosition(ref_frame_->GetX() + ref_coords_.x_, ref_frame_->GetY() + ref_coords_.y_);
+            //current_state_ = (current_state_+1)%num_of_state_;
             window_->draw(playerSprite);
         }
-        void Interact() { }
+        void Interact()
+        {
+            if (aim_of_interact_ != nullptr)
+            {
+                if (aim_of_interact_->GetObjectCode() == kEnemyId)
+                {
+                    if (clock() >= attack_ending_time_)
+                    {
+                        attack_ending_time_ = clock() + kCoolDown;
+                        aim_of_interact_->DecreaseHp(applied_damage_);
+                        aim_of_interact_->SetUnderAttack(true);
+                        aim_of_interact_->SetDamageEndingTime(clock() + kCoolDown);
+                    }
+                }
+            }
+        }
+
         void Move()
         {
             MovingObject::Move();
         }
+
+        void DecreaseHp(int damage)
+        {
+            Mortal::DecreaseHp(damage);
+        }
+
         Player();
         Player(RenderWindow* window, SurfaceType* pMap, LinearVector<int> spriteSize, Texture& texture,
                LinearVector<int> gridCoords, ReferenceFrame* refFrame)
         {
             window_ = window;
-            refFrame_ = refFrame;
-            spriteSize_ = spriteSize;
+            ref_frame_ = refFrame;
+            sprite_size_ = spriteSize;
             texture_ = texture;
-            gridCoords_ = gridCoords;
-            refCoords_ = GetCoordsFromCell(gridCoords);
-            cellCenter_ = refCoords_;
-            numOfFrames_ = 1;
-            curFrame_ = 0;
-            numOfState_ = 1;
-            curState_ = 0;
-            objectCode_ = 0;
+            grid_coords_ = gridCoords;
+            ref_coords_ = GetCoordsFromCell(gridCoords);
+            cell_center_ = ref_coords_;
+            num_of_frames_ = 1;
+            current_frame_ = 0;
+            num_of_state_ = 1;
+            current_state_ = 0;
+            object_code_ = 0;
+            applied_damage_ = 5;
             map_ = pMap;
             velocity_ = LinearVector<int>(0,0);
+            direction_ = GiveDirection();
+            aim_of_interact_ = nullptr;
         }
         Player(RenderWindow* window, SurfaceType* pMap, LinearVector<int> spriteSize, Texture& texture,
                LinearVector<int> gridCoords, ReferenceFrame* refFrame, int numOfFrames, int numOfStates)
         {
             window_ = window;
-            refFrame_ = refFrame;
-            spriteSize_ = spriteSize;
+            ref_frame_ = refFrame;
+            sprite_size_ = spriteSize;
             texture_ = texture;
-            gridCoords_ = gridCoords;
-            refCoords_ = GetCoordsFromCell(gridCoords);
-            cellCenter_ = refCoords_;
-            numOfFrames_ = numOfFrames;
-            curFrame_ = 0;
-            numOfState_ = numOfStates;
-            curState_ = 0;
-            objectCode_ = 0;
+            grid_coords_ = gridCoords;
+            ref_coords_ = GetCoordsFromCell(gridCoords);
+            cell_center_ = ref_coords_;
+            num_of_frames_ = numOfFrames;
+            current_frame_ = 0;
+            num_of_state_ = numOfStates;
+            current_state_ = 0;
+            object_code_ = 0;
+            applied_damage_ = 5;
             map_ = pMap;
             velocity_ = LinearVector<int>(0,0);
+            direction_ = GiveDirection();
+            aim_of_interact_ = nullptr;
         }
         ~Player() {
-            (*map_)[gridCoords_.x_][gridCoords_.y_] = nullptr;
+            (*map_)[grid_coords_.x_][grid_coords_.y_] = nullptr;
+            aim_of_interact_ = nullptr;
      }
 };
 #endif

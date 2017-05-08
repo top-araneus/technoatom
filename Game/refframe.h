@@ -1,5 +1,5 @@
-#ifndef REFFRAME_H
-#define REFFRAME_H
+#ifndef ref_frame_H
+#define ref_frame_H
 #include "linearvector.h"
 
 class ReferenceFrame

@@ -41,3 +41,5 @@ Game/SFML*
 *.dll
 *.layout
 *.pro.use*
+*.cbp
+*.depend

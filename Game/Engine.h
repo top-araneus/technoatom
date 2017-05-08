@@ -10,13 +10,15 @@ typedef Array<Array<GameObject*>> AirType;  //TODO: make weak_ptr
 class Engine
 {
   public:
+    LinearVector<char> GiveDirection();
     Engine(RenderWindow* window);
     ~Engine() { }
     SurfaceType InitializeMap();
     Array<Array<unsigned char>> InitializeGround();
     void DrawGround();
-    void DrawObjects();
-    void MoveObjects();
+    void DrawAll();
+    void MoveAll();
+    void InteractAll();
     void AddObject(GameObject* obj)
     {
       surface_[obj->GetGridCoords().x_][obj->GetGridCoords().y_] = obj;
@@ -99,7 +101,7 @@ void Engine::DrawGround()
   }
 }
 
-void Engine::DrawObjects()
+void Engine::DrawAll()
 {
   LinearVector<int> cell_coords (0, kTilesAtLine-1);
   int last_x_index = kTilesAtLine-1;
@@ -130,7 +132,7 @@ void Engine::DrawObjects()
   }
 }
 
-void Engine::MoveObjects()
+void Engine::MoveAll()
 {
   for (int i = 0; i < kTilesAtLine; ++i)
   {
@@ -138,6 +140,33 @@ void Engine::MoveObjects()
       {
         if (surface_[i][j] != nullptr)
           surface_[i][j]->Move();
+      }
+  }
+}
+
+
+void Engine::InteractAll()
+{
+  for (int i = 0; i < kTilesAtLine; ++i)
+  {
+    for (int j = 0; j < kTilesAtLine; ++j)
+      {
+        if (surface_[i][j] != nullptr)
+        {
+          if (clock() >= surface_[i][j]->GetDamageEndingTime())
+          {
+            surface_[i][j]->SetUnderAttack(false);
+          }
+          if (clock() >= surface_[i][j]->GetAttackEndingTime())
+          {
+            surface_[i][j]->SetInAttack(false);
+            surface_[i][j]->SetAimOfInteract(nullptr);
+          }
+          else
+          {
+            surface_[i][j]->Interact();
+          }
+        }
       }
   }
 }

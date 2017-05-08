@@ -4,7 +4,7 @@
 #include <math.h>
 const int kCellWidth = 128;
 const int kCellHeight = 64;
-const int kTilesAtLine = 40;
+const int kTilesAtLine = 10;
 
 double Pythagor(double x, double y)
 {
@@ -32,7 +32,7 @@ LinearVector<int> GetCellFromCoords(LinearVector<int> coords)
         result.y_ = roundl((Pythagor(coords.y_ - tmp, (coords.y_ - tmp) / 2.0) + Pythagor(coords.x_ / 2.0, coords.x_ / 4.0)) / Pythagor(kCellWidth / 2, kCellHeight / 2 ) - 0.5);
         result.x_ = roundl((Pythagor(coords.x_ / 2.0, coords.x_ / 4.0) - Pythagor(coords.y_ - tmp, (coords.y_ - tmp) / 2.0)) / Pythagor(kCellWidth / 2, kCellHeight / 2 ) - 0.5);
     }
-    print("Got /# /#, calculated /# /#  center/#\n", coords.x_, coords.y_, result.x_, result.y_, tmp);
+    //print("Got /# /#, calculated /# /#  center/#\n", coords.x_, coords.y_, result.x_, result.y_, tmp);
     return result;
 }
 
