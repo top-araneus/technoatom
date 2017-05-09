@@ -24,6 +24,18 @@ class GameObject
         {
             current_state_ = state;
         }
+        unsigned char GetFrame()
+        {
+            return current_frame_;
+        }
+        unsigned char GetState()
+        {
+            return current_state_;
+        }
+        unsigned char GetNumOfFrames()
+        {
+            return num_of_frames_;
+        }
         void SetDamageEndingTime(time_t time)
         {
             damage_ending_time_ = time;
@@ -76,17 +88,28 @@ class GameObject
         {
             return under_attack_;
         }
+        void NextFrame()
+        {
+          if ((clock() - time_last_frame_changing_) >= CLOCKS_PER_SEC / frames_per_second_)
+          {
+            time_last_frame_changing_ = clock();
+            unsigned char new_frame = (GetFrame() + 1) % GetNumOfFrames();
+            SetFrame(new_frame);
+          }
+        }
     protected:
         LinearVector<char> GiveDirection();
         LinearVector<int> ref_coords_;  //get
         LinearVector<int> cell_center_;
         LinearVector<int> grid_coords_; //get
         LinearVector<char> direction_;
-        unsigned char num_of_frames_;
-        unsigned char current_frame_; //set
+        unsigned char num_of_frames_; //get
+        unsigned char current_frame_; //set, get
         unsigned char num_of_state_;
-        unsigned char current_state_; //set
+        unsigned char current_state_; //set, get
         unsigned char object_code_; //get
+        unsigned char frames_per_second_;
+        time_t time_last_frame_changing_;
         int applied_damage_;
         time_t attack_ending_time_ = 0; //get, set
         time_t damage_ending_time_ = 0; //get, set
@@ -307,10 +330,10 @@ class Player: public Mortal
                     {
                       if (clock() >= attack_ending_time_)
                       {
-                          attack_ending_time_ = clock() + kCoolDown;
+                          attack_ending_time_ = clock() + kPlayerCoolDown;
                           aim_of_interact_->DecreaseHp(applied_damage_);
                           aim_of_interact_->SetUnderAttack(true);
-                          aim_of_interact_->SetDamageEndingTime(clock() + kCoolDown);
+                          aim_of_interact_->SetDamageEndingTime(clock() + kPlayerCoolDown);
                         print("attacked: /# /#\n", aim_of_interact_->GetGridCoords().x_, aim_of_interact_->GetGridCoords().y_);
                       }
                       print("not time to attack: /# /#\n", aim_of_interact_->GetGridCoords().x_, aim_of_interact_->GetGridCoords().y_);
@@ -370,6 +393,8 @@ class Player: public Mortal
             aim_of_interact_ = nullptr;
             hp_ = 1000;
             object_code_ = kPlayerId;
+            time_last_frame_changing_ = clock();
+            frames_per_second_ = kFramesPerSec;
         }
         Player(RenderWindow* window, SurfaceType* pMap, LinearVector<int> spriteSize, Texture& texture,
                LinearVector<int> gridCoords, ReferenceFrame* refFrame, int numOfFrames, int numOfStates)
@@ -392,6 +417,8 @@ class Player: public Mortal
             aim_of_interact_ = nullptr;
             hp_ = 1000;
             object_code_ = kPlayerId;
+            time_last_frame_changing_ = clock();
+            frames_per_second_ = kFramesPerSec;
         }
         ~Player() {
 
@@ -449,9 +476,9 @@ class Enemy: public Mortal
                 if (clock() >= attack_ending_time_)
                 {
                     print("attacked: /# /#\n", aim_of_interact_->GetGridCoords().x_, aim_of_interact_->GetGridCoords().y_);
-                    attack_ending_time_ = clock() + kCoolDown;
+                    attack_ending_time_ = clock() + kEnemyCoolDown;
                     aim_of_interact_->SetUnderAttack(true);
-                    aim_of_interact_->SetDamageEndingTime(clock() + kCoolDown);
+                    aim_of_interact_->SetDamageEndingTime(clock() + kEnemyCoolDown);
                     aim_of_interact_->DecreaseHp(applied_damage_);
 
 
@@ -526,6 +553,8 @@ class Enemy: public Mortal
             hp_ = 15;
             object_code_ = kEnemyId;
             aim_of_interact_ = nullptr;
+            time_last_frame_changing_ = clock();
+            frames_per_second_ = kFramesPerSec;
         //    aim_of_interact_ = nullptr;
         }
         Enemy(RenderWindow* window, SurfaceType* pMap, LinearVector<int> spriteSize, Texture& texture,
@@ -549,6 +578,8 @@ class Enemy: public Mortal
             hp_ = 15;
             object_code_ = kEnemyId;
             aim_of_interact_ = nullptr;
+            time_last_frame_changing_ = clock();
+            frames_per_second_ = kFramesPerSec;
         }
         ~Enemy() {
             (*map_)[grid_coords_.x_][grid_coords_.y_] = nullptr;

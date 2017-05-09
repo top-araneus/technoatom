@@ -19,6 +19,7 @@ class Engine
     void DrawAll();
     void MoveAll();
     void InteractAll();
+    void ChangeAllFrames();
     void AddObject(GameObject* obj)
     {
       surface_[obj->GetGridCoords().x_][obj->GetGridCoords().y_] = obj;
@@ -97,6 +98,20 @@ void Engine::DrawGround()
         ground_sprite_.setTextureRect(IntRect(kCellWidth*ground_[i][j], 0, kCellWidth, kCellHeight));
         window_->draw(ground_sprite_);
         ground_sprite_.setPosition(ground_sprite_.getPosition().x + kCellWidth / 2, ground_sprite_.getPosition().y - kCellHeight / 2);
+      }
+  }
+}
+
+void Engine::ChangeAllFrames()
+{
+  for (int i = 0; i < kTilesAtLine; ++i)
+  {
+    for (int j = 0; j < kTilesAtLine; ++j)
+      {
+        if (surface_[i][j] != nullptr)
+        {
+          surface_[i][j]->NextFrame();
+        }
       }
   }
 }
