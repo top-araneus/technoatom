@@ -1,6 +1,5 @@
-
-
 using namespace std;
+bool in_death = false;
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
 #include <SFML/System/Clock.hpp>
@@ -30,12 +29,12 @@ int main()
 	cube_texture.loadFromFile("images/cub.png");
 
 
-	Array<Player*> gops(kTilesAtLine*kTilesAtLine);
+	Array<Enemy*> gops(kTilesAtLine*kTilesAtLine);
 	for (int i=0; i<kTilesAtLine*kTilesAtLine; ++i)
     {
         if ((i/kTilesAtLine == 5) || (i%kTilesAtLine == 5) || (i/kTilesAtLine == kTilesAtLine-5)  || (i%kTilesAtLine == kTilesAtLine-5) )
         {
-          gops[i] = new Player(&window, &(engine.getMap()), LinearVector<int>(128,192), cube_texture,
+          gops[i] = new Enemy(&window, &(engine.getMap()), LinearVector<int>(128,192), cube_texture,
              LinearVector<int>(i/kTilesAtLine,i%kTilesAtLine), &(engine.getFrame()), 2, 1);
 
         engine.AddObject(gops[i]);}
@@ -44,6 +43,7 @@ int main()
     Player cilik(&window, &(engine.getMap()), LinearVector<int>(128,192), cilinder_texture,
              LinearVector<int>(14,16), &(engine.getFrame()), 2, 1);
     engine.AddObject(&cilik);
+
     Enemy kubik(&window, &(engine.getMap()), LinearVector<int>(128,192), cube_texture,
              LinearVector<int>(16,14), &(engine.getFrame()), 2, 1);
     engine.AddObject(&kubik);
@@ -122,16 +122,13 @@ int main()
        cilik.SetAimOfInteract(engine.getMap()[cell_coords.x_][cell_coords.y_]);
        if (engine.getMap()[cell_coords.x_][cell_coords.y_])
         print("id: /# /#\n", engine.getMap()[cell_coords.x_][cell_coords.y_]->GetObjectCode(), kEnemyId);
+       cilik.Interact();
+       cilik.SetAimOfInteract(nullptr);
     }
 
 		window.clear();
         engine.MoveAll();
         engine.DrawGround();
-        //player.Draw();
-     /*   for (int i=0; i<kTilesAtLine; ++i)
-            for (int j=0; j<kTilesAtLine; ++j)
-                if (!(engine.getMap()[i][j] == nullptr ))
-                    engine.getMap()[i][j]->Draw();*/
 
     engine.InteractAll();
     engine.DrawAll();
@@ -139,3 +136,4 @@ int main()
 	}
 	return 0;
 }
+

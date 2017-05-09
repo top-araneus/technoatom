@@ -170,10 +170,13 @@ void Engine::InteractAll()
           if (clock() >= surface_[i][j]->GetAttackEndingTime())
           {
             surface_[i][j]->SetInAttack(false);
-            //surface_[i][j]->SetAimOfInteract(nullptr);
+           // surface_[i][j]->SetAimOfInteract(nullptr);
+
           }
+
           surface_[i][j]->Interact();
         }
+
       }
   }
 }

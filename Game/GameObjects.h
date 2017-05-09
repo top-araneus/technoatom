@@ -52,6 +52,10 @@ class GameObject
         {
             return grid_coords_;
         }
+        LinearVector<int> GetRefCoords()
+        {
+          return ref_coords_;
+        }
         unsigned char GetObjectCode()
         {
             return object_code_;
@@ -74,7 +78,7 @@ class GameObject
         }
     protected:
         LinearVector<char> GiveDirection();
-        LinearVector<int> ref_coords_;
+        LinearVector<int> ref_coords_;  //get
         LinearVector<int> cell_center_;
         LinearVector<int> grid_coords_; //get
         LinearVector<char> direction_;
@@ -138,7 +142,7 @@ class MovingObject :public GameObject
         LinearVector<int> velocity_;
         void GoToCellIfEmpty(LinearVector<int> oldCell, LinearVector<int> cell, LinearVector<int> coords)
         {
-            if ((oldCell != cell) && InMap(cell))
+            if ((oldCell != cell))
             {
                 if ((*map_)[cell.x_][cell.y_] == nullptr)
                 {
@@ -154,9 +158,10 @@ class MovingObject :public GameObject
                 ref_coords_ = coords;
             }
         }
-        bool InMap(LinearVector<int> newCoords)
+        bool InMap(LinearVector<int> new_coords)
         {
-            return (!(newCoords.y_ < 0 || newCoords.x_ < 0 || newCoords.y_ >= kTilesAtLine || newCoords.x_  >= kTilesAtLine));
+          return (new_coords.x_ >= 0 && new_coords.x_ < kTilesAtLine && new_coords.y_ >= 0 && new_coords.y_ < kTilesAtLine);
+            //return (!(newCoords.y_ < 0 || newCoords.x_ < 0 || newCoords.y_ >= kTilesAtLine || newCoords.x_  >= kTilesAtLine));
         }
     public:
         MovingObject(){ }
@@ -188,7 +193,10 @@ class MovingObject :public GameObject
                 //print("gridcoords: /# /# \n", grid_coords_.x_, grid_coords_.y_);
                 LinearVector<int> newCell = GetCellFromCoords(tmp);
                 LinearVector<int> oldCell = grid_coords_;
-                GoToCellIfEmpty(oldCell, newCell, tmp);
+                if(InMap(newCell))
+                {
+                  GoToCellIfEmpty(oldCell, newCell, tmp);
+                }
                 //print("New cell: /# /# \n", newCell.x_, newCell.y_);
             }
         }
@@ -284,6 +292,7 @@ class Player: public Mortal
         }
         void Interact()
         {
+            print("hp: /#", hp_);
             if (aim_of_interact_ != nullptr)
             {
                 if (aim_of_interact_->GetObjectCode() == kEnemyId)
@@ -369,8 +378,22 @@ class Player: public Mortal
             object_code_ = kPlayerId;
         }
         ~Player() {
-            (*map_)[grid_coords_.x_][grid_coords_.y_] = nullptr;
-            aim_of_interact_ = nullptr;
+
+             for(int i = 0; i < kTilesAtLine; i++)
+             {
+               for(int j = 0; j < kTilesAtLine; j++)
+               {
+                 if((*map_)[i][j])
+                 {
+                   if((*map_)[i][j]->GetObjectCode() == kEnemyId)
+                   {
+                     (*map_)[i][j]->SetAimOfInteract(nullptr);
+                   }
+                 }
+               }
+             }
+             (*map_)[grid_coords_.x_][grid_coords_.y_] = nullptr;
+             in_death = true;
      }
 };
 
@@ -392,19 +415,63 @@ class Enemy: public Mortal
         }
         void Interact()
         {
-    /*        if (aim_of_interact_ != nullptr)
+            if (!aim_of_interact_)
             {
-                if (aim_of_interact_->GetObjectCode() == kEnemyId)
+              Scan();
+            }
+            if (aim_of_interact_ != nullptr)
+            {
+
+              if ((abs(aim_of_interact_->GetGridCoords().x_ - GetGridCoords().x_) <= 1)
+                && (abs(aim_of_interact_->GetGridCoords().y_ - GetGridCoords().y_) <= 1))
+              {
+                velocity_ = LinearVector<int>(0,0);
+                if (clock() >= attack_ending_time_)
                 {
-                    if (clock() >= attack_ending_time_)
-                    {
-                        attack_ending_time_ = clock() + kCoolDown;
-                        aim_of_interact_->DecreaseHp(applied_damage_);
-                        aim_of_interact_->SetUnderAttack(true);
-                        aim_of_interact_->SetDamageEndingTime(clock() + kCoolDown);
-                    }
+                    print("attacked: /# /#\n", aim_of_interact_->GetGridCoords().x_, aim_of_interact_->GetGridCoords().y_);
+                    attack_ending_time_ = clock() + kCoolDown;
+                    aim_of_interact_->SetUnderAttack(true);
+                    aim_of_interact_->SetDamageEndingTime(clock() + kCoolDown);
+                    aim_of_interact_->DecreaseHp(applied_damage_);
+
+
                 }
-            }*/
+
+              }
+             else
+             {
+               double abs = Pythagor(aim_of_interact_->GetRefCoords().x_ - ref_coords_.x_, aim_of_interact_->GetRefCoords().y_ - ref_coords_.y_);
+               LinearVector<double> tmp(6*(aim_of_interact_->GetRefCoords().x_ - ref_coords_.x_) / abs, 6*(aim_of_interact_->GetRefCoords().y_ - ref_coords_.y_) / abs);
+               velocity_.x_ = round(tmp.x_);
+               velocity_.y_ = round(tmp.y_);
+             }
+            }
+        }
+        void CheckCellAndSetAim(LinearVector<int> coords)
+        {
+          if(coords.x_ >= 0 && coords.x_ < kTilesAtLine && coords.y_ >= 0 && coords.y_ < kTilesAtLine)
+          {
+            if((*map_)[coords.x_][coords.y_] != nullptr)
+            {
+              if((*map_)[coords.x_][coords.y_]->GetObjectCode() == kPlayerId)
+              {
+                aim_of_interact_ = (*map_)[coords.x_][coords.y_];
+              }
+            }
+          }
+        }
+        void Scan()
+        {
+            for(int i = -1; i <= 1; i++)
+            {
+              for(int j =-1; j <= 1; j++)
+              {
+                if(i != 0 || j != 0)
+                {
+                  CheckCellAndSetAim(LinearVector<int>(grid_coords_.x_ + i, grid_coords_.y_ + j));
+                }
+              }
+            }
         }
 
         void Move()
@@ -438,6 +505,7 @@ class Enemy: public Mortal
             direction_ = GiveDirection();
             hp_ = 15;
             object_code_ = kEnemyId;
+            aim_of_interact_ = nullptr;
         //    aim_of_interact_ = nullptr;
         }
         Enemy(RenderWindow* window, SurfaceType* pMap, LinearVector<int> spriteSize, Texture& texture,
@@ -460,11 +528,11 @@ class Enemy: public Mortal
             direction_ = GiveDirection();
             hp_ = 15;
             object_code_ = kEnemyId;
-         //   aim_of_interact_ = nullptr;
+            aim_of_interact_ = nullptr;
         }
         ~Enemy() {
             (*map_)[grid_coords_.x_][grid_coords_.y_] = nullptr;
-         //   aim_of_interact_ = nullptr;
+            aim_of_interact_ = nullptr;
      }
 };
 #endif
