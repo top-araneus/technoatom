@@ -8,6 +8,7 @@ const int kWindowHeight = 1536;
 const int kPlayerVelocity = 6;
 const int kCameraVelocity = 10;
 const int kWindowMargin = 100;
+const int kRangeOfVision = 3;
 const unsigned char kEnemyId = 148;
 const unsigned char kPlayerId = 161;
 const time_t kPlayerCoolDown = 25;

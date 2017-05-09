@@ -488,7 +488,7 @@ class Enemy: public Mortal
              else
              {
                double abs = Pythagor(aim_of_interact_->GetRefCoords().x_ - ref_coords_.x_, aim_of_interact_->GetRefCoords().y_ - ref_coords_.y_);
-               LinearVector<double> tmp(6*(aim_of_interact_->GetRefCoords().x_ - ref_coords_.x_) / abs, 6*(aim_of_interact_->GetRefCoords().y_ - ref_coords_.y_) / abs);
+               LinearVector<double> tmp(kPlayerVelocity*(aim_of_interact_->GetRefCoords().x_ - ref_coords_.x_) / abs, kPlayerVelocity*(aim_of_interact_->GetRefCoords().y_ - ref_coords_.y_) / abs);
                velocity_.x_ = round(tmp.x_);
                velocity_.y_ = round(tmp.y_);
              }
@@ -509,9 +509,9 @@ class Enemy: public Mortal
         }
         void Scan()
         {
-            for(int i = -1; i <= 1; i++)
+            for(int i = -kRangeOfVision; i <= kRangeOfVision; i++)
             {
-              for(int j =-1; j <= 1; j++)
+              for(int j = -kRangeOfVision; j <= kRangeOfVision; j++)
               {
                 if(i != 0 || j != 0)
                 {
