@@ -119,11 +119,14 @@ int main()
        print("coords: /# /#\n", coords.x_, coords.y_);
        LinearVector<int> cell_coords = GetCellFromCoords(coords);
        print("cell: /# /#\n", cell_coords.x_, cell_coords.y_);
-       cilik.SetAimOfInteract(engine.getMap()[cell_coords.x_][cell_coords.y_]);
-       if (engine.getMap()[cell_coords.x_][cell_coords.y_])
-        print("id: /# /#\n", engine.getMap()[cell_coords.x_][cell_coords.y_]->GetObjectCode(), kEnemyId);
-       cilik.Interact();
-       cilik.SetAimOfInteract(nullptr);
+       if (cell_coords.x_ >= 0 && cell_coords.y_ >= 0 && cell_coords.x_ < kTilesAtLine && cell_coords.y_ < kTilesAtLine)
+       {
+         cilik.SetAimOfInteract(engine.getMap()[cell_coords.x_][cell_coords.y_]);
+         if (engine.getMap()[cell_coords.x_][cell_coords.y_])
+          print("id: /# /#\n", engine.getMap()[cell_coords.x_][cell_coords.y_]->GetObjectCode(), kEnemyId);
+         cilik.Interact();
+         cilik.SetAimOfInteract(nullptr);
+       }
     }
 
 		window.clear();

@@ -281,18 +281,23 @@ class Player: public Mortal
         //using MovingObject::Move;
         void Draw()
         {
-            Sprite playerSprite;
-            playerSprite.setTexture(texture_);
-            playerSprite.setTextureRect(IntRect(current_frame_ * sprite_size_.x_, current_state_ * sprite_size_.y_,
+            Sprite player_sprite;
+            player_sprite.setTexture(texture_);
+            player_sprite.setTextureRect(IntRect(current_frame_ * sprite_size_.x_, current_state_ * sprite_size_.y_,
                                                 sprite_size_.x_, sprite_size_.y_));
-            playerSprite.setOrigin(Vector2f(sprite_size_.x_ / 2, sprite_size_.y_ - kCellHeight / 2));
-            playerSprite.setPosition(ref_frame_->GetX() + ref_coords_.x_, ref_frame_->GetY() + ref_coords_.y_);
+            player_sprite.setOrigin(Vector2f(sprite_size_.x_ / 2, sprite_size_.y_ - kCellHeight / 2));
+            player_sprite.setPosition(ref_frame_->GetX() + ref_coords_.x_, ref_frame_->GetY() + ref_coords_.y_);
             //current_state_ = (current_state_+1)%num_of_state_;
-            window_->draw(playerSprite);
+            if (GetUnderAttack())
+              player_sprite.setColor(sf::Color(255,128,128));
+            else
+              player_sprite.setColor(sf::Color(255,255,255));
+            DrawHp();
+            window_->draw(player_sprite);
         }
         void Interact()
         {
-            print("hp: /#", hp_);
+            //print("hp: /#", hp_);
             if (aim_of_interact_ != nullptr)
             {
                 if (aim_of_interact_->GetObjectCode() == kEnemyId)
@@ -331,7 +336,18 @@ class Player: public Mortal
         {
             Mortal::DecreaseHp(damage);
         }
+        void DrawHp()
+        {
+          std::string hp = std::to_string(hp_);
+          sf::Font font;
+          font.loadFromFile("fonts/font.ttf");
 
+          sf::Text hp_text(hp, font);
+          hp_text.setCharacterSize(40);
+          hp_text.setColor(sf::Color::Green);
+          hp_text.setPosition(kWindowWidth - 120, 10);
+          window_->draw(hp_text);
+        }
         Player();
         Player(RenderWindow* window, SurfaceType* pMap, LinearVector<int> spriteSize, Texture& texture,
                LinearVector<int> gridCoords, ReferenceFrame* refFrame)
@@ -404,14 +420,18 @@ class Enemy: public Mortal
         //using MovingObject::Move;
         void Draw()
         {
-            Sprite enemySprite;
-            enemySprite.setTexture(texture_);
-            enemySprite.setTextureRect(IntRect(current_frame_ * sprite_size_.x_, current_state_ * sprite_size_.y_,
+            Sprite enemy_sprite;
+            enemy_sprite.setTexture(texture_);
+            enemy_sprite.setTextureRect(IntRect(current_frame_ * sprite_size_.x_, current_state_ * sprite_size_.y_,
                                                 sprite_size_.x_, sprite_size_.y_));
-            enemySprite.setOrigin(Vector2f(sprite_size_.x_ / 2, sprite_size_.y_ - kCellHeight / 2));
-            enemySprite.setPosition(ref_frame_->GetX() + ref_coords_.x_, ref_frame_->GetY() + ref_coords_.y_);
+            enemy_sprite.setOrigin(Vector2f(sprite_size_.x_ / 2, sprite_size_.y_ - kCellHeight / 2));
+            enemy_sprite.setPosition(ref_frame_->GetX() + ref_coords_.x_, ref_frame_->GetY() + ref_coords_.y_);
             //current_state_ = (current_state_+1)%num_of_state_;
-            window_->draw(enemySprite);
+            if (GetUnderAttack())
+              enemy_sprite.setColor(sf::Color(255,64,64));
+            else
+              enemy_sprite.setColor(sf::Color(255,255,255));
+            window_->draw(enemy_sprite);
         }
         void Interact()
         {
