@@ -12,8 +12,8 @@ class Factory
       {
         Texture player_texture;
         player_texture.loadFromFile(kPathToPlayerTexture);
-        Player* result = new Player(&(engine.GetWindow()), &(engine.getMap()), kStandartSpriteSizeOfPlayer, player_texture,
-                                    grid_coords, &(engine.getFrame()), kNumOfPlayerFrames, kNumOfPlayerStates);
+        Player* result = new Player(&(engine.GetWindow()), &(engine.GetMap()), kStandartSpriteSizeOfPlayer, player_texture,
+                                    grid_coords, &(engine.GetFrame()), kNumOfPlayerFrames, kNumOfPlayerStates);
         engine.AddObject(result);
         return result;
       }
@@ -21,8 +21,8 @@ class Factory
       {
         Texture enemy_texture;
         enemy_texture.loadFromFile(kPathToEnemyTexture);
-        Enemy* result = new Enemy(&(engine.GetWindow()), &(engine.getMap()), kStandartSpriteSizeOfEnemy, enemy_texture,
-                                    grid_coords, &(engine.getFrame()), kNumOfEnemyFrames, kNumOfEnemyStates);
+        Enemy* result = new Enemy(&(engine.GetWindow()), &(engine.GetMap()), kStandartSpriteSizeOfEnemy, enemy_texture,
+                                    grid_coords, &(engine.GetFrame()), kNumOfEnemyFrames, kNumOfEnemyStates);
         engine.AddObject(result);
         return result;
       }
