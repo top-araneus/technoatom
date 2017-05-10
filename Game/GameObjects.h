@@ -1,7 +1,7 @@
 #ifndef GAMEOBJECTS_H
 #define GAMEOBJECTS_H
 #include "refpoint.h"
-#include "Transformation.h"
+#include "transformation.h"
 #include <../stack/stack/smart_ptr.h>
 #include <../utils/print.h>
 
@@ -82,7 +82,7 @@ class GameObject
     void              SetVelocity(LinearVector<int> velocity) {
       velocity_ = velocity;
     }
-    void NextFrame();
+    virtual void NextFrame(char step = 1);
     void DecreaseHp(int damage);
 
   protected:
@@ -100,7 +100,6 @@ class GameObject
     int cooldown_; //!< cooldown will be in milliseconds
     LinearVector<int> velocity_; //set
     LinearVector<int> ref_coords_;  //get
-    LinearVector<int> cell_center_;
     LinearVector<int> grid_coords_; //get
     LinearVector<char> direction_;
     unsigned char num_of_frames_; //get
@@ -124,6 +123,8 @@ class GameObject
 
 };
 
+typedef Array<Array<GameObject*>> SurfaceType;
+
 LinearVector<char> GameObject::GiveDirection()
 {
   return LinearVector<char>(1,-1);
@@ -145,25 +146,22 @@ void GameObject::Move()
     LinearVector<int> tmp;
     tmp.x_ = ref_coords_.x_ + velocity_.x_;
     tmp.y_ = ref_coords_.y_ + velocity_.y_;
-     // print("refcoords: /# /# \n", ref_coords_.x_, ref_coords_.y_);
-    //print("gridcoords: /# /# \n", grid_coords_.x_, grid_coords_.y_);
     LinearVector<int> newCell = GetCellFromCoords(tmp);
     LinearVector<int> oldCell = grid_coords_;
     if(InMap(newCell))
     {
       GoToCellIfEmpty(oldCell, newCell, tmp);
     }
-    //print("New cell: /# /# \n", newCell.x_, newCell.y_);
   }
 }
 
-void GameObject::NextFrame()
+void GameObject::NextFrame(char step)
 {
   if ((clock() - time_last_frame_changing_) >= CLOCKS_PER_SEC / frames_per_second_)
   {
-  time_last_frame_changing_ = clock();
-  unsigned char new_frame = (GetFrame() + 1) % GetNumOfFrames();
-  SetFrame(new_frame);
+    time_last_frame_changing_ = clock();
+    unsigned char new_frame = (GetFrame() + step) % GetNumOfFrames();
+    SetFrame(new_frame);
   }
 }
 
@@ -175,7 +173,6 @@ void GameObject::GoToCellIfEmpty(LinearVector<int> oldCell, LinearVector<int> ce
     {
       grid_coords_ = cell;
       ref_coords_ = coords;
-      cell_center_ = GetCoordsFromCell(grid_coords_);
       (*map_)[cell.x_][cell.y_] = this;
       (*map_)[oldCell.x_][oldCell.y_] = nullptr;
     }
@@ -186,12 +183,9 @@ void GameObject::GoToCellIfEmpty(LinearVector<int> oldCell, LinearVector<int> ce
   }
 }
 
-typedef Array<Array<GameObject*>> SurfaceType;
-
 class Player: public GameObject
 {
   public:
-    //using MovingObject::Move;
     void Draw()
     {
       Sprite player_sprite;
@@ -200,7 +194,6 @@ class Player: public GameObject
                                           sprite_size_.x_, sprite_size_.y_));
       player_sprite.setOrigin(Vector2f(sprite_size_.x_ / 2, sprite_size_.y_ - kCellHeight / 2));
       player_sprite.setPosition(ref_frame_->GetX() + ref_coords_.x_, ref_frame_->GetY() + ref_coords_.y_);
-      //current_state_ = (current_state_+1)%num_of_state_;
       if (GetUnderAttack())
         player_sprite.setColor(sf::Color(255,128,128));
       else
@@ -210,7 +203,6 @@ class Player: public GameObject
     }
     void Interact()
     {
-      //print("hp: /#", hp_);
       if (aim_of_interact_ != nullptr)
       {
         if (aim_of_interact_->GetObjectCode() == kEnemyId)
@@ -234,15 +226,34 @@ class Player: public GameObject
           }
         }
       }
-      else
-      {
-        //print("nullptr\n");
-      }
     }
 
     void Move()
     {
       GameObject::Move();
+    }
+
+    virtual void NextFrame(char step = 1)
+    {
+      if(next_sprite_right){
+        if(GetFrame() == GetNumOfFrames()-1){
+          next_sprite_right = false;
+          GameObject::NextFrame(-1);
+        }
+        else{
+          GameObject::NextFrame(1);
+        }
+      }
+      else {
+        if(GetFrame() == 0){
+          next_sprite_right = true;
+          GameObject::NextFrame(1);
+        }
+        else{
+          GameObject::NextFrame(-1);
+        }
+      }
+
     }
 
     void DecreaseHp(int damage)
@@ -271,7 +282,6 @@ class Player: public GameObject
       texture_ = texture;
       grid_coords_ = gridCoords;
       ref_coords_ = GetCoordsFromCell(gridCoords);
-      cell_center_ = ref_coords_;
       num_of_frames_ = 1;
       current_frame_ = 0;
       num_of_state_ = 1;
@@ -295,7 +305,6 @@ class Player: public GameObject
       texture_ = texture;
       grid_coords_ = gridCoords;
       ref_coords_ = GetCoordsFromCell(gridCoords);
-      cell_center_ = ref_coords_;
       num_of_frames_ = numOfFrames;
       current_frame_ = 0;
       num_of_state_ = numOfStates;
@@ -328,13 +337,14 @@ class Player: public GameObject
        (*map_)[grid_coords_.x_][grid_coords_.y_] = nullptr;
        in_death = true;
    }
+  private:
+    bool next_sprite_right = true;
 };
 
 
 class Enemy: public GameObject
 {
   public:
-    //using MovingObject::Move;
     void Draw()
     {
       Sprite enemy_sprite;
@@ -343,7 +353,6 @@ class Enemy: public GameObject
                         sprite_size_.x_, sprite_size_.y_));
       enemy_sprite.setOrigin(Vector2f(sprite_size_.x_ / 2, sprite_size_.y_ - kCellHeight / 2));
       enemy_sprite.setPosition(ref_frame_->GetX() + ref_coords_.x_, ref_frame_->GetY() + ref_coords_.y_);
-      //current_state_ = (current_state_+1)%num_of_state_;
       if (GetUnderAttack())
         enemy_sprite.setColor(sf::Color(255,64,64));
       else
@@ -427,7 +436,6 @@ class Enemy: public GameObject
       texture_ = texture;
       grid_coords_ = gridCoords;
       ref_coords_ = GetCoordsFromCell(gridCoords);
-      cell_center_ = ref_coords_;
       num_of_frames_ = 1;
       current_frame_ = 0;
       num_of_state_ = 1;
@@ -451,7 +459,6 @@ class Enemy: public GameObject
       texture_ = texture;
       grid_coords_ = gridCoords;
       ref_coords_ = GetCoordsFromCell(gridCoords);
-      cell_center_ = ref_coords_;
       num_of_frames_ = numOfFrames;
       current_frame_ = 0;
       num_of_state_ = numOfStates;
@@ -469,6 +476,11 @@ class Enemy: public GameObject
     ~Enemy() {
       (*map_)[grid_coords_.x_][grid_coords_.y_] = nullptr;
       aim_of_interact_ = nullptr;
+   }
+
+   virtual void NextFrame(char step = 1)
+   {
+     GameObject::NextFrame(step);
    }
 };
 #endif

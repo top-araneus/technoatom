@@ -54,6 +54,8 @@ class Engine
 Engine::Engine(RenderWindow* window)
 {
   window_ = window;
+  window_->setFramerateLimit(kFrameRate);
+  window_->setVerticalSyncEnabled(true);
   frame_ = ReferenceFrame(-((kTilesAtLine + 1) * kCellWidth / 4), -((kTilesAtLine + 1) * kCellHeight / 4), 800, 600);
   surface_ = InitializeMap();
   ground_ = InitializeGround();
@@ -96,7 +98,6 @@ Array<Array<unsigned char>> Engine::InitializeGround()
   return ground_array;
 }
 
-// TODO: perspective for ground drawing
 void Engine::DrawGround()
 {
   for (int i = 0; i < kTilesAtLine; ++i)

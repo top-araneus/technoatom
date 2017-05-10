@@ -1,6 +1,6 @@
 #ifndef FACTORY_H
 #define FACTORY_H
-#include "GameObjects.h"
+#include "gameobjects.h"
 #include <SFML/Graphics.hpp>
 #include "constants.h"
 class Factory
