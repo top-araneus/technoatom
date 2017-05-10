@@ -9,6 +9,7 @@ class LinearVector
     LinearVector();
     LinearVector(CoordType x, CoordType y);
     LinearVector(LinearVector& that);
+    LinearVector(const LinearVector& that);
     LinearVector(LinearVector&& that);
     LinearVector& operator=(LinearVector& that);
     LinearVector& operator=(LinearVector&& that);
@@ -48,11 +49,20 @@ LinearVector<CoordType>::LinearVector(LinearVector& that)
 }
 
 template <typename CoordType>
+LinearVector<CoordType>::LinearVector(const LinearVector& that)
+{
+  x_ = that.x_;
+  y_ = that.y_;
+}
+
+template <typename CoordType>
 LinearVector<CoordType>::LinearVector(LinearVector&& that)
 {
   x_ = that.x_;
   y_ = that.y_;
 }
+
+
 
 template <typename CoordType>
 LinearVector<CoordType>& LinearVector<CoordType>::operator=(LinearVector<CoordType>& that)

@@ -22,23 +22,13 @@ int main()
   Engine engine(&window);
   window.setFramerateLimit(kFrameRate);
   window.setVerticalSyncEnabled(true);
-
-
-	/*Texture cilinder_texture;
-	cilinder_texture.loadFromFile("images/cilindr.png");*/
-	Texture cube_texture;
-	cube_texture.loadFromFile("images/cub.png");
-
-
-	Array<Enemy*> gops(kTilesAtLine*kTilesAtLine);
+	Array<GameObject*> gops(kTilesAtLine*kTilesAtLine);
 	for (int i=0; i<kTilesAtLine*kTilesAtLine; ++i)
   {
       if ((i/kTilesAtLine == 5) || (i%kTilesAtLine == 5) || (i/kTilesAtLine == kTilesAtLine-5)  || (i%kTilesAtLine == kTilesAtLine-5) )
       {
-        gops[i] = new Enemy(&window, &(engine.getMap()), LinearVector<int>(128,138), cube_texture,
-           LinearVector<int>(i/kTilesAtLine,i%kTilesAtLine), &(engine.getFrame()), 1, 1);
-
-      engine.AddObject(gops[i]);}
+        gops[i] = Factory::CreateCharacter(kEnemyId, LinearVector<int>(i/kTilesAtLine,i%kTilesAtLine), engine);
+      }
       else gops[i] = nullptr;
   }
 
@@ -46,9 +36,9 @@ int main()
               LinearVector<int>(14,16), &(engine.getFrame()), 4, 1);
   engine.AddObject(&cilik);*/
   GameObject* cilik = Factory::CreateCharacter(kPlayerId, LinearVector<int>(14,16), engine);
-  Enemy kubik(&window, &(engine.getMap()), LinearVector<int>(128,138), cube_texture,
+ /* Enemy kubik(&window, &(engine.getMap()), LinearVector<int>(128,138), cube_texture,
               LinearVector<int>(16,14), &(engine.getFrame()), 1, 1);
-  engine.AddObject(&kubik);
+  engine.AddObject(&kubik);*/
 
 	//float CurrentFrame = 0;//хранит текущий кадр
 	Clock clock;

@@ -6,16 +6,30 @@
 class Factory
 {
   public:
-    static GameObject* CreateCharacter(int object_code, LinearVector<int> gridCoords, Engine& engine)
+    static GameObject* CreateCharacter(int object_code, LinearVector<int> grid_coords, Engine& engine)
     {
       if(object_code == kPlayerId)
       {
         Texture player_texture;
-        player_texture.loadFromFile("images/cilindr.png");
-        Player* result = new Player(&(engine.GetWindow()), &(engine.getMap()), LinearVector<int>(128,192), player_texture,
-                                    gridCoords, &(engine.getFrame()), kNumOfPlayerFrames, kNumOfPlayerStates);
+        player_texture.loadFromFile(kPathToPlayerTexture);
+        Player* result = new Player(&(engine.GetWindow()), &(engine.getMap()), kStandartSpriteSizeOfPlayer, player_texture,
+                                    grid_coords, &(engine.getFrame()), kNumOfPlayerFrames, kNumOfPlayerStates);
         engine.AddObject(result);
         return result;
+      }
+      else if(object_code == kEnemyId)
+      {
+        Texture enemy_texture;
+        enemy_texture.loadFromFile(kPathToEnemyTexture);
+        Enemy* result = new Enemy(&(engine.GetWindow()), &(engine.getMap()), kStandartSpriteSizeOfEnemy, enemy_texture,
+                                    grid_coords, &(engine.getFrame()), kNumOfEnemyFrames, kNumOfEnemyStates);
+        engine.AddObject(result);
+        return result;
+      }
+      else
+      {
+        print("Object: /# is not created", object_code);
+        return nullptr;
       }
     }
 };

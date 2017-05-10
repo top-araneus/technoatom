@@ -22,5 +22,11 @@ const int kEnemyHp = 15;
 const LinearVector<int> kStandartSpriteSizeOfPlayer = LinearVector<int>(128,192);
 const unsigned char kNumOfPlayerStates = 1;
 const unsigned char kNumOfPlayerFrames = 4;
+const char* kPathToPlayerTexture = "images/cilindr.png";
 
+//!enemy
+const LinearVector<int> kStandartSpriteSizeOfEnemy = LinearVector<int>(128,138);
+const unsigned char kNumOfEnemyFrames = 1;
+const unsigned char kNumOfEnemyStates = 1;
+const char* kPathToEnemyTexture = "images/cub.png";
 #endif // CONSTANTS_H
