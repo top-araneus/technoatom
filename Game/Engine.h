@@ -20,7 +20,7 @@ class Engine
     void MoveAll();
     void InteractAll();
     void ChangeAllFrames();
-    void Control(RenderWindow& window, Player& cilik, Engine& engine);
+    void Control(GameObject& player);
     void AddObject(GameObject* obj)
     {
       surface_[obj->GetGridCoords().x_][obj->GetGridCoords().y_] = obj;
@@ -35,7 +35,14 @@ class Engine
     {
       return frame_;
     }
-
+    RenderWindow& GetWindow()
+    {
+      return *window_;
+    }
+    Text& GetGameOver()
+    {
+      return game_over_;
+    }
   private:
     SurfaceType surface_;
     GroundType ground_;
@@ -45,6 +52,8 @@ class Engine
     int num_of_grounds_;
     ReferenceFrame frame_;
     RenderWindow* window_;
+    Font font_;
+    Text game_over_;
 };
 
 Engine::Engine(RenderWindow* window)
@@ -57,6 +66,10 @@ Engine::Engine(RenderWindow* window)
   num_of_grounds_ = ground_texture_.getSize().x / kCellWidth;
   ground_sprite_.setTexture(ground_texture_);
   ground_sprite_.setTextureRect(IntRect(0, 0, kCellWidth, kCellHeight));
+  font_.loadFromFile("fonts/font.ttf");
+  game_over_ = Text("GAME OVER", font_, 48);
+  game_over_.setColor(Color(255,0,0));
+  game_over_.setPosition(kWindowWidth/2 - 100, kWindowHeight/2);
 }
 
 SurfaceType Engine::InitializeMap()
@@ -186,110 +199,101 @@ void Engine::InteractAll()
           if (clock() >= surface_[i][j]->GetAttackEndingTime())
           {
             surface_[i][j]->SetInAttack(false);
-           // surface_[i][j]->SetAimOfInteract(nullptr);
-
           }
 
           surface_[i][j]->Interact();
         }
-
       }
   }
 }
-  void Engine::Control(RenderWindow& window, Player& cilik, Engine& engine)
+  void Engine::Control(GameObject& player)
   {
-    		sf::Event event;
-		while (window.pollEvent(event))
-		{
-			if (event.type == sf::Event::Closed)
-				window.close();
-		}
 
-        if (Keyboard::isKeyPressed(Keyboard::A))
+          if (Keyboard::isKeyPressed(Keyboard::A))
+          {
+        player.SetVelocity(LinearVector<int>(-kPlayerVelocity, 0));
+          }
+          else if (Keyboard::isKeyPressed(Keyboard::D))
+          {
+        player.SetVelocity(LinearVector<int>(kPlayerVelocity, 0));
+          }
+          else if (Keyboard::isKeyPressed(Keyboard::W))
+          {
+        player.SetVelocity(LinearVector<int>(0, -kPlayerVelocity));
+          }
+          else if (Keyboard::isKeyPressed(Keyboard::S))
+          {
+        player.SetVelocity(LinearVector<int>(0, kPlayerVelocity));
+          }
+          else
+          {
+        player.SetVelocity(LinearVector<int>(0, 0));
+          }
+      if (Keyboard::isKeyPressed(Keyboard::Right) || sf::Mouse::getPosition(*window_).x > kWindowWidth-kWindowMargin)
+      {
+        if (sf::Mouse::getPosition(*window_).x > kWindowWidth-kWindowMargin/2)
         {
-			cilik.SetVelocity(LinearVector<int>(-kPlayerVelocity, 0));
-        }
-        else if (Keyboard::isKeyPressed(Keyboard::D))
-        {
-			cilik.SetVelocity(LinearVector<int>(kPlayerVelocity, 0));
-        }
-        else if (Keyboard::isKeyPressed(Keyboard::W))
-        {
-			cilik.SetVelocity(LinearVector<int>(0, -kPlayerVelocity));
-        }
-        else if (Keyboard::isKeyPressed(Keyboard::S))
-        {
-			cilik.SetVelocity(LinearVector<int>(0, kPlayerVelocity));
+          getFrame().SetX(getFrame().GetX()-2*kCameraVelocity);
         }
         else
         {
-			cilik.SetVelocity(LinearVector<int>(0, 0));
+          getFrame().SetX(getFrame().GetX()-kCameraVelocity);
         }
-		if (Keyboard::isKeyPressed(Keyboard::Right) || sf::Mouse::getPosition(window).x > kWindowWidth-kWindowMargin)
-    {
-      if (sf::Mouse::getPosition(window).x > kWindowWidth-kWindowMargin/2)
-      {
-        engine.getFrame().SetX(engine.getFrame().GetX()-2*kCameraVelocity);
       }
-      else
-      {
-        engine.getFrame().SetX(engine.getFrame().GetX()-kCameraVelocity);
-      }
-		}
 
-		if (Keyboard::isKeyPressed(Keyboard::Left) || sf::Mouse::getPosition(window).x < kWindowMargin)
-		{
-      if (sf::Mouse::getPosition(window).x < kWindowMargin/2)
+      if (Keyboard::isKeyPressed(Keyboard::Left) || sf::Mouse::getPosition(*window_).x < kWindowMargin)
       {
-        engine.getFrame().SetX(engine.getFrame().GetX()+2*kCameraVelocity);
+        if (sf::Mouse::getPosition(*window_).x < kWindowMargin/2)
+        {
+          getFrame().SetX(getFrame().GetX()+2*kCameraVelocity);
+        }
+        else
+        {
+          getFrame().SetX(getFrame().GetX()+kCameraVelocity);
+        }
       }
-      else
-      {
-        engine.getFrame().SetX(engine.getFrame().GetX()+kCameraVelocity);
-      }
-		}
 
-		if (Keyboard::isKeyPressed(Keyboard::Down) || sf::Mouse::getPosition(window).y > kWindowHeight-kWindowMargin)
-    {
-      if (sf::Mouse::getPosition(window).y > kWindowHeight-kWindowMargin/2)
+      if (Keyboard::isKeyPressed(Keyboard::Down) || sf::Mouse::getPosition(*window_).y > kWindowHeight-kWindowMargin)
       {
-        engine.getFrame().SetY(engine.getFrame().GetY()-2*kCameraVelocity);
+        if (sf::Mouse::getPosition(*window_).y > kWindowHeight-kWindowMargin/2)
+        {
+          getFrame().SetY(getFrame().GetY()-2*kCameraVelocity);
+        }
+        else
+        {
+          getFrame().SetY(getFrame().GetY()-kCameraVelocity);
+        }
       }
-      else
-      {
-        engine.getFrame().SetY(engine.getFrame().GetY()-kCameraVelocity);
-      }
-		}
 
-		if (Keyboard::isKeyPressed(Keyboard::Up) || sf::Mouse::getPosition(window).y < kWindowMargin)
-    {
-      if (sf::Mouse::getPosition(window).y < kWindowMargin/2)
+      if (Keyboard::isKeyPressed(Keyboard::Up) || sf::Mouse::getPosition(*window_).y < kWindowMargin)
       {
-        engine.getFrame().SetY(engine.getFrame().GetY()+2*kCameraVelocity);
+        if (sf::Mouse::getPosition(*window_).y < kWindowMargin/2)
+        {
+          getFrame().SetY(getFrame().GetY()+2*kCameraVelocity);
+        }
+        else
+        {
+          getFrame().SetY(getFrame().GetY()+kCameraVelocity);
+        }
       }
-      else
-      {
-        engine.getFrame().SetY(engine.getFrame().GetY()+kCameraVelocity);
-      }
-		}
 
 
-		if (sf::Mouse::isButtonPressed(sf::Mouse::Right))
-    {
-       LinearVector<int> coords = LinearVector<int>(sf::Mouse::getPosition(window).x - engine.getFrame().GetX(),
-                                                    sf::Mouse::getPosition(window).y - engine.getFrame().GetY());
-       print("coords: /# /#\n", coords.x_, coords.y_);
-       LinearVector<int> cell_coords = GetCellFromCoords(coords);
-       print("cell: /# /#\n", cell_coords.x_, cell_coords.y_);
-       if (cell_coords.x_ >= 0 && cell_coords.y_ >= 0 && cell_coords.x_ < kTilesAtLine && cell_coords.y_ < kTilesAtLine)
-       {
-         cilik.SetAimOfInteract(engine.getMap()[cell_coords.x_][cell_coords.y_]);
-         if (engine.getMap()[cell_coords.x_][cell_coords.y_])
-          print("id: /# /#\n", engine.getMap()[cell_coords.x_][cell_coords.y_]->GetObjectCode(), kEnemyId);
-         cilik.Interact();
-         cilik.SetAimOfInteract(nullptr);
-       }
-    }
-  }
+      if (sf::Mouse::isButtonPressed(sf::Mouse::Right))
+      {
+         LinearVector<int> coords = LinearVector<int>(sf::Mouse::getPosition(*window_).x - getFrame().GetX(),
+                                                      sf::Mouse::getPosition(*window_).y - getFrame().GetY());
+         print("coords: /# /#\n", coords.x_, coords.y_);
+         LinearVector<int> cell_coords = GetCellFromCoords(coords);
+         print("cell: /# /#\n", cell_coords.x_, cell_coords.y_);
+         if (cell_coords.x_ >= 0 && cell_coords.y_ >= 0 && cell_coords.x_ < kTilesAtLine && cell_coords.y_ < kTilesAtLine)
+         {
+           player.SetAimOfInteract(getMap()[cell_coords.x_][cell_coords.y_]);
+           if (getMap()[cell_coords.x_][cell_coords.y_])
+            print("id: /# /#\n", getMap()[cell_coords.x_][cell_coords.y_]->GetObjectCode(), kEnemyId);
+           player.Interact();
+           player.SetAimOfInteract(nullptr);
+         }
+      }
+}
 
 #endif // ENGINE_H

@@ -13,7 +13,8 @@ class GameObject
         virtual void Draw() = 0;
         virtual void Interact() = 0;
         virtual void Move() = 0;
-        virtual void DecreaseHp(int diff)=0;
+        virtual void DecreaseHp(int diff) = 0;
+        virtual void SetVelocity(LinearVector<int> velocity) = 0;
         GameObject() { }
         virtual ~GameObject() { }
         void SetFrame(unsigned char frame)
@@ -415,7 +416,7 @@ class Player: public Mortal
             velocity_ = LinearVector<int>(0,0);
             direction_ = GiveDirection();
             aim_of_interact_ = nullptr;
-            hp_ = 1000;
+            hp_ = kPlayerHp;
             object_code_ = kPlayerId;
             time_last_frame_changing_ = clock();
             frames_per_second_ = kFramesPerSec;
@@ -550,12 +551,11 @@ class Enemy: public Mortal
             map_ = pMap;
             velocity_ = LinearVector<int>(0,0);
             direction_ = GiveDirection();
-            hp_ = 15;
+            hp_ = kEnemyHp;
             object_code_ = kEnemyId;
             aim_of_interact_ = nullptr;
             time_last_frame_changing_ = clock();
             frames_per_second_ = kFramesPerSec;
-        //    aim_of_interact_ = nullptr;
         }
         Enemy(RenderWindow* window, SurfaceType* pMap, LinearVector<int> spriteSize, Texture& texture,
                LinearVector<int> gridCoords, ReferenceFrame* refFrame, int numOfFrames, int numOfStates)

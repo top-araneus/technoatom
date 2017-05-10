@@ -4,27 +4,28 @@ bool in_death = false;
 #include <SFML/Audio.hpp>
 #include <SFML/System/Clock.hpp>
 using namespace sf;
-#include "constants.h"
 #include <iostream>
 #include <../utils/print.h>
 #include <../ALU/ALU/alu.h>
 #include <../stack/stack/stack.h>
 #include <../stack/stack/smart_ptr.h>
 #include <refframe.h>
+#include "constants.h"
 #include <GameObjects.h>
 #include <Engine.h>
+#include "factory.h"
 
 int main()
 {
 	RenderWindow window(sf::VideoMode(kWindowWidth, kWindowHeight), "Cyberpunk Universe", sf::Style::Close);
 
-    Engine engine(&window);
-    window.setFramerateLimit(kFrameRate);
-    window.setVerticalSyncEnabled(true);
+  Engine engine(&window);
+  window.setFramerateLimit(kFrameRate);
+  window.setVerticalSyncEnabled(true);
 
 
-	Texture cilinder_texture;
-	cilinder_texture.loadFromFile("images/cilindr.png");
+	/*Texture cilinder_texture;
+	cilinder_texture.loadFromFile("images/cilindr.png");*/
 	Texture cube_texture;
 	cube_texture.loadFromFile("images/cub.png");
 
@@ -41,10 +42,10 @@ int main()
       else gops[i] = nullptr;
   }
 
-  Player cilik(&window, &(engine.getMap()), LinearVector<int>(128,192), cilinder_texture,
+ /* Player cilik(&window, &(engine.getMap()), LinearVector<int>(128,192), cilinder_texture,
               LinearVector<int>(14,16), &(engine.getFrame()), 4, 1);
-  engine.AddObject(&cilik);
-
+  engine.AddObject(&cilik);*/
+  GameObject* cilik = Factory::CreateCharacter(kPlayerId, LinearVector<int>(14,16), engine);
   Enemy kubik(&window, &(engine.getMap()), LinearVector<int>(128,138), cube_texture,
               LinearVector<int>(16,14), &(engine.getFrame()), 1, 1);
   engine.AddObject(&kubik);
@@ -54,6 +55,13 @@ int main()
 
 	while (window.isOpen())
 	{
+
+      sf::Event event;
+      while (window.pollEvent(event))
+      {
+        if (event.type == sf::Event::Closed)
+          window.close();
+      }
       /*  int cnt = 0;
 		float time = clock.getElapsedTime().asMicroseconds();
 		clock.restart();
@@ -63,14 +71,22 @@ int main()
 
 
 		window.clear();
-		engine.Control(window, cilik, engine);
-        engine.MoveAll();
-        engine.DrawGround();
+
+  if (in_death)
+  {
+      window.draw(engine.GetGameOver());
+  }
+  else
+  {
+    engine.Control(*cilik);
+    engine.MoveAll();
+    engine.DrawGround();
 
     engine.InteractAll();
     engine.ChangeAllFrames();
     engine.DrawAll();
-		window.display();
+  }
+  window.display();
 	}
 	return 0;
 }
