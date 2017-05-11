@@ -200,22 +200,20 @@ void Engine::InteractAll()
 void Engine::Control(GameObject& player)
 {
 
+  player.SetVelocity(LinearVector<int>(0, 0));
   if (Keyboard::isKeyPressed(Keyboard::A)) {
-    player.SetVelocity(LinearVector<int>(-kPlayerVelocity, 0));
+    player.SetVelocity(player.GetVelocity() + LinearVector<int>(-kPlayerVelocity, 0));
   }
-  else if (Keyboard::isKeyPressed(Keyboard::D)) {
-    player.SetVelocity(LinearVector<int>(kPlayerVelocity, 0));
+  if (Keyboard::isKeyPressed(Keyboard::D)) {
+    player.SetVelocity(player.GetVelocity() + LinearVector<int>(kPlayerVelocity, 0));
   }
-  else if (Keyboard::isKeyPressed(Keyboard::W)) {
-    player.SetVelocity(LinearVector<int>(0, -kPlayerVelocity));
+  if (Keyboard::isKeyPressed(Keyboard::W)) {
+    player.SetVelocity(player.GetVelocity() + LinearVector<int>(0, -kPlayerVelocity));
   }
-  else if (Keyboard::isKeyPressed(Keyboard::S)) {
-    player.SetVelocity(LinearVector<int>(0, kPlayerVelocity));
+  if (Keyboard::isKeyPressed(Keyboard::S)) {
+    player.SetVelocity(player.GetVelocity() + LinearVector<int>(0, kPlayerVelocity));
   }
-  else
-  {
-    player.SetVelocity(LinearVector<int>(0, 0));
-  }
+
 
   if (Keyboard::isKeyPressed(Keyboard::Right) || sf::Mouse::getPosition(*window_).x > kWindowWidth-kWindowMargin) {
     if (sf::Mouse::getPosition(*window_).x > kWindowWidth-kWindowMargin/2)

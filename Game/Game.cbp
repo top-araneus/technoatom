@@ -70,11 +70,16 @@
 		<Unit filename="../stack/stack/array.h" />
 		<Unit filename="../stack/stack/smart_ptr.h" />
 		<Unit filename="../stack/stack/stack.h" />
+		<Unit filename="../utils/alupa.h" />
 		<Unit filename="../utils/print.h" />
-		<Unit filename="GameObjects.h" />
+		<Unit filename="constants.h" />
+		<Unit filename="engine.h" />
+		<Unit filename="gameobjects.h" />
+		<Unit filename="linearvector.h" />
 		<Unit filename="main.cpp" />
 		<Unit filename="main.h" />
-		<Unit filename="refpoint.h" />
+		<Unit filename="refframe.h" />
+		<Unit filename="transformation.h" />
 		<Extensions>
 			<code_completion />
 			<debugger />
