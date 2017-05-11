@@ -6,10 +6,10 @@
 const int kCellWidth = 128;
 const int kCellHeight = 64;
 const int kTilesAtLine = 30;
-const int kFrameRate = 60;
+const int kFrameRate = 30;
 const int kFramesPerSec = 10;
-const int kWindowWidth = 1920;//GetSystemMetrics(SM_CXSCREEN);
-const int kWindowHeight = 1080;//GetSystemMetrics(SM_CYSCREEN);
+const int kWindowWidth = GetSystemMetrics(SM_CXSCREEN);
+const int kWindowHeight = GetSystemMetrics(SM_CYSCREEN);
 const int kCameraVelocity = 10;
 const int kWindowMargin = 100;
 const int kRangeOfVision = 3;

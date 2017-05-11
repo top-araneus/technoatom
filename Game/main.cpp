@@ -18,7 +18,6 @@ using namespace sf;
 
 int main()
 {
-  print("/# /# \n", kWindowWidth, kWindowHeight);
 	RenderWindow window(sf::VideoMode(kWindowWidth, kWindowHeight), "Cyberpunk Universe", sf::Style::Fullscreen);
   Engine engine(&window);
 	Array<GameObject*> gops(kTilesAtLine*kTilesAtLine);

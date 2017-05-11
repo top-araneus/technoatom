@@ -82,9 +82,6 @@ class GameObject
     void              SetVelocity(LinearVector<int> velocity) {
       velocity_ = velocity;
     }
-    LinearVector<int> GetVelocity() {
-      return velocity_;
-    }
     virtual void NextFrame(char step = 1);
     void DecreaseHp(int damage);
 

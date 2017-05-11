@@ -431,21 +431,17 @@
 	"refpoint.h"
 	<../../../stack/stack/smart_ptr.h>
 
-1494432321 source:d:\dropbox\coding\mailru\technoatom\game\main.cpp
+1492881255 source:d:\dropbox\coding\mailru\technoatom\game\main.cpp
 	<SFML/Graphics.hpp>
 	<SFML/Audio.hpp>
-	<SFML/System/Clock.hpp>
 	<iostream>
-	<windows.h>
 	<../utils/print.h>
 	<../ALU/ALU/alu.h>
 	<../stack/stack/stack.h>
 	<../stack/stack/smart_ptr.h>
-	<refframe.h>
-	"constants.h"
-	<gameobjects.h>
-	<engine.h>
-	"factory.h"
+	<refpoint.h>
+	<GameObjects.h>
+	<Engine.h>
 
 1429780453 c:\sfml-2.3.2\include\sfml\graphics.hpp
 	<SFML/Window.hpp>
@@ -825,13 +821,14 @@
 	<string>
 	<vector>
 
-1493839904 d:\dropbox\coding\mailru\technoatom\game\\refpoint.h
+1492717636 d:\dropbox\coding\mailru\technoatom\game\\refpoint.h
+	<math.h>
 
-1494433073 d:\dropbox\coding\mailru\technoatom\game\\gameobjects.h
+1492984181 d:\dropbox\coding\mailru\technoatom\game\\gameobjects.h
 	"refpoint.h"
-	"transformation.h"
 	<../stack/stack/smart_ptr.h>
 	<../utils/print.h>
+	<math.h>
 
 1429780453 d:\dropbox\coding\mailru\technoatom\game\sfml-2.3.2\include\sfml\graphics.hpp
 	<SFML/Window.hpp>
@@ -1314,7 +1311,7 @@
 	<SFML/Audio/Export.hpp>
 	<string>
 
-1494434062 d:\dropbox\coding\mailru\technoatom\game\\engine.h
+1492978467 d:\dropbox\coding\mailru\technoatom\game\\engine.h
 	"GameObjects.h"
 
 1492866349 d:\dropbox\coding\mailru\technoatom\game\map.h
@@ -1322,36 +1319,4 @@
 
 1492866288 d:\dropbox\coding\mailru\technoatom\game\view.h
 	<SFML/Graphics.hpp>
-
-1494426754 d:\dropbox\coding\mailru\technoatom\game\\refframe.h
-	"linearvector.h"
-
-1494433811 d:\dropbox\coding\mailru\technoatom\game\\linearvector.h
-	<math.h>
-
-1494431479 d:\dropbox\coding\mailru\technoatom\game\\transformation.h
-	"linearvector.h"
-	<math.h>
-
-1494532897 d:\dropbox\coding\mailru\technoatom\game\constants.h
-
-1494431480 d:\dropbox\coding\mailru\technoatom\game\factory.h
-	"gameobjects.h"
-	<SFML/Graphics.hpp>
-	"constants.h"
-
-1494433073 d:\dropbox\coding\mailru\technoatom\game\gameobjects.h
-	"refpoint.h"
-	"transformation.h"
-	<../stack/stack/smart_ptr.h>
-	<../utils/print.h>
-
-1493839904 d:\dropbox\coding\mailru\technoatom\game\refpoint.h
-
-1494431479 d:\dropbox\coding\mailru\technoatom\game\transformation.h
-	"linearvector.h"
-	<math.h>
-
-1494433811 d:\dropbox\coding\mailru\technoatom\game\linearvector.h
-	<math.h>
 

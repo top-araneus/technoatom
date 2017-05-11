@@ -22,7 +22,7 @@ class LinearVector
     bool operator!=(LinearVector&& that) const;
     operator sf::Vector2f();
     double GetAbs();
-    LinearVector Normal();
+
     CoordType x_;
     CoordType y_;
 };
@@ -115,27 +115,6 @@ template <typename CoordType>
 double LinearVector<CoordType>::GetAbs()
 {
   return sqrt(x_*x_ + y_*y_);
-}
-
-template <typename CoordType>
-LinearVector<CoordType> LinearVector<CoordType>::Normal()
-{
-
-  int abs = GetAbs();
-  CoordType x;
-  CoordType y;
-  if (abs != 0)
-  {
-    x = x_ / abs;
-    y = y_ / abs;
-  }
-  else
-  {
-    x = 0;
-    y = 0;
-  }
-  LinearVector<CoordType> result(x,y);
-  return result;
 }
 
 template <typename CoordType>
