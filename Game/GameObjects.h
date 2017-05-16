@@ -17,9 +17,9 @@ class GameObject
     GameObject(LinearVector<int> refCoords)
     {
       ref_coords_ = refCoords;
-      velocity_ = LinearVector<int>(0,0);
+      velocity_ = LinearVector<double>(0,0);
     }
-    GameObject(LinearVector<int> refCoords, LinearVector<int> velocity)
+    GameObject(LinearVector<int> refCoords, LinearVector<double> velocity)
     {
       ref_coords_ = refCoords;
       velocity_ = velocity;
@@ -79,7 +79,7 @@ class GameObject
     bool              GetUnderAttack() {
       return under_attack_;
     }
-    void              SetVelocity(LinearVector<int> velocity) {
+    void              SetVelocity(LinearVector<double> velocity) {
       velocity_ = velocity;
     }
     virtual void NextFrame(char step = 1);
@@ -98,7 +98,7 @@ class GameObject
     }
     int hp_;
     int cooldown_; //!< cooldown will be in milliseconds
-    LinearVector<int> velocity_; //set
+    LinearVector<double> velocity_; //set
     LinearVector<int> ref_coords_;  //get
     LinearVector<int> grid_coords_; //get
     LinearVector<char> direction_;
@@ -140,16 +140,17 @@ void GameObject::DecreaseHp(int damage)
 
 void GameObject::Move()
 {
-  if(velocity_ != LinearVector<int>(0,0))
+  if(velocity_ != LinearVector<double>(0,0))
   {
-    LinearVector<int> tmp;
-    tmp.x_ = ref_coords_.x_ + velocity_.x_;
-    tmp.y_ = ref_coords_.y_ + velocity_.y_;
-    LinearVector<int> newCell = GetCellFromCoords(tmp);
-    LinearVector<int> oldCell = grid_coords_;
-    if(InMap(newCell))
+    LinearVector<double> ort = velocity_.GetNorm();
+    LinearVector<int> where_to;
+    where_to.x_ = ref_coords_.x_ + velocity_.x_;
+    where_to.y_ = ref_coords_.y_ + velocity_.y_;
+    LinearVector<int> new_cell = GetCellFromCoords(where_to);
+    LinearVector<int> old_cell = grid_coords_;
+    if(InMap(new_cell))
     {
-      GoToCellIfEmpty(oldCell, newCell, tmp);
+      GoToCellIfEmpty(old_cell, new_cell, where_to);
     }
   }
 }
@@ -164,16 +165,16 @@ void GameObject::NextFrame(char step)
   }
 }
 
-void GameObject::GoToCellIfEmpty(LinearVector<int> oldCell, LinearVector<int> cell, LinearVector<int> coords)
+void GameObject::GoToCellIfEmpty(LinearVector<int> old_cell, LinearVector<int> cell, LinearVector<int> coords)
 {
-  if ((oldCell != cell))
+  if ((old_cell != cell))
   {
     if ((*map_)[cell.x_][cell.y_] == nullptr)
     {
       grid_coords_ = cell;
       ref_coords_ = coords;
       (*map_)[cell.x_][cell.y_] = this;
-      (*map_)[oldCell.x_][oldCell.y_] = nullptr;
+      (*map_)[old_cell.x_][old_cell.y_] = nullptr;
     }
   }
   else
@@ -220,7 +221,7 @@ Player::Player(RenderWindow& window, SurfaceType& pMap, const LinearVector<int> 
   current_state_ = 0;
   applied_damage_ = 5;
   map_ = &pMap;
-  velocity_ = LinearVector<int>(0,0);
+  velocity_ = LinearVector<double>(0,0);
   direction_ = GiveDirection();
   aim_of_interact_ = nullptr;
   hp_ = kPlayerHp;
@@ -362,7 +363,7 @@ Enemy::Enemy(RenderWindow& window, SurfaceType& pMap, LinearVector<int> spriteSi
   current_state_ = 0;
   applied_damage_ = kEnemyDamage;
   map_ = &pMap;
-  velocity_ = LinearVector<int>(0,0);
+  velocity_ = LinearVector<double>(0,0);
   direction_ = GiveDirection();
   hp_ = kEnemyHp;
   object_code_ = kEnemyId;
@@ -404,7 +405,7 @@ void Enemy::Interact()
   {
     if (aim_of_interact_->GetGridCoords().GetDistance(GetGridCoords()) <= kRangeOfEnemyAttack)
     {
-      velocity_ = LinearVector<int>(0,0);
+      velocity_ = LinearVector<double>(0,0);
       if (clock() >= attack_ending_time_)
       {
         attack_ending_time_ = clock() + kEnemyCoolDown;
