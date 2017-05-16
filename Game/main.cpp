@@ -18,8 +18,7 @@ using namespace sf;
 
 int main()
 {
-	RenderWindow window(sf::VideoMode(kWindowWidth, kWindowHeight), "Cyberpunk Universe", sf::Style::Fullscreen);
-  Engine engine(&window);
+  Engine engine;
 	Array<GameObject*> gops(kTilesAtLine*kTilesAtLine);
 	for (int i=0; i<kTilesAtLine*kTilesAtLine; ++i)
   {
@@ -31,19 +30,18 @@ int main()
   }
 
   GameObject* cilik = Factory::CreateCharacter(kPlayerId, LinearVector<int>(14,16), engine);
-	Clock clock;
-	while (window.isOpen())
+	while (engine.GetWindow().isOpen())
 	{
     sf::Event event;
-    while (window.pollEvent(event))
+    while (engine.GetWindow().pollEvent(event))
     {
       if (event.type == sf::Event::Closed || Keyboard::isKeyPressed(Keyboard::Escape))
-        window.close();
+        engine.GetWindow().close();
     }
-		window.clear();
+		engine.GetWindow().clear();
     if (in_death)
     {
-        window.draw(engine.GetGameOver());
+        engine.GetWindow().draw(engine.GetGameOver());
     }
     else
     {
@@ -54,7 +52,7 @@ int main()
       engine.ChangeAllFrames();
       engine.DrawAll();
     }
-    window.display();
+    engine.GetWindow().display();
   }
 	return 0;
 }

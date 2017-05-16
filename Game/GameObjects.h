@@ -118,7 +118,7 @@ class GameObject
     RenderWindow* window_;
     LinearVector<int> sprite_size_; //!< width and height of sprite
     Array<Array<GameObject*>>* map_; //! TODO: weak_ptr
-    Unique_ptr<ReferenceFrame> ref_frame_;
+    ReferenceFrame* ref_frame_;
     GameObject* aim_of_interact_; //set, get
 
 };
@@ -272,35 +272,11 @@ class Player: public GameObject
       hp_text.setPosition(kWindowWidth - 120, 10);
       window_->draw(hp_text);
     }
-    Player();
-    Player(RenderWindow* window, SurfaceType* pMap, LinearVector<int> spriteSize, Texture& texture,
-         LinearVector<int> gridCoords, ReferenceFrame* refFrame)
+    Player(RenderWindow& window, SurfaceType& pMap, const LinearVector<int> spriteSize, Texture& texture,
+          LinearVector<int> gridCoords, ReferenceFrame& refFrame, const int numOfFrames, const int numOfStates)
     {
-      window_ = window;
-      ref_frame_ = refFrame;
-      sprite_size_ = spriteSize;
-      texture_ = texture;
-      grid_coords_ = gridCoords;
-      ref_coords_ = GetCoordsFromCell(gridCoords);
-      num_of_frames_ = 1;
-      current_frame_ = 0;
-      num_of_state_ = 1;
-      current_state_ = 0;
-      applied_damage_ = 5;
-      map_ = pMap;
-      velocity_ = LinearVector<int>(0,0);
-      direction_ = GiveDirection();
-      aim_of_interact_ = nullptr;
-      hp_ = 1000;
-      object_code_ = kPlayerId;
-      time_last_frame_changing_ = clock();
-      frames_per_second_ = kFramesPerSec;
-    }
-    Player(RenderWindow* window, SurfaceType* pMap, LinearVector<int> spriteSize, Texture& texture,
-         LinearVector<int> gridCoords, ReferenceFrame* refFrame, int numOfFrames, int numOfStates)
-    {
-      window_ = window;
-      ref_frame_ = refFrame;
+      window_ = &window;
+      ref_frame_ = &refFrame;
       sprite_size_ = spriteSize;
       texture_ = texture;
       grid_coords_ = gridCoords;
@@ -310,7 +286,7 @@ class Player: public GameObject
       num_of_state_ = numOfStates;
       current_state_ = 0;
       applied_damage_ = 5;
-      map_ = pMap;
+      map_ = &pMap;
       velocity_ = LinearVector<int>(0,0);
       direction_ = GiveDirection();
       aim_of_interact_ = nullptr;
@@ -426,35 +402,11 @@ class Enemy: public GameObject
       GameObject::DecreaseHp(damage);
     }
 
-    Enemy();
-    Enemy(RenderWindow* window, SurfaceType* pMap, LinearVector<int> spriteSize, Texture& texture,
-         LinearVector<int> gridCoords, ReferenceFrame* refFrame)
+    Enemy(RenderWindow& window, SurfaceType& pMap, LinearVector<int> spriteSize, Texture& texture,
+         LinearVector<int> gridCoords, ReferenceFrame& refFrame, int numOfFrames, int numOfStates)
     {
-      window_ = window;
-      ref_frame_ = refFrame;
-      sprite_size_ = spriteSize;
-      texture_ = texture;
-      grid_coords_ = gridCoords;
-      ref_coords_ = GetCoordsFromCell(gridCoords);
-      num_of_frames_ = 1;
-      current_frame_ = 0;
-      num_of_state_ = 1;
-      current_state_ = 0;
-      applied_damage_ = 5;
-      map_ = pMap;
-      velocity_ = LinearVector<int>(0,0);
-      direction_ = GiveDirection();
-      hp_ = kEnemyHp;
-      object_code_ = kEnemyId;
-      aim_of_interact_ = nullptr;
-      time_last_frame_changing_ = clock();
-      frames_per_second_ = kFramesPerSec;
-    }
-    Enemy(RenderWindow* window, SurfaceType* pMap, LinearVector<int> spriteSize, Texture& texture,
-         LinearVector<int> gridCoords, ReferenceFrame* refFrame, int numOfFrames, int numOfStates)
-    {
-      window_ = window;
-      ref_frame_ = refFrame;
+      window_ = &window;
+      ref_frame_ = &refFrame;
       sprite_size_ = spriteSize;
       texture_ = texture;
       grid_coords_ = gridCoords;
@@ -464,7 +416,7 @@ class Enemy: public GameObject
       num_of_state_ = numOfStates;
       current_state_ = 0;
       applied_damage_ = 5;
-      map_ = pMap;
+      map_ = &pMap;
       velocity_ = LinearVector<int>(0,0);
       direction_ = GiveDirection();
       hp_ = 15;

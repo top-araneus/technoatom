@@ -2,7 +2,7 @@
 #define CONSTANTS_H
 
 
-
+//!window
 const int kCellWidth = 128;
 const int kCellHeight = 64;
 const int kTilesAtLine = 30;
@@ -10,12 +10,14 @@ const int kFrameRate = 30;
 const int kFramesPerSec = 10;
 const int kWindowWidth = GetSystemMetrics(SM_CXSCREEN);
 const int kWindowHeight = GetSystemMetrics(SM_CYSCREEN);
+
+//!camera
 const int kCameraVelocity = 10;
 const int kWindowMargin = 100;
-const int kRangeOfVision = 3;
+
+//!id
 const unsigned char kEnemyId = 148;
 const unsigned char kPlayerId = 161;
-const time_t kEnemyCoolDown = 500;
 
 //!player
 const int kPlayerVelocity = 6;
@@ -32,4 +34,6 @@ const LinearVector<int> kStandartSpriteSizeOfEnemy = LinearVector<int>(128,138);
 const unsigned char kNumOfEnemyFrames = 1;
 const unsigned char kNumOfEnemyStates = 1;
 const char* kPathToEnemyTexture = "images/cub.png";
+const int kRangeOfVision = 3;
+const time_t kEnemyCoolDown = 500;
 #endif // CONSTANTS_H

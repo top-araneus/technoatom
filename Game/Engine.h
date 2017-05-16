@@ -11,8 +11,8 @@ class Engine
 {
   public:
   LinearVector<char> GiveDirection();
-  Engine(RenderWindow* window);
-  ~Engine() { }
+  Engine();
+  ~Engine();
   SurfaceType InitializeMap();
   Array<Array<unsigned char>> InitializeGround();
   void DrawGround();
@@ -21,9 +21,9 @@ class Engine
   void InteractAll();
   void ChangeAllFrames();
   void Control(GameObject& player);
-  void AddObject(GameObject* obj)
+  void AddObject(GameObject& obj)
   {
-    surface_[obj->GetGridCoords().x_][obj->GetGridCoords().y_] = obj;
+    surface_[obj.GetGridCoords().x_][obj.GetGridCoords().y_] = &obj;
   }
 
   SurfaceType&    GetMap() {
@@ -51,8 +51,9 @@ class Engine
   Text game_over_;
 };
 
-Engine::Engine(RenderWindow* window)
+Engine::Engine()
 {
+	RenderWindow* window = new RenderWindow(sf::VideoMode(kWindowWidth, kWindowHeight), "Cyberpunk Universe", sf::Style::Fullscreen);
   window_ = window;
   window_->setFramerateLimit(kFrameRate);
   window_->setVerticalSyncEnabled(true);
@@ -67,6 +68,11 @@ Engine::Engine(RenderWindow* window)
   game_over_ = Text("GAME OVER", font_, 48);
   game_over_.setColor(Color(255,0,0));
   game_over_.setPosition(kWindowWidth/2 - 100, kWindowHeight/2);
+}
+
+Engine::~Engine()
+{
+  delete(window_);
 }
 
 SurfaceType Engine::InitializeMap()
