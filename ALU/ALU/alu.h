@@ -6,6 +6,7 @@
 //-----------------------------------
 #ifndef ALU_H
 #define ALU_H
+#include "math.h"
 #include "..\..\stack/stack/array.h"
 #include "..\..\stack/stack/stack.h"
 #include "..\..\utils\exception.h"
@@ -92,112 +93,103 @@ void ALU::Execute()
   int pos = 0;
   while (code_[pos] != END)
   {
-    switch(code_[pos])
-    {
-      case EXC:
+      if (code_[pos] == EXC){
         throw EALUBadInstruction(__FL__);
-      break;
-
-      case PUSH_RG:
+      }
+      else if(code_[pos] == PUSH_RG){
         stack_.push(regs_[code_[++pos]]);
         ++pos;
-      break;
-
-      case PUSH_VL:
+      }
+      else if(code_[pos] == PUSH_VL){
         stack_.push(code_[++pos]);
         ++pos;
-      break;
-
-      case POP:
+      }
+      else if(code_[pos] == POP){
         regs_[code_[++pos]] = stack_.pop();
         ++pos;
-      break;
-
-      case ADD:
+      }
+      else if(code_[pos] == ADD){
         stack_.push(stack_.pop() + stack_.pop());
         ++pos;
-      break;
-
-      case SUB:
-      {
+      }
+      else if(code_[pos] == SUB){
         BlockType subtr = stack_.pop();
         stack_.push(stack_.pop() - subtr);
         ++pos;
       }
-      break;
-
-      case MUL:
+      else if(code_[pos] == MUL){
         stack_.push(stack_.pop() * stack_.pop());
         ++pos;
-      break;
-
-      case DIV:
-      {
+      }
+      else if(code_[pos] == DIV){
         BlockType dividend = stack_.pop();
         stack_.push(stack_.pop() / dividend);
         ++pos;
       }
-      break;
-
-      case JMP:
+      else if(code_[pos] == JMP){
         pos = code_[pos+1];
-      break;
-
-      case CALL:
+      }
+      else if(code_[pos] == CALL){
         call_.push(pos+2);
         pos = code_[pos+1];
-      break;
-
-      case RET:
+      }
+      else if(code_[pos] == RET){
         pos = call_.pop();
-      break;
-
-      case JE:
+      }
+      else if(code_[pos] == JE){
         if (stack_.pop() == stack_.pop())
           pos = code_[pos+1];
         else
           pos += 2;
-      break;
-
-      case JNE:
+      }
+      else if(code_[pos] == JNE){
         if (stack_.pop() != stack_.pop())
           pos = code_[pos+1];
         else
           pos += 2;
-      break;
-
-      case JL:
+      }
+      else if(code_[pos] == JL){
         if (stack_.pop() > stack_.pop())
           pos = code_[pos+1];
         else
           pos += 2;
-      break;
-
-      case JLE:
+      }
+      else if(code_[pos] == JLE){
         if (stack_.pop() >= stack_.pop())
           pos = code_[pos+1];
         else
           pos += 2;
-      break;
-
-      case JG:
+      }
+      else if(code_[pos] == JG){
         if (stack_.pop() < stack_.pop())
           pos = code_[pos+1];
         else
           pos += 2;
-      break;
-
-      case JGE:
+      }
+      else if(code_[pos] == JGE){
         if (stack_.pop() <= stack_.pop())
           pos = code_[pos+1];
         else
           pos += 2;
-      break;
+      }
+      else if(code_[pos] == SQRT){
+        stack_.push(sqrt(stack_.pop()));
+        ++pos;
+      }
+      else if(code_[pos] == NORM){
+        double x0 = stack_.pop();
+        double y0 = stack_.pop();
+        double x = stack_.pop();
+        double y = stack_.pop();
+        double res_x = (x - x0)/(sqrt((x-x0)*(x-x0) + (y-y0)*(y-y0)));
+        double res_y = (y - y0)/(sqrt((x-x0)*(x-x0) + (y-y0)*(y-y0)));
+        stack_.push(res_y);
+        stack_.push(res_x);
+        ++pos;
+      }
+      else if(code_[pos] == END){
 
-      case END:
-      break;
-
-    }
+      }
   }
 }
 

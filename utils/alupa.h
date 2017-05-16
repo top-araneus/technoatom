@@ -12,7 +12,7 @@ const int CODE_DEFAULT_SIZE = 1000; // default number of code strings
 const int REGS_DEFAULT_SIZE = 16; // default number of registers
 const int STEP = 50; // step for enlarging arrays
 
-typedef int BlockType;
+typedef double BlockType;
 
 const BlockType EXC = 0;    // forbidden instruction, raise exception if code was wrong interpreted
 const BlockType PUSH_RG = 1;  // push from register to stack
@@ -33,6 +33,9 @@ const BlockType ADD = 20;  //addition of two popped values, push result
 const BlockType SUB = 21;  //substraction
 const BlockType MUL = 22;  //multiplication
 const BlockType DIV = 23;  //division
+const BlockType SQRT = 24; //^(1/2)
+
+const BlockType NORM = 30; // normiration of vector
 
 const BlockType END = 255; //end of program
 
