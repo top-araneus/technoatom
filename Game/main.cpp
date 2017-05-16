@@ -42,13 +42,14 @@ int main()
         engine.GetWindow().draw(engine.GetGameOver());
     }
     else
-    {
+    {/*
       engine.Control(*cilik);
       engine.MoveAll();
       engine.DrawGround();
       engine.InteractAll();
       engine.ChangeAllFrames();
-      engine.DrawAll();
+      engine.DrawAll();*/
+      engine.Tact(*cilik);
     }
     engine.GetWindow().display();
   }

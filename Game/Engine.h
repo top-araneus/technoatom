@@ -10,45 +10,53 @@ typedef Array<Array<GameObject*>> AirType;  //TODO: make weak_ptr
 class Engine
 {
   public:
-  LinearVector<char> GiveDirection();
-  Engine();
-  ~Engine();
-  SurfaceType InitializeMap();
-  Array<Array<unsigned char>> InitializeGround();
-  void DrawGround();
-  void DrawAll();
-  void MoveAll();
-  void InteractAll();
-  void ChangeAllFrames();
-  void Control(GameObject& player);
-  void AddObject(GameObject& obj)
-  {
-    surface_[obj.GetGridCoords().x_][obj.GetGridCoords().y_] = &obj;
-  }
+    LinearVector<char> GiveDirection();
+    Engine();
+    ~Engine();
+    SurfaceType InitializeMap();
+    Array<Array<unsigned char>> InitializeGround();
+    void DrawGround();
+    void DrawAll();
+    void MoveAll();
+    void InteractAll();
+    void ChangeAllFrames();
+    void Control(GameObject& player);
+    void Tact(GameObject& player);
+    void AddObject(GameObject& obj)
+    {
+      surface_[obj.GetGridCoords().x_][obj.GetGridCoords().y_] = &obj;
+    }
 
-  SurfaceType&    GetMap() {
-    return surface_;
-  }
-  ReferenceFrame& GetFrame() {
-    return frame_;
-  }
-  RenderWindow&   GetWindow() {
-    return *window_;
-  }
-  Text&           GetGameOver() {
-    return game_over_;
-  }
+    SurfaceType&    GetMap() {
+      return surface_;
+    }
+    ReferenceFrame& GetFrame() {
+      return frame_;
+    }
+    RenderWindow&   GetWindow() {
+      return *window_;
+    }
+    Text&           GetGameOver() {
+      return game_over_;
+    }
+    time_t          GetLastTime() {
+      return last_time_change;
+    }
+    void            SetLastTime() {
+      last_time_change = clock();
+    }
   private:
-  SurfaceType surface_;
-  GroundType ground_;
-  AirType air_;
-  Texture ground_texture_;
-  Sprite ground_sprite_;
-  int num_of_grounds_;
-  ReferenceFrame frame_;
-  RenderWindow* window_;
-  Font font_;
-  Text game_over_;
+    SurfaceType surface_;
+    GroundType ground_;
+    AirType air_;
+    Texture ground_texture_;
+    Sprite ground_sprite_;
+    int num_of_grounds_;
+    ReferenceFrame frame_;
+    RenderWindow* window_;
+    Font font_;
+    Text game_over_;
+    time_t last_time_change;
 };
 
 Engine::Engine()
@@ -68,6 +76,7 @@ Engine::Engine()
   game_over_ = Text("GAME OVER", font_, 48);
   game_over_.setColor(Color(255,0,0));
   game_over_.setPosition(kWindowWidth/2 - 100, kWindowHeight/2);
+  SetLastTime();
 }
 
 Engine::~Engine()
@@ -283,4 +292,21 @@ void Engine::Control(GameObject& player)
   }
 }
 
+void Engine::Tact(GameObject& player)
+{
+    Control(player);
+    if ((clock() - GetLastTime()) > kTactTime)
+    {
+      MoveAll();
+    }
+    DrawGround();
+    InteractAll();
+    if ((clock() - GetLastTime()) > kTactTime)
+    {
+      ChangeAllFrames();
+      SetLastTime();
+    }
+    DrawAll();
+
+}
 #endif // ENGINE_H

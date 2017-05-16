@@ -22,6 +22,7 @@ class LinearVector
     operator sf::Vector2f();
     double GetAbs() const;
     LinearVector<double> GetNorm() const;
+    double GetDistance(LinearVector that);
 
     CoordType x_;
     CoordType y_;
@@ -118,6 +119,13 @@ LinearVector<double> LinearVector<CoordType>::GetNorm() const
     return LinearVector<double>(x_ / GetAbs(), y_ / GetAbs());
   else
     return LinearVector<double>(0,0);
+}
+
+template <typename CoordType>
+double LinearVector<CoordType>::GetDistance(LinearVector<CoordType> that)
+{
+  LinearVector<CoordType> distance(x_-that.x_, y_-that.y_);
+  return distance.GetAbs();
 }
 
 template <typename CoordType>

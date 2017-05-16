@@ -84,7 +84,6 @@ class GameObject
     }
     virtual void NextFrame(char step = 1);
     void DecreaseHp(int damage);
-    virtual void HandleALU() = 0;
 
   protected:
     bool CheckAlive()
@@ -121,7 +120,6 @@ class GameObject
     Array<Array<GameObject*>>* map_; //! TODO: weak_ptr
     ReferenceFrame* ref_frame_;
     GameObject* aim_of_interact_; //set, get
-    ALU* alu_;
 };
 
 typedef Array<Array<GameObject*>> SurfaceType;
@@ -187,269 +185,281 @@ void GameObject::GoToCellIfEmpty(LinearVector<int> oldCell, LinearVector<int> ce
 class Player: public GameObject
 {
   public:
-    void Draw()
+    Player(RenderWindow& window, SurfaceType& pMap, const LinearVector<int> spriteSize, Texture& texture,
+      LinearVector<int> gridCoords, ReferenceFrame& refFrame, const int numOfFrames, const int numOfStates);
+    ~Player();
+    virtual void Draw();
+    virtual void Interact();
+    virtual void NextFrame(char step = 1);
+    void DrawHp();
+    virtual void DecreaseHp(int damage)
     {
-      Sprite player_sprite;
-      player_sprite.setTexture(texture_);
-      player_sprite.setTextureRect(IntRect(current_frame_ * sprite_size_.x_, current_state_ * sprite_size_.y_,
-                                          sprite_size_.x_, sprite_size_.y_));
-      player_sprite.setOrigin(Vector2f(sprite_size_.x_ / 2, sprite_size_.y_ - kCellHeight / 2));
-      player_sprite.setPosition(ref_frame_->GetX() + ref_coords_.x_, ref_frame_->GetY() + ref_coords_.y_);
-      if (GetUnderAttack())
-        player_sprite.setColor(sf::Color(255,128,128));
-      else
-        player_sprite.setColor(sf::Color(255,255,255));
-      DrawHp();
-      window_->draw(player_sprite);
+      GameObject::DecreaseHp(damage);
     }
-    void Interact()
-    {
-      if (aim_of_interact_ != nullptr)
-      {
-        if (aim_of_interact_->GetObjectCode() == kEnemyId)
-        {
-          if ((abs(aim_of_interact_->GetGridCoords().x_ - GetGridCoords().x_) <= kRangeOfPlayerAttack)
-            && (abs(aim_of_interact_->GetGridCoords().y_ - GetGridCoords().y_) <= kRangeOfPlayerAttack))
-          {
-            if (clock() >= attack_ending_time_)
-            {
-              attack_ending_time_ = clock() + kPlayerCoolDown;
-              aim_of_interact_->DecreaseHp(applied_damage_);
-              aim_of_interact_->SetUnderAttack(true);
-              aim_of_interact_->SetDamageEndingTime(clock() + kPlayerCoolDown);
-            }
-          }
-          else
-          {
-          }
-        }
-      }
-    }
-
-    void Move()
+    virtual void Move()
     {
       GameObject::Move();
     }
 
-    virtual void NextFrame(char step = 1)
-    {
-      if(next_sprite_right){
-        if(GetFrame() == GetNumOfFrames()-1){
-          next_sprite_right = false;
-          GameObject::NextFrame(-1);
-        }
-        else{
-          GameObject::NextFrame(1);
-        }
-      }
-      else {
-        if(GetFrame() == 0){
-          next_sprite_right = true;
-          GameObject::NextFrame(1);
-        }
-        else{
-          GameObject::NextFrame(-1);
-        }
-      }
-
-    }
-
-    void DecreaseHp(int damage)
-    {
-      GameObject::DecreaseHp(damage);
-    }
-    void DrawHp()
-    {
-      std::string hp = std::to_string(hp_);
-      sf::Font font;
-      font.loadFromFile("fonts/font.ttf");
-
-      sf::Text hp_text(hp, font);
-      hp_text.setCharacterSize(40);
-      hp_text.setColor(sf::Color::Green);
-      hp_text.setPosition(kWindowWidth - 120, 10);
-      window_->draw(hp_text);
-    }
-    Player(RenderWindow& window, SurfaceType& pMap, const LinearVector<int> spriteSize, Texture& texture,
-          LinearVector<int> gridCoords, ReferenceFrame& refFrame, const int numOfFrames, const int numOfStates)
-    {
-      window_ = &window;
-      ref_frame_ = &refFrame;
-      sprite_size_ = spriteSize;
-      texture_ = texture;
-      grid_coords_ = gridCoords;
-      ref_coords_ = GetCoordsFromCell(gridCoords);
-      num_of_frames_ = numOfFrames;
-      current_frame_ = 0;
-      num_of_state_ = numOfStates;
-      current_state_ = 0;
-      applied_damage_ = 5;
-      map_ = &pMap;
-      velocity_ = LinearVector<int>(0,0);
-      direction_ = GiveDirection();
-      aim_of_interact_ = nullptr;
-      hp_ = kPlayerHp;
-      object_code_ = kPlayerId;
-      time_last_frame_changing_ = clock();
-      frames_per_second_ = kFramesPerSec;
-    }
-    ~Player() {
-
-       for(int i = 0; i < kTilesAtLine; i++)
-       {
-         for(int j = 0; j < kTilesAtLine; j++)
-         {
-         if((*map_)[i][j])
-         {
-           if((*map_)[i][j]->GetObjectCode() == kEnemyId)
-           {
-           (*map_)[i][j]->SetAimOfInteract(nullptr);
-           }
-         }
-         }
-       }
-       (*map_)[grid_coords_.x_][grid_coords_.y_] = nullptr;
-       in_death = true;
-   }
-   virtual void HandleALU()
-   {
-
-   }
   private:
     bool next_sprite_right = true;
 };
+
+Player::Player(RenderWindow& window, SurfaceType& pMap, const LinearVector<int> spriteSize, Texture& texture,
+          LinearVector<int> gridCoords, ReferenceFrame& refFrame, const int numOfFrames, const int numOfStates)
+{
+  window_ = &window;
+  ref_frame_ = &refFrame;
+  sprite_size_ = spriteSize;
+  texture_ = texture;
+  grid_coords_ = gridCoords;
+  ref_coords_ = GetCoordsFromCell(gridCoords);
+  num_of_frames_ = numOfFrames;
+  current_frame_ = 0;
+  num_of_state_ = numOfStates;
+  current_state_ = 0;
+  applied_damage_ = 5;
+  map_ = &pMap;
+  velocity_ = LinearVector<int>(0,0);
+  direction_ = GiveDirection();
+  aim_of_interact_ = nullptr;
+  hp_ = kPlayerHp;
+  object_code_ = kPlayerId;
+  time_last_frame_changing_ = clock();
+  frames_per_second_ = kFramesPerSec;
+}
+
+Player::~Player()
+{
+   for(int i = 0; i < kTilesAtLine; i++)
+   {
+     for(int j = 0; j < kTilesAtLine; j++)
+     {
+     if((*map_)[i][j])
+     {
+       if((*map_)[i][j]->GetObjectCode() == kEnemyId)
+       {
+       (*map_)[i][j]->SetAimOfInteract(nullptr);
+       }
+     }
+     }
+   }
+   (*map_)[grid_coords_.x_][grid_coords_.y_] = nullptr;
+   in_death = true;
+}
+
+void Player::Draw()
+{
+  Sprite player_sprite;
+  player_sprite.setTexture(texture_);
+  player_sprite.setTextureRect(IntRect(current_frame_ * sprite_size_.x_, current_state_ * sprite_size_.y_,
+                                      sprite_size_.x_, sprite_size_.y_));
+  player_sprite.setOrigin(Vector2f(sprite_size_.x_ / 2, sprite_size_.y_ - kCellHeight / 2));
+  player_sprite.setPosition(ref_frame_->GetX() + ref_coords_.x_, ref_frame_->GetY() + ref_coords_.y_);
+  if (GetUnderAttack())
+    player_sprite.setColor(sf::Color(255,128,128));
+  else
+    player_sprite.setColor(sf::Color(255,255,255));
+  DrawHp();
+  window_->draw(player_sprite);
+}
+
+void Player::Interact()
+{
+  if (aim_of_interact_ != nullptr)
+  {
+    if (aim_of_interact_->GetObjectCode() == kEnemyId)
+    {
+      if (aim_of_interact_->GetGridCoords().GetDistance(GetGridCoords()) <= kRangeOfPlayerAttack)
+      {
+        if (clock() >= attack_ending_time_)
+        {
+          attack_ending_time_ = clock() + kPlayerCoolDown;
+          aim_of_interact_->DecreaseHp(applied_damage_);
+          aim_of_interact_->SetUnderAttack(true);
+          aim_of_interact_->SetDamageEndingTime(clock() + kPlayerCoolDown);
+        }
+      }
+    }
+  }
+}
+
+void Player::NextFrame(char step)
+{
+  if(next_sprite_right){
+    if(GetFrame() == GetNumOfFrames()-1){
+      next_sprite_right = false;
+      GameObject::NextFrame(-1);
+    }
+    else{
+      GameObject::NextFrame(1);
+    }
+  }
+  else {
+    if(GetFrame() == 0){
+      next_sprite_right = true;
+      GameObject::NextFrame(1);
+    }
+    else{
+      GameObject::NextFrame(-1);
+    }
+  }
+}
+
+void Player::DrawHp()
+{
+  std::string hp = std::to_string(hp_);
+  sf::Font font;
+  font.loadFromFile("fonts/font.ttf");
+
+  sf::Text hp_text(hp, font);
+  hp_text.setCharacterSize(40);
+  hp_text.setColor(sf::Color::Green);
+  hp_text.setPosition(kWindowWidth - 120, 10);
+  window_->draw(hp_text);
+}
 
 
 class Enemy: public GameObject
 {
   public:
-    void Draw()
-    {
-      Sprite enemy_sprite;
-      enemy_sprite.setTexture(texture_);
-      enemy_sprite.setTextureRect(IntRect(current_frame_ * sprite_size_.x_, current_state_ * sprite_size_.y_,
-                        sprite_size_.x_, sprite_size_.y_));
-      enemy_sprite.setOrigin(Vector2f(sprite_size_.x_ / 2, sprite_size_.y_ - kCellHeight / 2));
-      enemy_sprite.setPosition(ref_frame_->GetX() + ref_coords_.x_, ref_frame_->GetY() + ref_coords_.y_);
-      if (GetUnderAttack())
-        enemy_sprite.setColor(sf::Color(255,64,64));
-      else
-        enemy_sprite.setColor(sf::Color(255,255,255));
-      window_->draw(enemy_sprite);
-    }
-
-    void Interact()
-    {
-      if (!aim_of_interact_)
-      {
-        Scan();
-      }
-      if (aim_of_interact_ != nullptr)
-      {
-        if ((abs(aim_of_interact_->GetGridCoords().x_ - GetGridCoords().x_) <= kRangeOfEnemyAttack)
-        && (abs(aim_of_interact_->GetGridCoords().y_ - GetGridCoords().y_) <= kRangeOfEnemyAttack))
-        {
-          velocity_ = LinearVector<int>(0,0);
-          if (clock() >= attack_ending_time_)
-          {
-            attack_ending_time_ = clock() + kEnemyCoolDown;
-            aim_of_interact_->SetUnderAttack(true);
-            aim_of_interact_->SetDamageEndingTime(clock() + kEnemyCoolDown);
-            aim_of_interact_->DecreaseHp(applied_damage_);
-          }
-        }
-        else
-        {
-         HandleALU();
-        }
-      }
-    }
-
-    void CheckCellAndSetAim(LinearVector<int> coords)
-    {
-      if(coords.x_ >= 0 && coords.x_ < kTilesAtLine && coords.y_ >= 0 && coords.y_ < kTilesAtLine)
-      {
-        if((*map_)[coords.x_][coords.y_] != nullptr)
-        {
-          if((*map_)[coords.x_][coords.y_]->GetObjectCode() == kPlayerId)
-          {
-            aim_of_interact_ = (*map_)[coords.x_][coords.y_];
-          }
-        }
-      }
-    }
-
-    void Scan()
-    {
-      for(int i = -kRangeOfVision; i <= kRangeOfVision; i++)
-      {
-        for(int j = -kRangeOfVision; j <= kRangeOfVision; j++)
-        {
-          if(i != 0 || j != 0)
-          {
-            CheckCellAndSetAim(LinearVector<int>(grid_coords_.x_ + i, grid_coords_.y_ + j));
-          }
-        }
-      }
-    }
-
-    void Move()
+    Enemy(RenderWindow& window, SurfaceType& pMap, LinearVector<int> spriteSize, Texture& texture,
+         LinearVector<int> gridCoords, ReferenceFrame& refFrame, int numOfFrames, int numOfStates);
+    ~Enemy();
+    virtual void Draw();
+    virtual void Interact();
+    void CheckCellAndSetAim(LinearVector<int> coords);
+    void Scan();
+    void HandleALU();
+    virtual void Move()
     {
       GameObject::Move();
     }
-
-    void DecreaseHp(int damage)
+    virtual void DecreaseHp(int damage)
     {
       GameObject::DecreaseHp(damage);
     }
-
-    Enemy(RenderWindow& window, SurfaceType& pMap, LinearVector<int> spriteSize, Texture& texture,
-         LinearVector<int> gridCoords, ReferenceFrame& refFrame, int numOfFrames, int numOfStates)
+    virtual void NextFrame(char step = 1)
     {
-      window_ = &window;
-      ref_frame_ = &refFrame;
-      sprite_size_ = spriteSize;
-      texture_ = texture;
-      grid_coords_ = gridCoords;
-      ref_coords_ = GetCoordsFromCell(gridCoords);
-      num_of_frames_ = numOfFrames;
-      current_frame_ = 0;
-      num_of_state_ = numOfStates;
-      current_state_ = 0;
-      applied_damage_ = 5;
-      map_ = &pMap;
-      velocity_ = LinearVector<int>(0,0);
-      direction_ = GiveDirection();
-      hp_ = 15;
-      object_code_ = kEnemyId;
-      aim_of_interact_ = nullptr;
-      time_last_frame_changing_ = clock();
-      frames_per_second_ = kFramesPerSec;
-      alu_ = new ALU(kEnemyProgram);
+      GameObject::NextFrame(step);
     }
-    ~Enemy() {
-      (*map_)[grid_coords_.x_][grid_coords_.y_] = nullptr;
-      aim_of_interact_ = nullptr;
-      delete alu_;
-   }
-
-   virtual void NextFrame(char step = 1)
-   {
-     GameObject::NextFrame(step);
-   }
-
-   virtual void HandleALU()
-   {
-     if (aim_of_interact_ != nullptr)
-     {
-       alu_->Execute(aim_of_interact_->GetRefCoords().y_, aim_of_interact_->GetRefCoords().x_, GetRefCoords().y_, GetRefCoords().x_);
-       velocity_.x_ = roundl((alu_->GetRegister(0))*kEnemyVelocity);
-       velocity_.y_ = roundl((alu_->GetRegister(1))*kEnemyVelocity);
-       if (velocity_.GetAbs() == 0)
-       {
-         aim_of_interact_ = nullptr;
-       }
-     }
-   }
+  protected:
+    ALU* alu_;
 };
+
+Enemy::Enemy(RenderWindow& window, SurfaceType& pMap, LinearVector<int> spriteSize, Texture& texture,
+     LinearVector<int> gridCoords, ReferenceFrame& refFrame, int numOfFrames, int numOfStates)
+{
+  window_ = &window;
+  ref_frame_ = &refFrame;
+  sprite_size_ = spriteSize;
+  texture_ = texture;
+  grid_coords_ = gridCoords;
+  ref_coords_ = GetCoordsFromCell(gridCoords);
+  num_of_frames_ = numOfFrames;
+  current_frame_ = 0;
+  num_of_state_ = numOfStates;
+  current_state_ = 0;
+  applied_damage_ = kEnemyDamage;
+  map_ = &pMap;
+  velocity_ = LinearVector<int>(0,0);
+  direction_ = GiveDirection();
+  hp_ = kEnemyHp;
+  object_code_ = kEnemyId;
+  aim_of_interact_ = nullptr;
+  time_last_frame_changing_ = clock();
+  frames_per_second_ = kFramesPerSec;
+  alu_ = new ALU(kEnemyProgram);
+}
+
+Enemy::~Enemy()
+{
+  (*map_)[grid_coords_.x_][grid_coords_.y_] = nullptr;
+  aim_of_interact_ = nullptr;
+  delete alu_;
+}
+
+void Enemy::Draw()
+{
+  Sprite enemy_sprite;
+  enemy_sprite.setTexture(texture_);
+  enemy_sprite.setTextureRect(IntRect(current_frame_ * sprite_size_.x_, current_state_ * sprite_size_.y_,
+                    sprite_size_.x_, sprite_size_.y_));
+  enemy_sprite.setOrigin(Vector2f(sprite_size_.x_ / 2, sprite_size_.y_ - kCellHeight / 2));
+  enemy_sprite.setPosition(ref_frame_->GetX() + ref_coords_.x_, ref_frame_->GetY() + ref_coords_.y_);
+  if (GetUnderAttack())
+    enemy_sprite.setColor(sf::Color(255,64,64));
+  else
+    enemy_sprite.setColor(sf::Color(255,255,255));
+  window_->draw(enemy_sprite);
+}
+
+void Enemy::Interact()
+{
+  if (aim_of_interact_ == nullptr)
+  {
+    Scan();
+  }
+  if (aim_of_interact_ != nullptr)
+  {
+    if (aim_of_interact_->GetGridCoords().GetDistance(GetGridCoords()) <= kRangeOfEnemyAttack)
+    {
+      velocity_ = LinearVector<int>(0,0);
+      if (clock() >= attack_ending_time_)
+      {
+        attack_ending_time_ = clock() + kEnemyCoolDown;
+        aim_of_interact_->SetUnderAttack(true);
+        aim_of_interact_->SetDamageEndingTime(clock() + kEnemyCoolDown);
+        aim_of_interact_->DecreaseHp(applied_damage_);
+      }
+    }
+    else
+    {
+     HandleALU();
+    }
+  }
+}
+
+void Enemy::CheckCellAndSetAim(LinearVector<int> coords)
+{
+  if(coords.x_ >= 0 && coords.x_ < kTilesAtLine && coords.y_ >= 0 && coords.y_ < kTilesAtLine)
+  {
+    if((*map_)[coords.x_][coords.y_] != nullptr)
+    {
+      if((*map_)[coords.x_][coords.y_]->GetObjectCode() == kPlayerId)
+      {
+        aim_of_interact_ = (*map_)[coords.x_][coords.y_];
+      }
+    }
+  }
+}
+
+void Enemy::Scan()
+{
+  for(int i = -kRangeOfVision; i <= kRangeOfVision; i++)
+  {
+    for(int j = -kRangeOfVision; j <= kRangeOfVision; j++)
+    {
+      if(i != 0 || j != 0)
+      {
+        CheckCellAndSetAim(LinearVector<int>(grid_coords_.x_ + i, grid_coords_.y_ + j));
+      }
+    }
+  }
+}
+
+void Enemy::HandleALU()
+{
+  if (aim_of_interact_ != nullptr)
+  {
+    alu_->Execute(aim_of_interact_->GetRefCoords().y_, aim_of_interact_->GetRefCoords().x_, GetRefCoords().y_, GetRefCoords().x_);
+    velocity_.x_ = roundl((alu_->GetRegister(0))*kEnemyVelocity);
+    velocity_.y_ = roundl((alu_->GetRegister(1))*kEnemyVelocity);
+    if (velocity_.GetAbs() == 0)
+    {
+      aim_of_interact_ = nullptr;
+    }
+  }
+}
+
 #endif
