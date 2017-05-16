@@ -64,7 +64,7 @@ ALU::ALU(std::string filename)
 {
   regs_.Resize(REGS_DEFAULT_SIZE);
   code_.Resize(CODE_DEFAULT_SIZE);
-  Load("..\\..\\bin_code\\" + filename);
+  Load("scripts/" + filename);
 }
 
 ALU::~ALU()
@@ -181,10 +181,26 @@ void ALU::Execute()
         double y0 = stack_.pop();
         double x = stack_.pop();
         double y = stack_.pop();
-        double res_x = (x - x0)/(sqrt((x-x0)*(x-x0) + (y-y0)*(y-y0)));
-        double res_y = (y - y0)/(sqrt((x-x0)*(x-x0) + (y-y0)*(y-y0)));
-        stack_.push(res_y);
-        stack_.push(res_x);
+        if (x == x0 && y == y0)
+        {
+          print("trying to divide by zero in ALU");
+          stack_.push(0);
+          stack_.push(0);
+        }
+        else
+        {
+          double res_x = (x - x0)/(sqrt((x-x0)*(x-x0) + (y-y0)*(y-y0)));
+          double res_y = (y - y0)/(sqrt((x-x0)*(x-x0) + (y-y0)*(y-y0)));
+          stack_.push(res_y);
+          stack_.push(res_x);
+        }
+        ++pos;
+      }
+      else if(code_[pos] == ABS){
+        double x = stack_.pop();
+        double y = stack_.pop();
+        double abs = sqrt(x*x + y*y);
+        stack_.push(abs);
         ++pos;
       }
       else if(code_[pos] == END){

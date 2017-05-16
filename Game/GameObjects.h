@@ -4,7 +4,7 @@
 #include "transformation.h"
 #include <../stack/stack/smart_ptr.h>
 #include <../utils/print.h>
-
+#include "../ALU/ALU/alu.h"
 using namespace sf;
 
 class GameObject
@@ -84,6 +84,7 @@ class GameObject
     }
     virtual void NextFrame(char step = 1);
     void DecreaseHp(int damage);
+    virtual void HandleALU() = 0;
 
   protected:
     bool CheckAlive()
@@ -120,7 +121,7 @@ class GameObject
     Array<Array<GameObject*>>* map_; //! TODO: weak_ptr
     ReferenceFrame* ref_frame_;
     GameObject* aim_of_interact_; //set, get
-
+    ALU* alu_;
 };
 
 typedef Array<Array<GameObject*>> SurfaceType;
@@ -207,8 +208,8 @@ class Player: public GameObject
       {
         if (aim_of_interact_->GetObjectCode() == kEnemyId)
         {
-          if ((abs(aim_of_interact_->GetGridCoords().x_ - GetGridCoords().x_) <= 1)
-            && (abs(aim_of_interact_->GetGridCoords().y_ - GetGridCoords().y_) <= 1))
+          if ((abs(aim_of_interact_->GetGridCoords().x_ - GetGridCoords().x_) <= kRangeOfPlayerAttack)
+            && (abs(aim_of_interact_->GetGridCoords().y_ - GetGridCoords().y_) <= kRangeOfPlayerAttack))
           {
             if (clock() >= attack_ending_time_)
             {
@@ -216,13 +217,10 @@ class Player: public GameObject
               aim_of_interact_->DecreaseHp(applied_damage_);
               aim_of_interact_->SetUnderAttack(true);
               aim_of_interact_->SetDamageEndingTime(clock() + kPlayerCoolDown);
-            print("attacked: /# /#\n", aim_of_interact_->GetGridCoords().x_, aim_of_interact_->GetGridCoords().y_);
             }
-            print("not time to attack: /# /#\n", aim_of_interact_->GetGridCoords().x_, aim_of_interact_->GetGridCoords().y_);
           }
           else
           {
-            print("too far: /# /#\n", aim_of_interact_->GetGridCoords().x_, aim_of_interact_->GetGridCoords().y_);
           }
         }
       }
@@ -313,6 +311,10 @@ class Player: public GameObject
        (*map_)[grid_coords_.x_][grid_coords_.y_] = nullptr;
        in_death = true;
    }
+   virtual void HandleALU()
+   {
+
+   }
   private:
     bool next_sprite_right = true;
 };
@@ -335,6 +337,7 @@ class Enemy: public GameObject
         enemy_sprite.setColor(sf::Color(255,255,255));
       window_->draw(enemy_sprite);
     }
+
     void Interact()
     {
       if (!aim_of_interact_)
@@ -343,13 +346,12 @@ class Enemy: public GameObject
       }
       if (aim_of_interact_ != nullptr)
       {
-        if ((abs(aim_of_interact_->GetGridCoords().x_ - GetGridCoords().x_) <= 1)
-        && (abs(aim_of_interact_->GetGridCoords().y_ - GetGridCoords().y_) <= 1))
+        if ((abs(aim_of_interact_->GetGridCoords().x_ - GetGridCoords().x_) <= kRangeOfEnemyAttack)
+        && (abs(aim_of_interact_->GetGridCoords().y_ - GetGridCoords().y_) <= kRangeOfEnemyAttack))
         {
           velocity_ = LinearVector<int>(0,0);
           if (clock() >= attack_ending_time_)
           {
-            print("attacked: /# /#\n", aim_of_interact_->GetGridCoords().x_, aim_of_interact_->GetGridCoords().y_);
             attack_ending_time_ = clock() + kEnemyCoolDown;
             aim_of_interact_->SetUnderAttack(true);
             aim_of_interact_->SetDamageEndingTime(clock() + kEnemyCoolDown);
@@ -358,13 +360,11 @@ class Enemy: public GameObject
         }
         else
         {
-         double abs = Pythagor(aim_of_interact_->GetRefCoords().x_ - ref_coords_.x_, aim_of_interact_->GetRefCoords().y_ - ref_coords_.y_);
-         LinearVector<double> tmp(kPlayerVelocity*(aim_of_interact_->GetRefCoords().x_ - ref_coords_.x_) / abs, kPlayerVelocity*(aim_of_interact_->GetRefCoords().y_ - ref_coords_.y_) / abs);
-         velocity_.x_ = round(tmp.x_);
-         velocity_.y_ = round(tmp.y_);
+         HandleALU();
         }
       }
     }
+
     void CheckCellAndSetAim(LinearVector<int> coords)
     {
       if(coords.x_ >= 0 && coords.x_ < kTilesAtLine && coords.y_ >= 0 && coords.y_ < kTilesAtLine)
@@ -378,6 +378,7 @@ class Enemy: public GameObject
         }
       }
     }
+
     void Scan()
     {
       for(int i = -kRangeOfVision; i <= kRangeOfVision; i++)
@@ -424,15 +425,31 @@ class Enemy: public GameObject
       aim_of_interact_ = nullptr;
       time_last_frame_changing_ = clock();
       frames_per_second_ = kFramesPerSec;
+      alu_ = new ALU(kEnemyProgram);
     }
     ~Enemy() {
       (*map_)[grid_coords_.x_][grid_coords_.y_] = nullptr;
       aim_of_interact_ = nullptr;
+      delete alu_;
    }
 
    virtual void NextFrame(char step = 1)
    {
      GameObject::NextFrame(step);
+   }
+
+   virtual void HandleALU()
+   {
+     if (aim_of_interact_ != nullptr)
+     {
+       alu_->Execute(aim_of_interact_->GetRefCoords().y_, aim_of_interact_->GetRefCoords().x_, GetRefCoords().y_, GetRefCoords().x_);
+       velocity_.x_ = roundl((alu_->GetRegister(0))*kEnemyVelocity);
+       velocity_.y_ = roundl((alu_->GetRegister(1))*kEnemyVelocity);
+       if (velocity_.GetAbs() == 0)
+       {
+         aim_of_interact_ = nullptr;
+       }
+     }
    }
 };
 #endif

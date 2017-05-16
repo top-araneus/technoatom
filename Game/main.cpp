@@ -19,14 +19,12 @@ using namespace sf;
 int main()
 {
   Engine engine;
-	Array<GameObject*> gops(kTilesAtLine*kTilesAtLine);
 	for (int i=0; i<kTilesAtLine*kTilesAtLine; ++i)
   {
       if ((i/kTilesAtLine == 5) || (i%kTilesAtLine == 5) || (i/kTilesAtLine == kTilesAtLine-5)  || (i%kTilesAtLine == kTilesAtLine-5) )
       {
-        gops[i] = Factory::CreateCharacter(kEnemyId, LinearVector<int>(i/kTilesAtLine,i%kTilesAtLine), engine);
+        Factory::CreateCharacter(kEnemyId, LinearVector<int>(i/kTilesAtLine,i%kTilesAtLine), engine);
       }
-      else gops[i] = nullptr;
   }
 
   GameObject* cilik = Factory::CreateCharacter(kPlayerId, LinearVector<int>(14,16), engine);

@@ -205,23 +205,27 @@ void Engine::InteractAll()
 
 void Engine::Control(GameObject& player)
 {
-
+  LinearVector<double> new_double_velocity(0,0);
   if (Keyboard::isKeyPressed(Keyboard::A)) {
-    player.SetVelocity(LinearVector<int>(-kPlayerVelocity, 0));
+      new_double_velocity.x_ -= 1;
   }
-  else if (Keyboard::isKeyPressed(Keyboard::D)) {
-    player.SetVelocity(LinearVector<int>(kPlayerVelocity, 0));
+  if (Keyboard::isKeyPressed(Keyboard::D)) {
+
+      new_double_velocity.x_ += 1;
   }
-  else if (Keyboard::isKeyPressed(Keyboard::W)) {
-    player.SetVelocity(LinearVector<int>(0, -kPlayerVelocity));
+  if (Keyboard::isKeyPressed(Keyboard::W)) {
+    new_double_velocity.y_ -= 1;
   }
-  else if (Keyboard::isKeyPressed(Keyboard::S)) {
-    player.SetVelocity(LinearVector<int>(0, kPlayerVelocity));
+  if (Keyboard::isKeyPressed(Keyboard::S)) {
+    new_double_velocity.y_ += 1;
   }
-  else
-  {
-    player.SetVelocity(LinearVector<int>(0, 0));
-  }
+  new_double_velocity = new_double_velocity.GetNorm();
+  new_double_velocity.x_ *= kPlayerVelocity;
+  new_double_velocity.y_ *= kPlayerVelocity;
+
+  LinearVector<int> new_velocity(roundl(new_double_velocity.x_), roundl(new_double_velocity.y_));
+  player.SetVelocity(new_velocity);
+
 
   if (Keyboard::isKeyPressed(Keyboard::Right) || sf::Mouse::getPosition(*window_).x > kWindowWidth-kWindowMargin) {
     if (sf::Mouse::getPosition(*window_).x > kWindowWidth-kWindowMargin/2)
@@ -269,16 +273,10 @@ void Engine::Control(GameObject& player)
   {
     LinearVector<int> coords = LinearVector<int>(sf::Mouse::getPosition(*window_).x - GetFrame().GetX(),
                                                   sf::Mouse::getPosition(*window_).y - GetFrame().GetY());
-    print("coords: /# /#\n", coords.x_, coords.y_);
     LinearVector<int> cell_coords = GetCellFromCoords(coords);
-    print("cell: /# /#\n", cell_coords.x_, cell_coords.y_);
     if (cell_coords.x_ >= 0 && cell_coords.y_ >= 0 && cell_coords.x_ < kTilesAtLine && cell_coords.y_ < kTilesAtLine)
     {
       player.SetAimOfInteract(GetMap()[cell_coords.x_][cell_coords.y_]);
-      if (GetMap()[cell_coords.x_][cell_coords.y_])
-      {
-        print("id: /# /#\n", GetMap()[cell_coords.x_][cell_coords.y_]->GetObjectCode(), kEnemyId);
-      }
       player.Interact();
       player.SetAimOfInteract(nullptr);
     }

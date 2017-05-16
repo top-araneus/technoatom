@@ -21,6 +21,7 @@ class LinearVector
     bool operator!=(const LinearVector&& that) const;
     operator sf::Vector2f();
     double GetAbs() const;
+    LinearVector<double> GetNorm() const;
 
     CoordType x_;
     CoordType y_;
@@ -107,6 +108,16 @@ template <typename CoordType>
 double LinearVector<CoordType>::GetAbs() const
 {
   return sqrt(x_*x_ + y_*y_);
+}
+
+
+template <typename CoordType>
+LinearVector<double> LinearVector<CoordType>::GetNorm() const
+{
+  if (GetAbs() != 0)
+    return LinearVector<double>(x_ / GetAbs(), y_ / GetAbs());
+  else
+    return LinearVector<double>(0,0);
 }
 
 template <typename CoordType>

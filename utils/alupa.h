@@ -36,6 +36,7 @@ const BlockType DIV = 23;  //division
 const BlockType SQRT = 24; //^(1/2)
 
 const BlockType NORM = 30; // normiration of vector
+const BlockType ABS = 31;  // absolute value of vector
 
 const BlockType END = 255; //end of program
 
