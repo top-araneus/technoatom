@@ -214,28 +214,24 @@ void Engine::InteractAll()
 
 void Engine::Control(GameObject& player)
 {
-  LinearVector<double> new_double_velocity(0,0);
+  LinearVector<double> new_velocity(0,0);
   if (Keyboard::isKeyPressed(Keyboard::A)) {
-      new_double_velocity.x_ -= 1;
+      new_velocity.x_ -= 1;
   }
   if (Keyboard::isKeyPressed(Keyboard::D)) {
 
-      new_double_velocity.x_ += 1;
+      new_velocity.x_ += 1;
   }
   if (Keyboard::isKeyPressed(Keyboard::W)) {
-    new_double_velocity.y_ -= 1;
+    new_velocity.y_ -= 1;
   }
   if (Keyboard::isKeyPressed(Keyboard::S)) {
-    new_double_velocity.y_ += 1;
+    new_velocity.y_ += 1;
   }
-  new_double_velocity = new_double_velocity.GetNorm();
-  new_double_velocity.x_ *= kPlayerVelocity;
-  new_double_velocity.y_ *= kPlayerVelocity;
-
-  LinearVector<int> new_velocity(roundl(new_double_velocity.x_), roundl(new_double_velocity.y_));
+  new_velocity = new_velocity.GetNorm();
+  new_velocity.x_ *= kPlayerVelocity;
+  new_velocity.y_ *= kPlayerVelocity;
   player.SetVelocity(new_velocity);
-
-
   if (Keyboard::isKeyPressed(Keyboard::Right) || sf::Mouse::getPosition(*window_).x > kWindowWidth-kWindowMargin) {
     if (sf::Mouse::getPosition(*window_).x > kWindowWidth-kWindowMargin/2)
     {
