@@ -21,6 +21,7 @@ class Engine
     void InteractAll();
     void ChangeAllFrames();
     void Control(GameObject& player);
+    void ClearDead();
     void Tact(GameObject& player);
     void AddObject(GameObject& obj)
     {
@@ -57,6 +58,7 @@ class Engine
     Font font_;
     Text game_over_;
     time_t last_time_change;
+    bool is_game_over_;
 };
 
 Engine::Engine()
@@ -76,6 +78,7 @@ Engine::Engine()
   game_over_ = Text("GAME OVER", font_, 48);
   game_over_.setColor(Color(255,0,0));
   game_over_.setPosition(kWindowWidth/2 - 100, kWindowHeight/2);
+  is_game_over_ = false;
   SetLastTime();
 }
 
@@ -188,7 +191,6 @@ void Engine::MoveAll()
   }
 }
 
-
 void Engine::InteractAll()
 {
   for (int i = 0; i < kTilesAtLine; ++i)
@@ -207,6 +209,29 @@ void Engine::InteractAll()
         }
 
         surface_[i][j]->Interact();
+      }
+    }
+  }
+}
+
+
+void Engine::ClearDead()
+{
+  for (int i = 0; i < kTilesAtLine; ++i)
+  {
+    for (int j = 0; j < kTilesAtLine; ++j)
+    {
+      if (surface_[i][j] != nullptr)
+      {
+        if (!(surface_[i][j]->CheckAlive()))
+        {
+          if (surface_[i][j]->GetObjectCode() == kPlayerCode)
+          {
+            is_game_over_ = true;
+          }
+          delete surface_[i][j];
+          surface_[i][j] = nullptr;
+        }
       }
     }
   }
@@ -290,6 +315,10 @@ void Engine::Control(GameObject& player)
 
 void Engine::Tact(GameObject& player)
 {
+  if (is_game_over_) {
+    window_->draw(GetGameOver());
+  }
+  else {
     Control(player);
     if ((clock() - GetLastTime()) > kTactTime)
     {
@@ -302,7 +331,9 @@ void Engine::Tact(GameObject& player)
       ChangeAllFrames();
       SetLastTime();
     }
+    ClearDead();
     DrawAll();
+  }
 
 }
 #endif // ENGINE_H
