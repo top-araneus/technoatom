@@ -21,13 +21,13 @@ int main()
   Engine engine;
 	for (int i=0; i<kTilesAtLine*kTilesAtLine; ++i)
   {
-      if ((i/kTilesAtLine == 5) || (i%kTilesAtLine == 5) || (i/kTilesAtLine == kTilesAtLine-5)  || (i%kTilesAtLine == kTilesAtLine-5) )
+      if ((i%2 == 0) && ((i/kTilesAtLine == 5) || (i%kTilesAtLine == 5) || (i/kTilesAtLine == kTilesAtLine-5)  || (i%kTilesAtLine == kTilesAtLine-5)) )
       {
-        Factory::CreateCharacter(kEnemyId, LinearVector<int>(i/kTilesAtLine,i%kTilesAtLine), engine);
+        Factory::CreateCharacter(kEnemyCode, LinearVector<int>(i/kTilesAtLine,i%kTilesAtLine), engine);
       }
   }
 
-  GameObject* cilik = Factory::CreateCharacter(kPlayerId, LinearVector<int>(14,16), engine);
+  GameObject* cilik = Factory::CreateCharacter(kPlayerCode, LinearVector<int>(14,16), engine);
 	while (engine.GetWindow().isOpen())
 	{
     sf::Event event;

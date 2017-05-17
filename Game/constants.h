@@ -8,8 +8,8 @@ const int kCellHeight = 64;
 const int kTilesAtLine = 30;
 const int kFrameRate = 70;
 const int kFramesPerSec = 10;
-const int kWindowWidth = 1920;//GetSystemMetrics(SM_CXSCREEN);
-const int kWindowHeight = 1080;//GetSystemMetrics(SM_CYSCREEN);
+const int kWindowWidth = GetSystemMetrics(SM_CXSCREEN);
+const int kWindowHeight = GetSystemMetrics(SM_CYSCREEN);
 
 //!engine
 const time_t kTactTime = 25;
@@ -19,8 +19,8 @@ const int kCameraVelocity = 10;
 const int kWindowMargin = 100;
 
 //!id
-const unsigned char kEnemyId = 148;
-const unsigned char kPlayerId = 161;
+const unsigned char kEnemyCode = 148;
+const unsigned char kPlayerCode = 161;
 
 //!player
 const int kPlayerVelocity = 7;

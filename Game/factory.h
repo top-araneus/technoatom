@@ -8,7 +8,7 @@ class Factory
   public:
     static GameObject* CreateCharacter(const int object_code, const LinearVector<int>& grid_coords, Engine& engine)
     {
-      if(object_code == kPlayerId)
+      if(object_code == kPlayerCode)
       {
         Texture player_texture;
         player_texture.loadFromFile(kPathToPlayerTexture);
@@ -17,7 +17,7 @@ class Factory
         engine.AddObject(*result);
         return result;
       }
-      else if(object_code == kEnemyId)
+      else if(object_code == kEnemyCode)
       {
         Texture enemy_texture;
         enemy_texture.loadFromFile(kPathToEnemyTexture);

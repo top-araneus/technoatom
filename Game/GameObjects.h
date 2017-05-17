@@ -84,6 +84,7 @@ class GameObject
     }
     virtual void NextFrame(char step = 1);
     void DecreaseHp(int damage);
+    bool CheckCellsNear(LinearVector<int> where_to, bool is_right);
 
   protected:
     bool CheckAlive()
@@ -138,20 +139,77 @@ void GameObject::DecreaseHp(int damage)
   }
 }
 
+bool GameObject::CheckCellsNear(LinearVector<int> where_to, bool is_right)
+{
+    LinearVector<double> right_ort = LinearVector<double>(1,0);
+    LinearVector<double> left_ort = LinearVector<double>(-1,0);
+    if (is_right) {
+        where_to.x_ = roundl(ref_coords_.x_ + velocity_.x_ + 0.5 * sprite_size_.x_ * right_ort.x_);
+        where_to.y_ = roundl(ref_coords_.y_ + velocity_.y_);
+    }
+    else {
+      where_to.x_ = roundl(ref_coords_.x_ + velocity_.x_ + 0.5 * sprite_size_.x_ * left_ort.x_);
+      where_to.y_ = roundl(ref_coords_.y_ + velocity_.y_);
+    }
+    LinearVector<int> new_cell = GetCellFromCoords(where_to);
+    if(InMap(new_cell))
+    {
+      if((*map_)[new_cell.x_][new_cell.y_] != this && (*map_)[new_cell.x_][new_cell.y_] != nullptr)
+      {
+        return false;
+      }
+      else
+      {
+        return true;
+      }
+    }
+
+}
+
 void GameObject::Move()
 {
   if(velocity_ != LinearVector<double>(0,0))
   {
-    LinearVector<double> ort = velocity_.GetNorm();
+    //LinearVector<double> ort = LinearVector<double>(1,0);
     LinearVector<int> where_to;
-    where_to.x_ = ref_coords_.x_ + velocity_.x_;
-    where_to.y_ = ref_coords_.y_ + velocity_.y_;
+    where_to.x_ = roundl(ref_coords_.x_ + velocity_.x_/* + 0.5 * sprite_size_.x_ * ort.x_*/);
+    where_to.y_ = roundl(ref_coords_.y_ + velocity_.y_);
     LinearVector<int> new_cell = GetCellFromCoords(where_to);
-    LinearVector<int> old_cell = grid_coords_;
-    if(InMap(new_cell))
+    if (CheckCellsNear(where_to, true) && CheckCellsNear(where_to, false) )
     {
-      GoToCellIfEmpty(old_cell, new_cell, where_to);
+        new_cell = GetCellFromCoords(where_to);
+        LinearVector<int> old_cell = grid_coords_;
+        if(InMap(new_cell))
+        {
+          GoToCellIfEmpty(old_cell, new_cell, where_to);
+        }
     }
+   /* if(InMap(new_cell))
+      {
+      if((*map_)[new_cell.x_][new_cell.y_] == nullptr)
+      {
+        where_to.x_ = roundl(ref_coords_.x_ + velocity_.x_);
+        where_to.y_ = roundl(ref_coords_.y_ + velocity_.y_);
+        new_cell = GetCellFromCoords(where_to);
+        LinearVector<int> old_cell = grid_coords_;
+      }
+      else if (((*map_)[new_cell.x_][new_cell.y_]->GetObjectCode()) == kPlayerCode)
+      {
+        where_to.x_ = roundl(ref_coords_.x_ + velocity_.x_);
+        where_to.y_ = roundl(ref_coords_.y_ + velocity_.y_);
+        new_cell = GetCellFromCoords(where_to);
+        LinearVector<int> old_cell = grid_coords_;
+        GoToCellIfEmpty(old_cell, new_cell, where_to);
+      }
+
+      if(InMap(new_cell))
+      {
+        GoToCellIfEmpty(old_cell, new_cell, where_to);
+      }
+    }*/
+
+
+
   }
 }
 
@@ -225,7 +283,7 @@ Player::Player(RenderWindow& window, SurfaceType& pMap, const LinearVector<int> 
   direction_ = GiveDirection();
   aim_of_interact_ = nullptr;
   hp_ = kPlayerHp;
-  object_code_ = kPlayerId;
+  object_code_ = kPlayerCode;
   time_last_frame_changing_ = clock();
   frames_per_second_ = kFramesPerSec;
 }
@@ -238,7 +296,7 @@ Player::~Player()
      {
      if((*map_)[i][j])
      {
-       if((*map_)[i][j]->GetObjectCode() == kEnemyId)
+       if((*map_)[i][j]->GetObjectCode() == kEnemyCode)
        {
        (*map_)[i][j]->SetAimOfInteract(nullptr);
        }
@@ -269,7 +327,7 @@ void Player::Interact()
 {
   if (aim_of_interact_ != nullptr)
   {
-    if (aim_of_interact_->GetObjectCode() == kEnemyId)
+    if (aim_of_interact_->GetObjectCode() == kEnemyCode)
     {
       if (aim_of_interact_->GetGridCoords().GetDistance(GetGridCoords()) <= kRangeOfPlayerAttack)
       {
@@ -312,7 +370,6 @@ void Player::DrawHp()
   std::string hp = std::to_string(hp_);
   sf::Font font;
   font.loadFromFile("fonts/font.ttf");
-
   sf::Text hp_text(hp, font);
   hp_text.setCharacterSize(40);
   hp_text.setColor(sf::Color::Green);
@@ -366,7 +423,7 @@ Enemy::Enemy(RenderWindow& window, SurfaceType& pMap, LinearVector<int> spriteSi
   velocity_ = LinearVector<double>(0,0);
   direction_ = GiveDirection();
   hp_ = kEnemyHp;
-  object_code_ = kEnemyId;
+  object_code_ = kEnemyCode;
   aim_of_interact_ = nullptr;
   time_last_frame_changing_ = clock();
   frames_per_second_ = kFramesPerSec;
@@ -427,7 +484,7 @@ void Enemy::CheckCellAndSetAim(LinearVector<int> coords)
   {
     if((*map_)[coords.x_][coords.y_] != nullptr)
     {
-      if((*map_)[coords.x_][coords.y_]->GetObjectCode() == kPlayerId)
+      if((*map_)[coords.x_][coords.y_]->GetObjectCode() == kPlayerCode)
       {
         aim_of_interact_ = (*map_)[coords.x_][coords.y_];
       }
