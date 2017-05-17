@@ -1,6 +1,5 @@
 #ifndef GAMEOBJECTS_H
 #define GAMEOBJECTS_H
-#include "refpoint.h"
 #include "transformation.h"
 #include <../stack/stack/smart_ptr.h>
 #include <../utils/print.h>

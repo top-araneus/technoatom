@@ -3,7 +3,7 @@
 #include "gameobjects.h"
 #include <SFML/Graphics.hpp>
 #include "constants.h"
-class Factory
+/*class Factory
 {
   public:
     static GameObject* CreateCharacter(const int object_code, const LinearVector<int>& grid_coords, Engine& engine)
@@ -32,6 +32,6 @@ class Factory
         return nullptr;
       }
     }
-};
+};*/
 
 #endif
