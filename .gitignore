@@ -45,3 +45,7 @@ Game/SFML*
 *.depend
 *.cbp
 *.depend
+ALU/ALU/ALU.pro
+*.exe
+*.o
+ALU/alu_bin/Makefile

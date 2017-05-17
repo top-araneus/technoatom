@@ -7,7 +7,6 @@
 #ifndef ALU_H
 #define ALU_H
 #include "math.h"
-#include "..\..\stack/stack/array.h"
 #include "..\..\stack/stack/stack.h"
 #include "..\..\utils\exception.h"
 #include "..\..\utils\print.h"
@@ -62,151 +61,44 @@ class ALU
 
 ALU::ALU(std::string filename)
 {
-  regs_.Resize(REGS_DEFAULT_SIZE);
-  code_.Resize(CODE_DEFAULT_SIZE);
-  Load("scripts/" + filename);
+  regs_.Resize(kRegsDefaultSize);
+  code_.Resize(kCodeDefaultSize);
+  Load("..\\..\\bin_code\\" + filename);
 }
 
-ALU::~ALU()
-{
-}
+ALU::~ALU(){}
 
 void ALU::Load(std::string filename)
 {
   std::ifstream fin(filename, std::ios_base::in | std::ios_base::binary);
+  if (!fin.is_open())
+	throw EFileCreationError(__FL__);
   BlockType buff;
   int cnt = 0;
-  if (!fin.is_open())
-    throw EFileCreationError(__FL__);
   while (fin.read((char*)&buff, sizeof(buff)))
   {
     code_[cnt++] = buff;
     if (code_.Size() - cnt == 0)
-      code_.Resize(code_.Size() + STEP);
+	{
+		code_.Resize(code_.Size() + kStep);
+	}
   }
   fin.close();
-
 }
 
 void ALU::Execute()
 {
-  int pos = 0;
-  while (code_[pos] != END)
-  {
-      if (code_[pos] == EXC){
-        throw EALUBadInstruction(__FL__);
-      }
-      else if(code_[pos] == PUSH_RG){
-        stack_.push(regs_[code_[++pos]]);
-        ++pos;
-      }
-      else if(code_[pos] == PUSH_VL){
-        stack_.push(code_[++pos]);
-        ++pos;
-      }
-      else if(code_[pos] == POP){
-        regs_[code_[++pos]] = stack_.pop();
-        ++pos;
-      }
-      else if(code_[pos] == ADD){
-        stack_.push(stack_.pop() + stack_.pop());
-        ++pos;
-      }
-      else if(code_[pos] == SUB){
-        BlockType subtr = stack_.pop();
-        stack_.push(stack_.pop() - subtr);
-        ++pos;
-      }
-      else if(code_[pos] == MUL){
-        stack_.push(stack_.pop() * stack_.pop());
-        ++pos;
-      }
-      else if(code_[pos] == DIV){
-        BlockType dividend = stack_.pop();
-        stack_.push(stack_.pop() / dividend);
-        ++pos;
-      }
-      else if(code_[pos] == JMP){
-        pos = code_[pos+1];
-      }
-      else if(code_[pos] == CALL){
-        call_.push(pos+2);
-        pos = code_[pos+1];
-      }
-      else if(code_[pos] == RET){
-        pos = call_.pop();
-      }
-      else if(code_[pos] == JE){
-        if (stack_.pop() == stack_.pop())
-          pos = code_[pos+1];
-        else
-          pos += 2;
-      }
-      else if(code_[pos] == JNE){
-        if (stack_.pop() != stack_.pop())
-          pos = code_[pos+1];
-        else
-          pos += 2;
-      }
-      else if(code_[pos] == JL){
-        if (stack_.pop() > stack_.pop())
-          pos = code_[pos+1];
-        else
-          pos += 2;
-      }
-      else if(code_[pos] == JLE){
-        if (stack_.pop() >= stack_.pop())
-          pos = code_[pos+1];
-        else
-          pos += 2;
-      }
-      else if(code_[pos] == JG){
-        if (stack_.pop() < stack_.pop())
-          pos = code_[pos+1];
-        else
-          pos += 2;
-      }
-      else if(code_[pos] == JGE){
-        if (stack_.pop() <= stack_.pop())
-          pos = code_[pos+1];
-        else
-          pos += 2;
-      }
-      else if(code_[pos] == SQRT){
-        stack_.push(sqrt(stack_.pop()));
-        ++pos;
-      }
-      else if(code_[pos] == NORM){
-        double x0 = stack_.pop();
-        double y0 = stack_.pop();
-        double x = stack_.pop();
-        double y = stack_.pop();
-        if (x == x0 && y == y0)
-        {
-          print("trying to divide by zero in ALU");
-          stack_.push(0);
-          stack_.push(0);
-        }
-        else
-        {
-          double res_x = (x - x0)/(sqrt((x-x0)*(x-x0) + (y-y0)*(y-y0)));
-          double res_y = (y - y0)/(sqrt((x-x0)*(x-x0) + (y-y0)*(y-y0)));
-          stack_.push(res_y);
-          stack_.push(res_x);
-        }
-        ++pos;
-      }
-      else if(code_[pos] == ABS){
-        double x = stack_.pop();
-        double y = stack_.pop();
-        double abs = sqrt(x*x + y*y);
-        stack_.push(abs);
-        ++pos;
-      }
-      else if(code_[pos] == END){
+  #define CMD(name, num, code)\
+	else if(code_[pos] == num)\
+	    code\
 
-      }
+  int pos = 0;
+  while (code_[pos] != kEnd)
+  {
+	  if(0){}
+      #include "alucommands.h"
   }
+  #undef CMD(name, num, code)
 }
 
 template <typename... Args>
