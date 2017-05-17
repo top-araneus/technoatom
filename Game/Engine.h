@@ -351,6 +351,11 @@ void Engine::Tact()
 {
   if (is_game_over_) {
     window_->draw(GetGameOver());
+    if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+    {
+      InitializationOfSurface();
+      is_game_over_ = false;
+    }
   }
   else {
     Control();
@@ -372,6 +377,14 @@ void Engine::Tact()
 
 void Engine::InitializationOfSurface()
 {
+  for (int i = 0; i < kTilesAtLine; ++i)
+  {
+    for (int j = 0; j < kTilesAtLine; ++j)
+    {
+      delete surface_[i][j];
+      surface_[i][j] = nullptr;
+    }
+  }
   for (int i=0; i<kTilesAtLine*kTilesAtLine; ++i)
   {
     if ((i/kTilesAtLine == 5) || (i%kTilesAtLine == 5) || (i/kTilesAtLine == kTilesAtLine-5)  || (i%kTilesAtLine == kTilesAtLine-5) )
