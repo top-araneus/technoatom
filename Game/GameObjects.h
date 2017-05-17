@@ -95,30 +95,30 @@ class GameObject
     {
       return (new_coords.x_ >= 0 && new_coords.x_ < kTilesAtLine && new_coords.y_ >= 0 && new_coords.y_ < kTilesAtLine);
     }
-    int hp_;
-    int cooldown_; //!< cooldown will be in milliseconds
-    LinearVector<double> velocity_; //set
-    LinearVector<int> ref_coords_;  //get
-    LinearVector<int> grid_coords_; //get
-    LinearVector<char> direction_;
-    unsigned char num_of_frames_; //get
-    unsigned char current_frame_; //set, get
-    unsigned char num_of_state_;
-    unsigned char current_state_; //set, get
-    unsigned char object_code_; //get
-    unsigned char frames_per_second_;
-    time_t time_last_frame_changing_;
-    int applied_damage_;
-    time_t attack_ending_time_ = 0; //get, set
-    time_t damage_ending_time_ = 0; //get, set
-    bool in_attack_ = false; //get, set
-    bool under_attack_ = false; //get, set
-    Texture texture_;
-    RenderWindow* window_;
-    LinearVector<int> sprite_size_; //!< width and height of sprite
-    Array<Array<GameObject*>>* map_; //! TODO: weak_ptr
-    ReferenceFrame* ref_frame_;
-    GameObject* aim_of_interact_; //set, get
+    int                         hp_;
+    int                         cooldown_; //!< cooldown will be in milliseconds
+    LinearVector<double>        velocity_;               //set
+    LinearVector<int>           ref_coords_;             //get
+    LinearVector<int>           grid_coords_;            //get
+    LinearVector<char>          direction_;
+    unsigned char               num_of_frames_;          //get
+    unsigned char               current_frame_;          //set, get
+    unsigned char               num_of_state_;
+    unsigned char               current_state_;          //set, get
+    unsigned char               object_code_;            //get
+    unsigned char               frames_per_second_;
+    time_t                      time_last_frame_changing_;
+    int                         applied_damage_;
+    time_t                      attack_ending_time_ = 0; //get, set
+    time_t                      damage_ending_time_ = 0; //get, set
+    bool                        in_attack_ = false;      //get, set
+    bool                        under_attack_ = false;   //get, set
+    Texture                     texture_;
+    RenderWindow*               window_;
+    LinearVector<int>           sprite_size_; //!< width and height of sprite
+    Array<Array<GameObject*>>*  map_; //! TODO: weak_ptr
+    ReferenceFrame*             ref_frame_;
+    GameObject*                 aim_of_interact_;        //get, set
 };
 
 typedef Array<Array<GameObject*>> SurfaceType;

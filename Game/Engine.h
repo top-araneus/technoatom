@@ -46,19 +46,20 @@ class Engine
     void            SetLastTime() {
       last_time_change = clock();
     }
+
   private:
-    SurfaceType surface_;
-    GroundType ground_;
-    AirType air_;
-    Texture ground_texture_;
-    Sprite ground_sprite_;
-    int num_of_grounds_;
-    ReferenceFrame frame_;
-    RenderWindow* window_;
-    Font font_;
-    Text game_over_;
-    time_t last_time_change;
-    bool is_game_over_;
+    SurfaceType     surface_;         //get
+    GroundType      ground_;
+    AirType         air_;
+    Texture         ground_texture_;
+    Sprite          ground_sprite_;
+    int             num_of_grounds_;
+    ReferenceFrame  frame_;           //get
+    RenderWindow*   window_;          //get
+    Font            font_;
+    Text            game_over_;       //get
+    time_t          last_time_change; //get, set
+    bool            is_game_over_;
 };
 
 Engine::Engine()

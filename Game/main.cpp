@@ -36,13 +36,7 @@ int main()
       if (event.type == sf::Event::Closed || Keyboard::isKeyPressed(Keyboard::Escape))
         engine.GetWindow().close();
     }
-    engine.GetWindow().clear();/*
-      engine.Control(*cilik);
-      engine.MoveAll();
-      engine.DrawGround();
-      engine.InteractAll();
-      engine.ChangeAllFrames();
-      engine.DrawAll();*/
+    engine.GetWindow().clear();
     engine.Tact(*cilik);
     engine.GetWindow().display();
   }
