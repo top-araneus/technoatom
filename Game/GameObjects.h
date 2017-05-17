@@ -82,14 +82,13 @@ class GameObject
     void              SetVelocity(LinearVector<double> velocity) {
       velocity_ = velocity;
     }
+    bool CheckAlive() {
+      return (hp_ > 0);
+    }
     virtual void NextFrame(char step = 1);
     void DecreaseHp(int damage);
 
   protected:
-    bool CheckAlive()
-    {
-      return (hp_ > 0);
-    }
     LinearVector<char> GiveDirection();
     void GoToCellIfEmpty(LinearVector<int> oldCell, LinearVector<int> cell, LinearVector<int> coords);
     bool InMap(LinearVector<int> new_coords)
@@ -132,10 +131,6 @@ LinearVector<char> GameObject::GiveDirection()
 void GameObject::DecreaseHp(int damage)
 {
   hp_ -= damage;
-  if (!(CheckAlive()))
-  {
-    delete this;
-  }
 }
 
 void GameObject::Move()
