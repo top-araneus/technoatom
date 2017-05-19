@@ -90,15 +90,14 @@ void ALU::Execute()
 {
   #define CMD(name, num, code)\
 	else if(code_[pos] == num)\
-	    code\
-
+	    code
   int pos = 0;
   while (code_[pos] != kEnd)
   {
 	  if(0){}
       #include "alucommands.h"
   }
-  #undef CMD(name, num, code)
+  #undef CMD
 }
 
 template <typename... Args>

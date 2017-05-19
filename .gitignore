@@ -49,3 +49,6 @@ ALU/ALU/ALU.pro
 *.exe
 *.o
 ALU/alu_bin/Makefile
+*.exe
+*.exe
+ALU/alu_bin/debug/main.o

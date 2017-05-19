@@ -78,11 +78,12 @@ void Translator(std::string input, std::string output)
     }
     std::ifstream fin(input.c_str(), std::ios_base::in);
     std::ofstream fout(output.c_str(), std::ios_base::out | std::ios_base::binary);
-	if (!fin.is_open())
-	{
+
+  if (!fin.is_open())
+  {
         cout << "File didn't open" << endl;
-		return;
-	}
+    return;
+  }
     std::string current_cmd;
     BlockType line_number = 0;
     while(!fin.eof())

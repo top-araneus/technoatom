@@ -12,4 +12,5 @@ TEMPLATE = app
 SOURCES += main.cpp
 
 HEADERS += \
-    alu.h
+    alu.h \
+    alucommands.h
