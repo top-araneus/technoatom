@@ -6,14 +6,11 @@
 #include "../../stack/stack/array.h"
 #include "typeconvert.h"
 
+
 class Command
 {
-  protected:
-  int num_of_args_ = 0;
-  BlockType index_of_cmd_;
-  Array<BlockType> arguments_;
-  std::map<std::string, BlockType>* marks_;
   public:
+  typedef std::map<std::string, BlockType> CommandMap;
   inline int GetNumOfArgs(){
     return num_of_args_;
   }
@@ -42,6 +39,11 @@ class Command
     WriteToFile(fout);
   }
   virtual ~Command() = 0;
+  protected:
+  int num_of_args_ = 0;
+  BlockType index_of_cmd_;
+  Array<BlockType> arguments_;
+  CommandMap* marks_;
 };
 
 class PushCmd : public Command
@@ -109,7 +111,7 @@ protected:
   }
 public:
   inline JmpCmd(){}
-  inline JmpCmd(std::map<std::string, BlockType>& marks)
+  inline JmpCmd(CommandMap& marks)
   {
     marks_ = &marks;
     num_of_args_ = 1;
@@ -141,7 +143,7 @@ public:
 
 class CallCmd : public JmpCmd
 {
-  inline CallCmd(std::map<std::string, BlockType>& marks)
+  inline CallCmd(CommandMap& marks)
   {
     marks_ = &marks;
     num_of_args_ = 1;
@@ -172,7 +174,7 @@ class RetCmd : public Command
 
 class JeCmd : public JmpCmd
 {
-  inline JeCmd(std::map<std::string, BlockType> marks)
+  inline JeCmd(CommandMap marks)
   {
     marks_ = &marks;
     num_of_args_ = 1;
@@ -190,7 +192,7 @@ class JeCmd : public JmpCmd
 
 class JneCmd : public JmpCmd
 {
-  inline JneCmd(std::map<std::string, BlockType> marks)
+  inline JneCmd(CommandMap marks)
   {
     marks_ = &marks;
     num_of_args_ = 1;
@@ -208,7 +210,7 @@ class JneCmd : public JmpCmd
 
 class JlCmd : public JmpCmd
 {
-  inline JlCmd(std::map<std::string, BlockType> marks)
+  inline JlCmd(CommandMap marks)
   {
     marks_ = &marks;
     num_of_args_ = 1;
@@ -226,7 +228,7 @@ class JlCmd : public JmpCmd
 
 class JleCmd : public JmpCmd
 {
-  inline JleCmd(std::map<std::string, BlockType> marks)
+  inline JleCmd(CommandMap marks)
   {
     marks_ = &marks;
     num_of_args_ = 1;
@@ -244,7 +246,7 @@ class JleCmd : public JmpCmd
 
 class JgCmd : public JmpCmd
 {
-  inline JgCmd(std::map<std::string, BlockType> marks)
+  inline JgCmd(CommandMap marks)
   {
     marks_ = &marks;
     num_of_args_ = 1;
@@ -262,7 +264,7 @@ class JgCmd : public JmpCmd
 
 class JgeCmd : public JmpCmd
 {
-  inline JgeCmd(std::map<std::string, BlockType> marks)
+  inline JgeCmd(CommandMap marks)
   {
     marks_ = &marks;
     num_of_args_ = 1;
@@ -411,89 +413,6 @@ class EndCmd : public Command
   virtual void ConvertToBin(std::ifstream& fin, std::ofstream& fout) override
   {
     Command::ConvertToBin(fin, fout);
-  }
-};
-
-class FactoryOfCommands
-{
-  static Command* CreateCommand(std::string name_of_command, std::map<std::string, BlockType> marks)
-  {
-    std::string push("push");
-    std::string pop("pop");
-    std::string jmp("jmp");
-    std::string call("call");
-    std::string ret("ret");
-    std::string je("je");
-    std::string jne("jne");
-    std::string jl("jl");
-    std::string jle("jle");
-    std::string jg("jg");
-    std::string jge("jge");
-    std::string add("add");
-    std::string sub("sub");
-    std::string mul("mul");
-    std::string div("div");
-    std::string sqrt("sqrt");
-    std::string norm("norm");
-    std::string abs("abs");
-    std::string end("end");
-    if(name_of_command == push){
-      return PushCmd();
-    }
-    else if(name_of_command == pop){
-      return PopCmd();
-    }
-    else if(name_of_command == jmp){
-      return JmpCmd(marks);
-    }
-    else if(name_of_command == call){
-      return CallCmd(marks);
-    }
-    else if(name_of_command == ret){
-      return RetCmd();
-    }
-    else if(name_of_command == je){
-      return JeCmd(marks);
-    }
-    else if(name_of_command == jne){
-      return JneCmd(marks);
-    }
-    else if(name_of_command == jl){
-      return JlCmd(marks);
-    }
-    else if(name_of_command == jle){
-      return JleCmd(marks);
-    }
-    else if(name_of_command == jg){
-      return JgCmd(marks);
-    }
-    else if(name_of_command == jge){
-      return JgeCmd(marks);
-    }
-    else if(name_of_command == add){
-      return AddCmd();
-    }
-    else if(name_of_command == sub){
-      return SubCmd();
-    }
-    else if(name_of_command == mul){
-      return MulCmd();
-    }
-    else if(name_of_command == div){
-      return DivCmd();
-    }
-    else if(name_of_command == sqrt){
-      return SqrtCmd();
-    }
-    else if(name_of_command == norm){
-      return NormCmd();
-    }
-    else if(name_of_command == abs){
-      return AbsCmd();
-    }
-    else if(name_of_command == end){
-      return EndCmd();
-    }
   }
 };
 

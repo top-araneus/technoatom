@@ -5,7 +5,7 @@
 #include <sstream>
 #include "../../../technoatom/stack/stack/array.h"
 #include "../../utils/alupa.h"
-
+#include "commandfactory.h"
 
 const int default_size = 200;
 const int default_value = -1;

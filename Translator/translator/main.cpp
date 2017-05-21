@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
   std::string from(argv[1]);
   std::string to(argv[2]);
   cout << "started" << endl;
-  Translator("..\\..\\source_code\\" + from, "..\\..\\bin_code\\" + to);
+  //Translator("..\\..\\source_code\\" + from, "..\\..\\bin_code\\" + to);
   cout << "done" << endl;
   return a.exec();
 

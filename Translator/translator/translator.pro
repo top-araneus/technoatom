@@ -26,4 +26,5 @@ HEADERS += \
     translator.h \
     transl.h \
     typeconvert.h \
-    ../../utils/alupa.h
+    ../../utils/alupa.h \
+    commandfactory.h
