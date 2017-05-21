@@ -71,9 +71,15 @@
 		<Unit filename="../stack/stack/smart_ptr.h" />
 		<Unit filename="../stack/stack/stack.h" />
 		<Unit filename="../utils/print.h" />
+		<Unit filename="Engine.h" />
 		<Unit filename="GameObjects.h" />
+		<Unit filename="Transformation.h" />
+		<Unit filename="constants.h" />
+		<Unit filename="dialogs.h" />
+		<Unit filename="factory.h" />
+		<Unit filename="linearvector.h" />
 		<Unit filename="main.cpp" />
-		<Unit filename="main.h" />
+		<Unit filename="refframe.h" />
 		<Unit filename="refpoint.h" />
 		<Extensions>
 			<code_completion />

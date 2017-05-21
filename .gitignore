@@ -45,3 +45,5 @@ Game/SFML*
 *.depend
 *.cbp
 *.depend
+*.cbp
+*.depend

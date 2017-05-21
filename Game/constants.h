@@ -46,4 +46,6 @@ const int               kEnemyHp = 15;
 //!ALU
 const std::string       kEnemyProgram("pursuit80.bin");
 
+//!Dialog windows
+const sf::Color kDialogWindowColor = sf::Color::Black;
 #endif // CONSTANTS_H

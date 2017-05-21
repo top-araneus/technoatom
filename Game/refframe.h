@@ -29,6 +29,9 @@ class ReferenceFrame
   int  GetY() {
     return coords_.y_;
   }
+  LinearVector<int> GetCoords() {
+    return coords_;
+  }
 
   LinearVector<int> size_;
 
