@@ -1,419 +1,141 @@
 #ifndef TRANSL_H
 #define TRANSL_H
-#include <string>
+
+#include "commandfactory.h"
+#include "fstream"
+#include "iostream"
+#include "sstream"
+#include "../../../technoatom/stack/stack/array.h"
+#include <cstdio>
 #include <map>
-#include "../../utils/alupa.h"
-#include "../../stack/stack/array.h"
-#include "typeconvert.h"
 
-
-class Command
+class Translator
 {
-  public:
-  typedef std::map<std::string, BlockType> CommandMap;
-  inline int GetNumOfArgs(){
-    return num_of_args_;
-  }
-  virtual void FillIndexOfCmd(std::ifstream& fin) = 0;
-  virtual void FillArguments(std::ifstream& fin)
-  {
-     for(int i = 0; i < num_of_args_; i++)
-     {
-       std::string word;
-       fin >> word;
-       arguments_.PushBack(fromString<BlockType>(word));
-     }
-  }
-  inline void WriteToFile(std::ofstream& fout)
-  {
-    fout.write((char*)&index_of_cmd_, sizeof(index_of_cmd_));
-    for(auto it = arguments_.begin(); it != arguments_.end(); ++it)
-    {
-      fout.write((char*)&(*it), sizeof(*it));
-    }
-  }
-  virtual void ConvertToBin(std::ifstream& fin, std::ofstream& fout)
-  {
-    FillIndexOfCmd(fin);
-    FillArguments(fin);
-    WriteToFile(fout);
-  }
-  virtual ~Command() = 0;
-  protected:
-  int num_of_args_ = 0;
-  BlockType index_of_cmd_;
-  Array<BlockType> arguments_;
-  CommandMap* marks_;
-};
-
-class PushCmd : public Command
-{
-  private:
-  inline bool IsRegisterArg(std::string& word)
-  {
-    return (word[0] == 'x');
-  }
-  public:
-  inline PushCmd()
-  {
-    num_of_args_ = 1;
-  }
-  virtual void FillIndexOfCmd(std::ifstream& fin) override
-  {
-    int initial_pos_in_file = fin.tellg();
-    std::string word;
-    fin >> word;
-    if(IsRegisterArg(word)){
-    word.erase(0, 1);
-    index_of_cmd_ = kPushRG;
-    }
-    else{
-    index_of_cmd_ = kPushVL;
-    }
-    fin.seekg(initial_pos_in_file);
-  }
-  virtual void FillArguments(std::ifstream& fin) override
-  {
-    Command::FillArguments(fin);
-  }
-  virtual void ConvertToBin(std::ifstream& fin, std::ofstream& fout) override
-  {
-    Command::ConvertToBin(fin, fout);
-  }
-};
-
-class PopCmd : public Command
-{
-  inline PopCmd()
-  {
-    num_of_args_ = 1;
-    index_of_cmd_ = kPop;
-  }
-  virtual void FillArguments(std::ifstream& fin) override
-  {
-    std::string word;
-    fin >> word;
-    word.erase(0, 1);
-    arguments_.PushBack(fromString<BlockType>(word));
-  }
-  virtual void ConvertToBin(std::ifstream& fin, std::ofstream& fout) override
-  {
-    Command::ConvertToBin(fin, fout);
-  }
-};
-
-class JmpCmd : public Command
-{
-protected:
-  inline bool IsMark(std::string word)
-  {
-    return (word[0] == '>');
-  }
 public:
-  inline JmpCmd(){}
-  inline JmpCmd(CommandMap& marks)
+  inline Translator(string& in, string& out);
+  void CollectIncludes(ifstream& input, Array<string>& list_of_includes_);
+  void FirstPass();
+  void CollectMarks();
+  void SecondPass();
+  void ThirdPass();
+  ~Translator();
+private:
+  typename Command::TypeOfMarksMap marks_;
+  CommandFactory factory_;
+  std::ifstream file_input_;
+  std::fstream file_full_instruction_;
+  std::ofstream file_out_;
+  Array<string> list_of_includes_;
+  bool IsMark(string word);
+  bool IsInclude(string word);
+};
+
+Translator::Translator(string& in, string& out)
+{
+  factory_.FillCommands();
+  file_input_.open(in.c_str());
+  file_full_instruction_.open("__tmp_full_instruction_");
+  file_out_.open(out.c_str(), ios_base::binary);
+}
+
+void Translator::CollectIncludes(ifstream& fin, Array<string>& list_of_includes)
+{
+  string word;
+  fin.seekg(0,ios_base::beg);
+  while (fin)
   {
-    marks_ = &marks;
-    num_of_args_ = 1;
-    index_of_cmd_ = kJmp;
-  }
-  virtual void FillArguments(std::ifstream& fin) override
-  {
-    std::string word;
     fin >> word;
-    if(IsMark(word)){
+    if (IsInclude(word))
+    {
+      fin >> word;
+      list_of_includes.PushBack(word);
+      ifstream next_input(word.c_str());
+      CollectIncludes(next_input, list_of_includes);
+    }
+  }
+}
+
+void Translator::FirstPass( )
+{
+  CollectIncludes(file_input_, list_of_includes_);
+  file_input_ >> file_full_instruction_;
+  for (auto it = list_of_includes_.begin(); it != list_of_includes_.end(); ++it)
+  {
+    ifstream tmp((*it).c_str());
+    tmp >> file_full_instruction_;
+    tmp.close();
+  }
+}
+
+inline bool Translator::IsMark(string word)
+{
+  return (word[0] == ':');
+}
+
+inline bool Translator::IsInclude(string word)
+{
+  return (word == string("include"));
+}
+
+void Translator::CollectMarks()
+{
+  std::string word;
+  double current_num_of_word = 0;
+  file_full_instruction_.seekg(0,ios_base::beg);
+  while(file_full_instruction_)
+  {
+    file_full_instruction_ >> word;
+    current_num_of_word += 1;
+    if (IsInclude(word)){
+      file_full_instruction_ >> word;
+      current_num_of_word += 1;
+    }
+    else if (IsMark(word)){
       word.erase(0, 1);
-      auto number_of_line = marks_->find(word);
-      if (number_of_line != marks_->end()){
-        arguments_.PushBack(number_of_line->second);
-      }
-      else{
-        print("Mark: /# did not found",word);
-      }
+      marks_.insert(std::pair<std::string, double>(word, current_num_of_word + 1));
+      file_full_instruction_ >> word;
+      current_num_of_word += 1;
     }
     else{
-      arguments_.PushBack(fromString<BlockType>(word));
+      Command* cmd = factory_.Create(word, &marks_);
+      cmd->SkipArguments(file_full_instruction_);
+      current_num_of_word += cmd->GetNumOfArgs();
+      delete cmd;
     }
   }
-  virtual void ConvertToBin(std::ifstream& fin, std::ofstream& fout)
-  {
-    Command::ConvertToBin(fin, fout);
-  }
-};
+}
 
-class CallCmd : public JmpCmd
+void Translator::SecondPass()
 {
-  inline CallCmd(CommandMap& marks)
-  {
-    marks_ = &marks;
-    num_of_args_ = 1;
-    index_of_cmd_ = kCall;
-  }
-  virtual void FillArguments(std::ifstream& fin) override
-  {
-    JmpCmd::FillArguments(fin);
-  }
-  virtual void ConvertToBin(std::ifstream& fin, std::ofstream& fout) override
-  {
-    Command::ConvertToBin(fin, fout);
-  }
-};
+  CollectMarks();
+}
 
-class RetCmd : public Command
+void Translator::ThirdPass()
 {
-  inline RetCmd()
+  string word;
+  file_full_instruction_.seekg(0,ios_base::beg);
+  while(file_full_instruction_)
   {
-    num_of_args_ = 0;
-    index_of_cmd_ = kRet;
+    file_full_instruction_ >> word;
+    if(IsMark(word) || IsInclude(word)){
+      file_full_instruction_ >> word;
+    }
+    else{
+      Command* cmd = factory_.Create(word, &marks_);
+      cmd->ConvertToBin((std::ifstream&)file_full_instruction_, file_out_);
+      delete cmd;
+    }
   }
-  virtual void ConvertToBin(std::ifstream& fin, std::ofstream& fout) override
-  {
-    Command::ConvertToBin(fin, fout);
-  }
-};
+}
 
-class JeCmd : public JmpCmd
-{
-  inline JeCmd(CommandMap marks)
-  {
-    marks_ = &marks;
-    num_of_args_ = 1;
-    index_of_cmd_ = kJe;
-  }
-  virtual void FillArguments(std::ifstream& fin) override
-  {
-    JmpCmd::FillArguments(fin);
-  }
-  virtual void ConvertToBin(std::ifstream& fin, std::ofstream& fout) override
-  {
-    Command::ConvertToBin(fin, fout);
-  }
-};
 
-class JneCmd : public JmpCmd
+Translator::~Translator()
 {
-  inline JneCmd(CommandMap marks)
-  {
-    marks_ = &marks;
-    num_of_args_ = 1;
-    index_of_cmd_ = kJne;
-  }
-  virtual void FillArguments(std::ifstream& fin) override
-  {
-    JmpCmd::FillArguments(fin);
-  }
-  virtual void ConvertToBin(std::ifstream& fin, std::ofstream& fout) override
-  {
-    Command::ConvertToBin(fin, fout);
-  }
-};
+  file_input_.close();
+  file_full_instruction_.close();
+  file_out_.close();
+  remove("__tmp_full_instruction_");
+}
 
-class JlCmd : public JmpCmd
-{
-  inline JlCmd(CommandMap marks)
-  {
-    marks_ = &marks;
-    num_of_args_ = 1;
-    index_of_cmd_ = kJl;
-  }
-  virtual void FillArguments(std::ifstream& fin) override
-  {
-    JmpCmd::FillArguments(fin);
-  }
-  virtual void ConvertToBin(std::ifstream& fin, std::ofstream& fout) override
-  {
-    Command::ConvertToBin(fin, fout);
-  }
-};
-
-class JleCmd : public JmpCmd
-{
-  inline JleCmd(CommandMap marks)
-  {
-    marks_ = &marks;
-    num_of_args_ = 1;
-    index_of_cmd_ = kJle;
-  }
-  virtual void FillArguments(std::ifstream& fin) override
-  {
-    JmpCmd::FillArguments(fin);
-  }
-  virtual void ConvertToBin(std::ifstream& fin, std::ofstream& fout) override
-  {
-    Command::ConvertToBin(fin, fout);
-  }
-};
-
-class JgCmd : public JmpCmd
-{
-  inline JgCmd(CommandMap marks)
-  {
-    marks_ = &marks;
-    num_of_args_ = 1;
-    index_of_cmd_ = kJg;
-  }
-  virtual void FillArguments(std::ifstream& fin) override
-  {
-    JmpCmd::FillArguments(fin);
-  }
-  virtual void ConvertToBin(std::ifstream& fin, std::ofstream& fout) override
-  {
-    Command::ConvertToBin(fin, fout);
-  }
-};
-
-class JgeCmd : public JmpCmd
-{
-  inline JgeCmd(CommandMap marks)
-  {
-    marks_ = &marks;
-    num_of_args_ = 1;
-    index_of_cmd_ = kJge;
-  }
-  virtual void FillArguments(std::ifstream& fin) override
-  {
-    JmpCmd::FillArguments(fin);
-  }
-  virtual void ConvertToBin(std::ifstream& fin, std::ofstream& fout) override
-  {
-    Command::ConvertToBin(fin, fout);
-  }
-};
-
-class AddCmd : public Command
-{
-  inline AddCmd()
-  {
-    num_of_args_ = 0;
-    index_of_cmd_ = kAdd;
-  }
-  virtual void FillArguments(std::ifstream& fin) override
-  {
-    Command::FillArguments(fin);
-  }
-  virtual void ConvertToBin(std::ifstream& fin, std::ofstream& fout) override
-  {
-    Command::ConvertToBin(fin, fout);
-  }
-};
-
-class SubCmd : public Command
-{
-  inline SubCmd()
-  {
-    num_of_args_ = 0;
-    index_of_cmd_ = kSub;
-  }
-  virtual void FillArguments(std::ifstream& fin) override
-  {
-    Command::FillArguments(fin);
-  }
-  virtual void ConvertToBin(std::ifstream& fin, std::ofstream& fout) override
-  {
-    Command::ConvertToBin(fin, fout);
-  }
-};
-
-class MulCmd : public Command
-{
-  inline MulCmd()
-  {
-    num_of_args_ = 0;
-    index_of_cmd_ = kMul;
-  }
-  virtual void FillArguments(std::ifstream& fin) override
-  {
-    Command::FillArguments(fin);
-  }
-  virtual void ConvertToBin(std::ifstream& fin, std::ofstream& fout) override
-  {
-    Command::ConvertToBin(fin, fout);
-  }
-};
-
-class DivCmd : public Command
-{
-  inline DivCmd()
-  {
-    num_of_args_ = 0;
-    index_of_cmd_ = kDiv;
-  }
-  virtual void FillArguments(std::ifstream& fin) override
-  {
-    Command::FillArguments(fin);
-  }
-  virtual void ConvertToBin(std::ifstream& fin, std::ofstream& fout) override
-  {
-    Command::ConvertToBin(fin, fout);
-  }
-};
-
-class SqrtCmd : public Command
-{
-  inline SqrtCmd()
-  {
-    num_of_args_ = 0;
-    index_of_cmd_ = kSqrt;
-  }
-  virtual void FillArguments(std::ifstream& fin) override
-  {
-    Command::FillArguments(fin);
-  }
-  virtual void ConvertToBin(std::ifstream& fin, std::ofstream& fout) override
-  {
-    Command::ConvertToBin(fin, fout);
-  }
-};
-
-class NormCmd : public Command
-{
-  inline NormCmd()
-  {
-    num_of_args_ = 4;
-    index_of_cmd_ = kNorm;
-  }
-  virtual void FillArguments(std::ifstream& fin) override
-  {
-    Command::FillArguments(fin);
-  }
-  virtual void ConvertToBin(std::ifstream& fin, std::ofstream& fout) override
-  {
-    Command::ConvertToBin(fin, fout);
-  }
-};
-
-class AbsCmd : public Command
-{
-  inline AbsCmd()
-  {
-    num_of_args_ = 2;
-    index_of_cmd_ = kAbs;
-  }
-  virtual void FillArguments(std::ifstream& fin) override
-  {
-    Command::FillArguments(fin);
-  }
-  virtual void ConvertToBin(std::ifstream& fin, std::ofstream& fout) override
-  {
-    Command::ConvertToBin(fin, fout);
-  }
-};
-
-class EndCmd : public Command
-{
-  inline EndCmd()
-  {
-    num_of_args_ = 0;
-    index_of_cmd_ = kEnd;
-  }
-  virtual void FillArguments(std::ifstream& fin) override
-  {
-    Command::FillArguments(fin);
-  }
-  virtual void ConvertToBin(std::ifstream& fin, std::ofstream& fout) override
-  {
-    Command::ConvertToBin(fin, fout);
-  }
-};
 
 #endif // TRANSL_H

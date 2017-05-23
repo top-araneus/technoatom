@@ -54,3 +54,5 @@ ALU/alu_bin/Makefile
 ALU/alu_bin/debug/main.o
 *.user
 *.o
+*.user
+Translator/translator/translator.pro
