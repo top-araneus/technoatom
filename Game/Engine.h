@@ -20,9 +20,10 @@ class Engine
     void MoveAll();
     void InteractAll();
     void ChangeAllFrames();
-    void Control(GameObject& player);
+    void Control();
     void ClearDead();
-    void Tact(GameObject& player);
+    void Tact();
+    void InitializationOfSurface();
     void AddObject(GameObject& obj)
     {
       surface_[obj.GetGridCoords().x_][obj.GetGridCoords().y_] = &obj;
@@ -60,6 +61,37 @@ class Engine
     Text            game_over_;       //get
     time_t          last_time_change; //get, set
     bool            is_game_over_;
+    GameObject*     player_;
+    class Factory
+    {
+      public:
+        static GameObject* CreateCharacter(const int object_code, const LinearVector<int>& grid_coords, Engine& engine)
+        {
+          if(object_code == kPlayerId)
+          {
+            Texture player_texture;
+            player_texture.loadFromFile(kPathToPlayerTexture);
+            Player* result = new Player(engine.GetWindow(), engine.GetMap(), kStandartSpriteSizeOfPlayer, player_texture,
+                                        grid_coords, engine.GetFrame(), kNumOfPlayerFrames, kNumOfPlayerStates);
+            engine.AddObject(*result);
+            return result;
+          }
+          else if(object_code == kEnemyId)
+          {
+            Texture enemy_texture;
+            enemy_texture.loadFromFile(kPathToEnemyTexture);
+            Enemy* result = new Enemy(engine.GetWindow(), engine.GetMap(), kStandartSpriteSizeOfEnemy, enemy_texture,
+                                        grid_coords, engine.GetFrame(), kNumOfEnemyFrames, kNumOfEnemyStates);
+            engine.AddObject(*result);
+            return result;
+          }
+          else
+          {
+            print("Object: /# is not created", object_code);
+            return nullptr;
+          }
+        }
+    };
 };
 
 Engine::Engine()
@@ -239,7 +271,7 @@ void Engine::ClearDead()
 }
 
 
-void Engine::Control(GameObject& player)
+void Engine::Control()
 {
   LinearVector<double> new_velocity(0,0);
   if (Keyboard::isKeyPressed(Keyboard::A)) {
@@ -258,7 +290,7 @@ void Engine::Control(GameObject& player)
   new_velocity = new_velocity.GetNorm();
   new_velocity.x_ *= kPlayerVelocity;
   new_velocity.y_ *= kPlayerVelocity;
-  player.SetVelocity(new_velocity);
+  player_->SetVelocity(new_velocity);
   if (Keyboard::isKeyPressed(Keyboard::Right) || sf::Mouse::getPosition(*window_).x > kWindowWidth-kWindowMargin) {
     if (sf::Mouse::getPosition(*window_).x > kWindowWidth-kWindowMargin/2)
     {
@@ -308,20 +340,25 @@ void Engine::Control(GameObject& player)
     LinearVector<int> cell_coords = GetCellFromCoords(coords);
     if (cell_coords.x_ >= 0 && cell_coords.y_ >= 0 && cell_coords.x_ < kTilesAtLine && cell_coords.y_ < kTilesAtLine)
     {
-      player.SetAimOfInteract(GetMap()[cell_coords.x_][cell_coords.y_]);
-      player.Interact();
-      player.SetAimOfInteract(nullptr);
+      player_->SetAimOfInteract(GetMap()[cell_coords.x_][cell_coords.y_]);
+      player_->Interact();
+      player_->SetAimOfInteract(nullptr);
     }
   }
 }
 
-void Engine::Tact(GameObject& player)
+void Engine::Tact()
 {
   if (is_game_over_) {
     window_->draw(GetGameOver());
+    if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+    {
+      InitializationOfSurface();
+      is_game_over_ = false;
+    }
   }
   else {
-    Control(player);
+    Control();
     if ((clock() - GetLastTime()) > kTactTime)
     {
       MoveAll();
@@ -336,5 +373,25 @@ void Engine::Tact(GameObject& player)
     ClearDead();
     DrawAll();
   }
+}
+
+void Engine::InitializationOfSurface()
+{
+  for (int i = 0; i < kTilesAtLine; ++i)
+  {
+    for (int j = 0; j < kTilesAtLine; ++j)
+    {
+      delete surface_[i][j];
+      surface_[i][j] = nullptr;
+    }
+  }
+  for (int i=0; i<kTilesAtLine*kTilesAtLine; ++i)
+  {
+    if ((i/kTilesAtLine == 5) || (i%kTilesAtLine == 5) || (i/kTilesAtLine == kTilesAtLine-5)  || (i%kTilesAtLine == kTilesAtLine-5) )
+    {
+      Factory::CreateCharacter(kEnemyId, LinearVector<int>(i/kTilesAtLine,i%kTilesAtLine), *this);
+    }
+  }
+  player_ = Factory::CreateCharacter(kPlayerId, LinearVector<int>(14,16), *this);
 }
 #endif // ENGINE_H

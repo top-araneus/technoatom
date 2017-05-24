@@ -26,6 +26,7 @@ const int               kPlayerVelocity = 7;
 const time_t            kPlayerCoolDown = 25;
 const int               kRangeOfPlayerAttack = 3;
 const int               kPlayerHp = 100;
+const int               kXpStep = 10;
 const LinearVector<int> kStandartSpriteSizeOfPlayer = LinearVector<int>(160,192);
 const unsigned char     kNumOfPlayerStates = 1;
 const unsigned char     kNumOfPlayerFrames = 4;

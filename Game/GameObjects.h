@@ -1,6 +1,5 @@
 #ifndef GAMEOBJECTS_H
 #define GAMEOBJECTS_H
-#include "refpoint.h"
 #include "transformation.h"
 #include <../stack/stack/smart_ptr.h>
 #include <../utils/print.h>
@@ -187,10 +186,16 @@ class Player: public GameObject
     virtual void Draw();
     virtual void Interact();
     virtual void NextFrame(char step = 1);
-    void DrawHp();
+    void DrawHUD();
     virtual void DecreaseHp(int damage)
     {
       GameObject::DecreaseHp(damage);
+    }
+    int GetXp(){
+      return xp_;
+    }
+    void SetXp(int xp){
+      xp_ = xp;
     }
     virtual void Move()
     {
@@ -198,6 +203,7 @@ class Player: public GameObject
     }
 
   private:
+    int xp_;                 //get, set
     bool next_sprite_right = true;
 };
 
@@ -223,6 +229,7 @@ Player::Player(RenderWindow& window, SurfaceType& pMap, const LinearVector<int> 
   object_code_ = kPlayerId;
   time_last_frame_changing_ = clock();
   frames_per_second_ = kFramesPerSec;
+  SetXp(0);
 }
 
 Player::~Player()
@@ -256,7 +263,7 @@ void Player::Draw()
     player_sprite.setColor(sf::Color(255,128,128));
   else
     player_sprite.setColor(sf::Color(255,255,255));
-  DrawHp();
+  DrawHUD();
   window_->draw(player_sprite);
 }
 
@@ -274,6 +281,7 @@ void Player::Interact()
           aim_of_interact_->DecreaseHp(applied_damage_);
           aim_of_interact_->SetUnderAttack(true);
           aim_of_interact_->SetDamageEndingTime(clock() + kPlayerCoolDown);
+          SetXp(xp_ + kXpStep);
         }
       }
     }
@@ -302,17 +310,24 @@ void Player::NextFrame(char step)
   }
 }
 
-void Player::DrawHp()
+void Player::DrawHUD()
 {
-  std::string hp = std::to_string(hp_);
+  std::string hp = std::string("Health: ") + std::to_string(hp_);
+  std::string xp = std::string("Points: ") + std::to_string(xp_);
   sf::Font font;
   font.loadFromFile("fonts/font.ttf");
 
   sf::Text hp_text(hp, font);
   hp_text.setCharacterSize(40);
   hp_text.setColor(sf::Color::Green);
-  hp_text.setPosition(kWindowWidth - 120, 10);
+  hp_text.setPosition(kWindowWidth - 300, 10);
   window_->draw(hp_text);
+
+  sf::Text xp_text(xp, font);
+  xp_text.setCharacterSize(40);
+  xp_text.setColor(sf::Color::Red);
+  xp_text.setPosition(50, 10);
+  window_->draw(xp_text);
 }
 
 
