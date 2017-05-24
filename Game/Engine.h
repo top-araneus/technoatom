@@ -2,6 +2,7 @@
 #define ENGINE_H
 
 #include "GameObjects.h"
+#include "dialogmanager.h"
 using namespace sf;
 
 typedef Array<Array<unsigned char>> GroundType;
@@ -62,6 +63,7 @@ class Engine
     time_t          last_time_change; //get, set
     bool            is_game_over_;
     GameObject*     player_;
+    DialogManager*   dialog_manager_;
     class Factory
     {
       public:
@@ -107,12 +109,16 @@ Engine::Engine()
   num_of_grounds_ = ground_texture_.getSize().x / kCellWidth;
   ground_sprite_.setTexture(ground_texture_);
   ground_sprite_.setTextureRect(IntRect(0, 0, kCellWidth, kCellHeight));
-  font_.loadFromFile("fonts/font.ttf");
+  font_.loadFromFile(kFontPath);
   game_over_ = Text("GAME OVER", font_, 48);
   game_over_.setColor(Color(255,0,0));
   game_over_.setPosition(kWindowWidth/2 - 100, kWindowHeight/2);
   is_game_over_ = false;
   SetLastTime();
+  dialog_manager_ = new DialogManager(window_);
+  DialogWindow* dialog = dialog_manager_->AddDialog(LinearVector<int>(300,300), LinearVector<int>(300,300));
+  dialog->SetVisible(true);
+  dialog->AddButton(LinearVector<int>(100,50), LinearVector<int>(100,100), "Hello!");
 }
 
 Engine::~Engine()
@@ -210,6 +216,8 @@ void Engine::DrawAll()
     last_x_index += 1;
     cell_coords = LinearVector<int>(last_x_index, 0);
   }
+
+  dialog_manager_->DrawDialogs();
 }
 
 void Engine::MoveAll()
