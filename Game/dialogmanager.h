@@ -8,6 +8,9 @@ private:
   Array<DialogWindow*> dialogs_;
   RenderWindow* window_;
 public:
+  Array<DialogWindow*>& GetDialogs() {
+    return dialogs_;
+  }
   DialogManager(RenderWindow* window);
   void OnClick(LinearVector<int> coords);
   void DrawDialogs();

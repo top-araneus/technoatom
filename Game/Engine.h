@@ -119,6 +119,9 @@ Engine::Engine()
   DialogWindow* dialog = dialog_manager_->AddDialog(LinearVector<int>(300,300), LinearVector<int>(300,300));
   dialog->SetVisible(true);
   dialog->AddButton(LinearVector<int>(100,50), LinearVector<int>(100,100), "Hello!");
+  DialogWindow* dialog2 = dialog_manager_->AddDialog(LinearVector<int>(600,300), LinearVector<int>(700,400));
+  dialog2->SetVisible(true);
+  dialog2->AddButton(LinearVector<int>(200,100), LinearVector<int>(100,100), "World!");
 }
 
 Engine::~Engine()
