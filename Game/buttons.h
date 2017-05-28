@@ -13,7 +13,7 @@ public:
     sf::Text text_; //get
     std::string caption_;
     sf::Font font_;
-    void OnClick();
+    Delegate OnClick;
     void Draw();
     bool GetVisible() {
       return visible_;

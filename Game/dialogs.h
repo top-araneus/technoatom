@@ -25,6 +25,7 @@ class DialogWindow
     const void                SetVisible(bool value) {
       is_visible_ = value;
     }
+    void Close();
   protected:
     bool is_visible_;
     LinearVector<int> constraints_;
@@ -52,6 +53,12 @@ DialogWindow::DialogWindow(LinearVector<int> constraints, LinearVector<int> coor
   }
   is_visible_ = true;
   buttons_[0] = ButtonFactory::GetExitButton(constraints, coords);
+ buttons_[0]->OnClick.Connect(this, &DialogWindow::Close);
+}
+
+void DialogWindow::Close()
+{
+  is_visible_ = false;
 }
 
 Button* DialogWindow::AddButton(LinearVector<int> constraints, LinearVector<int> coords, std::string caption)

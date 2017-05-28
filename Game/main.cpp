@@ -6,6 +6,7 @@ bool in_death = false;
 using namespace sf;
 #include <iostream>
 #include <windows.h>
+#include "delegates.h"
 #include <../utils/print.h>
 #include <../ALU/ALU/alu.h>
 #include <../stack/stack/stack.h>

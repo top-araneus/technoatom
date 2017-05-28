@@ -48,7 +48,7 @@ class Engine
     void            SetLastTime() {
       last_time_change = clock();
     }
-
+DialogWindow* dialog; //! REMOVE AFTER TEST
   private:
     SurfaceType     surface_;         //get
     GroundType      ground_;
@@ -116,7 +116,7 @@ Engine::Engine()
   is_game_over_ = false;
   SetLastTime();
   dialog_manager_ = new DialogManager(window_);
-  DialogWindow* dialog = dialog_manager_->AddDialog(LinearVector<int>(300,300), LinearVector<int>(300,300));
+  /*DialogWindow* */dialog = dialog_manager_->AddDialog(LinearVector<int>(300,300), LinearVector<int>(300,300));
   dialog->SetVisible(true);
   dialog->AddButton(LinearVector<int>(100,50), LinearVector<int>(100,100), "Hello!");
   DialogWindow* dialog2 = dialog_manager_->AddDialog(LinearVector<int>(600,300), LinearVector<int>(700,400));
@@ -355,6 +355,10 @@ void Engine::Control()
       player_->Interact();
       player_->SetAimOfInteract(nullptr);
     }
+  }
+  if (sf::Mouse::isButtonPressed(sf::Mouse::Middle))
+  {
+    dialog->GetButtons()[0]->OnClick();
   }
 }
 
