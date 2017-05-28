@@ -26,10 +26,10 @@ class DialogWindow
       is_visible_ = value;
     }
     void Close();
-  protected:
-    bool is_visible_;
     LinearVector<int> constraints_;
     LinearVector<int> coords_;
+  protected:
+    bool is_visible_;
     sf::Color background_color_;
     Array<Button*> buttons_;  //get
     Array<sf::Text*> texts_;  //get

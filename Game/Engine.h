@@ -98,7 +98,7 @@ DialogWindow* dialog; //! REMOVE AFTER TEST
 
 Engine::Engine()
 {
-	RenderWindow* window = new RenderWindow(sf::VideoMode(kWindowWidth, kWindowHeight), "Cyberpunk Universe", sf::Style::Fullscreen);
+	RenderWindow* window = new RenderWindow(sf::VideoMode(kWindowWidth, kWindowHeight), "Cyberpunk Universe"/*, sf::Style::Fullscreen*/);
   window_ = window;
   window_->setFramerateLimit(kFrameRate);
   window_->setVerticalSyncEnabled(true);
@@ -344,6 +344,12 @@ void Engine::Control()
   }
 
 
+  if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+  {
+    LinearVector<int> coords = LinearVector<int>(sf::Mouse::getPosition(*window_).x,
+                                                  sf::Mouse::getPosition(*window_).y);
+    dialog_manager_->ManageClicks(coords);
+  }
   if (sf::Mouse::isButtonPressed(sf::Mouse::Right))
   {
     LinearVector<int> coords = LinearVector<int>(sf::Mouse::getPosition(*window_).x - GetFrame().GetX(),

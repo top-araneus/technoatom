@@ -15,6 +15,7 @@ public:
   void OnClick(LinearVector<int> coords);
   void DrawDialogs();
   DialogWindow* AddDialog(LinearVector<int> constraints, LinearVector<int> coords);
+  bool ManageClicks(LinearVector<int> coords);
 };
 
 DialogManager::DialogManager(RenderWindow* window)
@@ -74,4 +75,37 @@ void DialogManager::DrawDialogs()
     }
   }
 }
+
+bool DialogManager::ManageClicks(LinearVector<int> coords)
+{
+  for (int i = 0; i<kDialogsMaxNumber; ++i)
+  {
+    if (dialogs_[i] != nullptr)
+    {
+      DialogWindow* dialog = dialogs_[i];
+      for (int j = 0; j<kDialogElemsMaxNumber; ++j)
+      {
+        if (dialog->GetButtons()[j] != nullptr)
+        {
+          Button* button = dialog->GetButtons()[j];
+          int x = coords.x_;
+          int y = coords.y_;
+          int button_x = dialog->coords_.x_ + button->coords_.x_;
+          int button_y = dialog->coords_.y_ + button->coords_.y_;
+          int button_width = button->constraints_.x_;
+          int button_height = button->constraints_.y_;
+          print("Clicked to /# /#, window /# button /# on /# /# with constraints /# /#\n", x,y,i,j,button_x, button_y, button_width, button_height);
+          if (dialogs_[i]->GetVisible() && (x > button_x && x < (button_x + button_width)) && (y > button_y && y < (button_y + button_height)))
+          {
+            button->OnClick();
+            return true;
+          }
+        }
+      }
+    }
+    else break;
+  }
+  return false;
+}
+
 #endif // DIALOGMANAGER_H
