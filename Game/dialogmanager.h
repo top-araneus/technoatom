@@ -94,7 +94,7 @@ bool DialogManager::ManageClicks(LinearVector<int> coords)
           int button_y = button->coords_.y_;
           int button_width = button->constraints_.x_;
           int button_height = button->constraints_.y_;
-          print("Clicked to /# /#, window /# button /# on /# /# with constraints /# /#\n", x,y,i,j,button_x, button_y, button_width, button_height);
+          //print("Clicked to /# /#, window /# button /# on /# /# with constraints /# /#\n", x,y,i,j,button_x, button_y, button_width, button_height);
           if (dialogs_[i]->GetVisible() && (x > button_x && x < (button_x + button_width)) && (y > button_y && y < (button_y + button_height)))
           {
             button->OnClick();

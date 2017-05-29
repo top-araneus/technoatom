@@ -14,7 +14,6 @@ class Engine
     LinearVector<char> GiveDirection();
     Engine();
     ~Engine();
-    SurfaceType InitializeMap();
     Array<Array<unsigned char>> InitializeGround();
     void DrawGround();
     void DrawAll();
@@ -27,10 +26,10 @@ class Engine
     void InitializationOfSurface();
     void AddObject(GameObject& obj)
     {
-      surface_[obj.GetGridCoords().x_][obj.GetGridCoords().y_] = &obj;
+      surface_.push_back(&obj);
     }
 
-    SurfaceType&    GetMap() {
+    std::vector<GameObject*>&    GetObjects() {
       return surface_;
     }
     ReferenceFrame& GetFrame() {
@@ -50,7 +49,7 @@ class Engine
     }
 DialogWindow* dialog; //! REMOVE AFTER TEST
   private:
-    SurfaceType     surface_;         //get
+    std::vector<GameObject*>     surface_;         //get
     GroundType      ground_;
     AirType         air_;
     Texture         ground_texture_;
@@ -73,7 +72,7 @@ DialogWindow* dialog; //! REMOVE AFTER TEST
           {
             Texture player_texture;
             player_texture.loadFromFile(kPathToPlayerTexture);
-            Player* result = new Player(engine.GetWindow(), engine.GetMap(), kStandartSpriteSizeOfPlayer, player_texture,
+            Player* result = new Player(engine.GetWindow(), engine.GetObjects(), kStandartSpriteSizeOfPlayer, player_texture,
                                         grid_coords, engine.GetFrame(), kNumOfPlayerFrames, kNumOfPlayerStates);
             engine.AddObject(*result);
             return result;
@@ -82,7 +81,7 @@ DialogWindow* dialog; //! REMOVE AFTER TEST
           {
             Texture enemy_texture;
             enemy_texture.loadFromFile(kPathToEnemyTexture);
-            Enemy* result = new Enemy(engine.GetWindow(), engine.GetMap(), kStandartSpriteSizeOfEnemy, enemy_texture,
+            Enemy* result = new Enemy(engine.GetWindow(), engine.GetObjects(), kStandartSpriteSizeOfEnemy, enemy_texture,
                                         grid_coords, engine.GetFrame(), kNumOfEnemyFrames, kNumOfEnemyStates);
             engine.AddObject(*result);
             return result;
@@ -103,7 +102,6 @@ Engine::Engine()
   window_->setFramerateLimit(kFrameRate);
   window_->setVerticalSyncEnabled(true);
   frame_ = ReferenceFrame(-((kTilesAtLine + 1) * kCellWidth / 4), -((kTilesAtLine + 1) * kCellHeight / 4), 800, 600);
-  surface_ = InitializeMap();
   ground_ = InitializeGround();
   ground_texture_.loadFromFile("images/debuggrid.png");
   num_of_grounds_ = ground_texture_.getSize().x / kCellWidth;
@@ -129,19 +127,7 @@ Engine::~Engine()
   delete(window_);
 }
 
-SurfaceType Engine::InitializeMap()
-{
-  SurfaceType map_array(kTilesAtLine);
-  for (int i = 0; i < kTilesAtLine; ++i)
-  {
-    map_array[i] = Array<GameObject*>(kTilesAtLine);
-    for (int j = 0; j < kTilesAtLine; ++j)
-    {
-      map_array[i][j] = nullptr;
-    }
-  }
-  return map_array;
-}
+
 
 Array<Array<unsigned char>> Engine::InitializeGround()
 {
@@ -174,20 +160,14 @@ void Engine::DrawGround()
 
 void Engine::ChangeAllFrames()
 {
-  for (int i = 0; i < kTilesAtLine; ++i)
-  {
-    for (int j = 0; j < kTilesAtLine; ++j)
-    {
-      if (surface_[i][j] != nullptr)
-      {
-        surface_[i][j]->NextFrame();
-      }
-    }
-  }
+  std::for_each(surface_.begin(), surface_.end(), [](GameObject* obj){ obj->NextFrame(); });
 }
 
 void Engine::DrawAll()
 {
+  std::sort(surface_.begin(), surface_.end(), [](GameObject* left, GameObject* right) { return(left->GetRefCoords().y_ < right->GetRefCoords().y_); });
+  std::for_each(surface_.begin(), surface_.end(), [](GameObject* obj){ obj->Draw(); });
+  /*
   LinearVector<int> cell_coords (0, kTilesAtLine-1);
   int last_x_index = kTilesAtLine-1;
   while (cell_coords.y_ >= 0)
@@ -218,42 +198,31 @@ void Engine::DrawAll()
     }
     last_x_index += 1;
     cell_coords = LinearVector<int>(last_x_index, 0);
-  }
+  }*/
 
   dialog_manager_->DrawDialogs();
 }
 
 void Engine::MoveAll()
 {
-  for (int i = 0; i < kTilesAtLine; ++i)
-  {
-    for (int j = 0; j < kTilesAtLine; ++j)
-    {
-      if (surface_[i][j] != nullptr)
-        surface_[i][j]->Move();
-    }
-  }
+std::for_each(surface_.begin(), surface_.end(), [](GameObject* obj){ obj->Move(); });
 }
 
 void Engine::InteractAll()
 {
-  for (int i = 0; i < kTilesAtLine; ++i)
+  for(int i = 0; i < surface_.size(); ++i)
   {
-    for (int j = 0; j < kTilesAtLine; ++j)
+    if ( clock() >= surface_[i]->GetDamageEndingTime())
     {
-      if (surface_[i][j] != nullptr)
-      {
-        if (clock() >= surface_[i][j]->GetDamageEndingTime())
-        {
-          surface_[i][j]->SetUnderAttack(false);
-        }
-        if (clock() >= surface_[i][j]->GetAttackEndingTime())
-        {
-          surface_[i][j]->SetInAttack(false);
-        }
-
-        surface_[i][j]->Interact();
-      }
+      surface_[i]->SetUnderAttack(false);
+    }
+    if (clock() >= surface_[i]->GetAttackEndingTime())
+    {
+      surface_[i]->SetInAttack(false);
+    }
+    if(surface_[i]->GetObjectCode() != kPlayerId)
+    {
+      surface_[i]->Interact();
     }
   }
 }
@@ -261,22 +230,17 @@ void Engine::InteractAll()
 
 void Engine::ClearDead()
 {
-  for (int i = 0; i < kTilesAtLine; ++i)
+  for(int i = 0; i < surface_.size(); i++)
   {
-    for (int j = 0; j < kTilesAtLine; ++j)
+    if (!(surface_[i]->CheckAlive()))
     {
-      if (surface_[i][j] != nullptr)
+      if (surface_[i]->GetObjectCode() == kPlayerId)
       {
-        if (!(surface_[i][j]->CheckAlive()))
-        {
-          if (surface_[i][j]->GetObjectCode() == kPlayerId)
-          {
-            is_game_over_ = true;
-         }
-          delete surface_[i][j];
-          surface_[i][j] = nullptr;
-        }
-      }
+        is_game_over_ = true;
+     }
+      delete surface_[i];
+      surface_.erase(surface_.begin() + i);
+      i--;
     }
   }
 }
@@ -357,9 +321,16 @@ void Engine::Control()
     LinearVector<int> cell_coords = GetCellFromCoords(coords);
     if (cell_coords.x_ >= 0 && cell_coords.y_ >= 0 && cell_coords.x_ < kTilesAtLine && cell_coords.y_ < kTilesAtLine)
     {
-      player_->SetAimOfInteract(GetMap()[cell_coords.x_][cell_coords.y_]);
-      player_->Interact();
-      player_->SetAimOfInteract(nullptr);
+      for(int i = 0; i < surface_.size(); ++i)
+      {
+        if(surface_[i]->GetObjectCode() == kEnemyId && surface_[i]->GetRefCoords().GetDistance(coords) <= kEnemyWidth)
+        {
+          player_->SetAimOfInteract(surface_[i]);
+          player_->Interact();
+          player_->SetAimOfInteract(nullptr);
+        }
+      }
+
     }
   }
   if (sf::Mouse::isButtonPressed(sf::Mouse::Middle))
@@ -398,13 +369,11 @@ void Engine::Tact()
 
 void Engine::InitializationOfSurface()
 {
-  for (int i = 0; i < kTilesAtLine; ++i)
+  for(int i = 0; i < surface_.size(); ++i)
   {
-    for (int j = 0; j < kTilesAtLine; ++j)
-    {
-      delete surface_[i][j];
-      surface_[i][j] = nullptr;
-    }
+    delete surface_[i];
+    surface_.erase(surface_.begin() + i);
+    i--;
   }
   for (int i=0; i<kTilesAtLine*kTilesAtLine; ++i)
   {
