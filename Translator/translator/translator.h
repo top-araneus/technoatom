@@ -198,6 +198,18 @@ void Translator(std::string input, std::string output)
             fout.write((char*)&buff, sizeof(buff));
             cout << "Ret: " << RET << endl;
         }
+        if(current_cmd == "sqrt")
+        {
+            BlockType buff = SQRT;
+            fout.write((char*)&buff, sizeof(buff));
+            cout << "Sqrt: " << SQRT << endl;
+        }
+        if(current_cmd == "norm")
+        {
+            BlockType buff = NORM;
+            fout.write((char*)&buff, sizeof(buff));
+            cout << "Norm: " << NORM << endl;
+        }
         if(current_cmd == "end")
         {
             cout << "End: " << END << endl;

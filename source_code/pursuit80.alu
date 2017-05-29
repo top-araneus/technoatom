@@ -1,0 +1,34 @@
+pop x0
+pop x1
+pop x2
+pop x3
+push x0
+push x2
+sub
+pop x4
+push x1
+push x3
+sub
+pop x5
+push x4
+push x5
+abs
+push 200
+jge :1
+push x3
+push x2
+push x1
+push x0
+norm
+pop x0
+pop x1
+jmp :5
+:1
+push 0
+push 0
+pop x0
+pop x1
+jmp :5
+:5
+end
+

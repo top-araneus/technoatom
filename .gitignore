@@ -37,3 +37,13 @@ ALU/alu_bin/Makefile
 disassembler/disassembler_bin/Makefile
 *.o
 stack/stack_bin/Makefile
+Game/SFML*
+*.dll
+*.layout
+*.pro.use*
+*.cbp
+*.depend
+*.cbp
+*.depend
+*.cbp
+*.depend

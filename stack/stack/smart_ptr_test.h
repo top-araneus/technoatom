@@ -449,14 +449,17 @@ Shared_ptr<Type> shared_ptr_copyprobe(Shared_ptr<Type> victim)
 template <typename Type>
 void hack_autoptr()
 {
+    //given
     print("Auto_ptr has bad copy constructor:\n");
     Type obj = static_cast<Type>(1);
     Auto_ptr<Type> victim(&obj);
+    //when
     auto_ptr_copyprobe(victim);
     try
-    {
+    {        
         *victim;
     }
+    //then
     catch(Exception err)
     {
         print("/#",err);
@@ -466,13 +469,16 @@ void hack_autoptr()
 template <typename Type>
 void hack_sharedptr()
 {
+    //given
     print("Shared_ptr has good copy constructor: ");
     Type obj = static_cast<Type>(1);
     Shared_ptr<Type> victim(&obj);
+    //when
     shared_ptr_copyprobe(victim);
     try
     {
         *victim;
+    //then
         print("no exceptions\n");
     }
     catch(Exception err)
