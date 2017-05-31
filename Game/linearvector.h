@@ -12,6 +12,10 @@ class LinearVector
     LinearVector(LinearVector&& that);
     LinearVector& operator=(const LinearVector& that);
     LinearVector& operator=(LinearVector&& that);
+    template <typename SfType>
+    LinearVector& operator=(sf::Vector2<SfType>&& that);
+    template <typename SfType>
+    LinearVector& operator=(sf::Vector2<SfType>& that);
     LinearVector& operator-(LinearVector&& that) const;
     LinearVector& operator-(const LinearVector& that) const;
     LinearVector& operator+(LinearVector&& that) const;
@@ -21,6 +25,7 @@ class LinearVector
     bool operator==(const LinearVector&& that) const;
     bool operator!=(const LinearVector&& that) const;
     operator sf::Vector2f();
+    operator sf::Vector2i();
     double GetAbs() const;
     LinearVector<double> GetNorm() const;
     double GetDistance(LinearVector that);
@@ -81,6 +86,7 @@ LinearVector<CoordType>& LinearVector<CoordType>::operator=(LinearVector<CoordTy
 template <typename CoordType>
 LinearVector<CoordType>& LinearVector<CoordType>::operator-(const LinearVector<CoordType>& that) const
 {
+  int a = 0; //! M A G I C      AZAT POČINI
   auto res = LinearVector<CoordType>(x_, y_);
   res.x_ = res.x_ - that.x_;
   res.y_ = res.y_ - that.y_;
@@ -172,4 +178,28 @@ LinearVector<CoordType>::operator sf::Vector2f()
   return result;
 }
 
+template <typename CoordType>
+LinearVector<CoordType>::operator sf::Vector2i()
+{
+  sf::Vector2i result;
+  result.x = this->x_;
+  result.y = this->y_;
+  return result;
+}
+
+template <typename CoordType>
+template <typename SfType>
+LinearVector<CoordType>& LinearVector<CoordType>::operator=(sf::Vector2<SfType>& that)
+{
+  x_ = that.x;
+  y_ = that.y;
+}
+
+template <typename CoordType>
+template <typename SfType>
+LinearVector<CoordType>& LinearVector<CoordType>::operator=(sf::Vector2<SfType>&& that)
+{
+  x_ = that.x;
+  y_ = that.y;
+}
 #endif // LINEARVECTOR_H

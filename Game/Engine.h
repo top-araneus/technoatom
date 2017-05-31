@@ -5,6 +5,7 @@
 #include "dialogmanager.h"
 using namespace sf;
 
+int clock1 = 1;
 typedef Array<Array<unsigned char>> GroundType;
 typedef Array<Array<GameObject*>> AirType;  //TODO: make weak_ptr
 
@@ -24,6 +25,7 @@ class Engine
     void ClearDead();
     void Tact();
     void InitializationOfSurface();
+    void DebugCheck();
     void ChangeWindowText(DialogWindow* window); //! REMOVE AFTER TEST
     void AddObject(GameObject& obj)
     {
@@ -48,7 +50,15 @@ class Engine
     void            SetLastTime() {
       last_time_change = clock();
     }
-DialogWindow* dialog; //! REMOVE AFTER TEST
+    void            SetEvent(sf::Event event)
+    {
+      event_ = event;
+    }
+    void            PrintDebug()
+    {
+      debug_window_->GetTexts()[0]->setString(debug_stream_.str());
+    }
+DialogWindow* debug_window_; //! REMOVE AFTER TEST
   private:
     std::vector<GameObject*>     surface_;         //get
     GroundType      ground_;
@@ -61,9 +71,18 @@ DialogWindow* dialog; //! REMOVE AFTER TEST
     Font            font_;
     Text            game_over_;       //get
     time_t          last_time_change; //get, set
+    time_t          last_time_debug_;
     bool            is_game_over_;
     GameObject*     player_;
-    DialogManager*   dialog_manager_;
+    DialogManager*  dialog_manager_;
+    sf::Event       event_;
+    LinearVector<int> mouse_position_;
+    LinearVector<int> starting_drag_;
+    LinearVector<int> ending_drag_;
+    bool            debug_visible_;
+    std::ostringstream debug_stream_;
+
+    bool            dragging_;
     class Factory
     {
       public:
@@ -102,7 +121,7 @@ Engine::Engine()
 	RenderWindow* window = new RenderWindow(sf::VideoMode(kWindowWidth, kWindowHeight), "Cyberpunk Universe"/*, sf::Style::Fullscreen*/);
   window_ = window;
   window_->setFramerateLimit(kFrameRate);
-  window_->setVerticalSyncEnabled(true);
+  //window_->setVerticalSyncEnabled(true);
   frame_ = ReferenceFrame(-((kTilesAtLine + 1) * kCellWidth / 4), -((kTilesAtLine + 1) * kCellHeight / 4), 800, 600);
   ground_ = InitializeGround();
   ground_texture_.loadFromFile("images/debuggrid.png");
@@ -115,11 +134,15 @@ Engine::Engine()
   game_over_.setPosition(kWindowWidth/2 - 100, kWindowHeight/2);
   is_game_over_ = false;
   SetLastTime();
+  last_time_debug_ = clock();
   dialog_manager_ = new DialogManager(window_);
-  /*DialogWindow* */dialog = dialog_manager_->AddDialog(LinearVector<int>(300,300), LinearVector<int>(300,300));
-  dialog->SetVisible(true);
-  Button* button = dialog->AddButton(LinearVector<int>(100,50), LinearVector<int>(100,100), "Hello!");
-  button->OnClick.Connect(dialog, &DialogWindow::TestFunc);
+  /*DialogWindow* */debug_window_ = dialog_manager_->AddDialog(LinearVector<int>(300,300), LinearVector<int>(300,300));
+  debug_window_->SetVisible(true);
+  Button* button = debug_window_->AddButton(LinearVector<int>(70,30), LinearVector<int>(130,250), "Debug!");
+  button->OnClick.Connect(this, &Engine::PrintDebug);
+  mouse_position_ = sf::Mouse::getPosition();
+  dragging_ = false;
+  debug_visible_ = debug_window_->GetVisible();
 }
 
 Engine::~Engine()
@@ -306,18 +329,32 @@ void Engine::Control()
       GetFrame().SetY(GetFrame().GetY()+kCameraVelocity);
     }
   }
-
-
   if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
   {
     LinearVector<int> coords = LinearVector<int>(sf::Mouse::getPosition(*window_).x,
                                                   sf::Mouse::getPosition(*window_).y);
     dialog_manager_->ManageClicks(coords, false);
+    if (!dragging_)
+    {
+      dragging_ = true;
+      starting_drag_ = mouse_position_;
+    }
+    else
+    {
+      ending_drag_ = mouse_position_;
+      dialog_manager_->ManageMoves(starting_drag_, ending_drag_);
+      starting_drag_ = ending_drag_;
+    }
   }
   else
   {
     LinearVector<int> coords = LinearVector<int>(sf::Mouse::getPosition(*window_).x,
                                                   sf::Mouse::getPosition(*window_).y);
+
+    if (dragging_)
+    {
+      dragging_ = false;
+    }
     dialog_manager_->ManageClicks(coords, true);
   }
 
@@ -342,8 +379,41 @@ void Engine::Control()
   }
 }
 
+void Engine::DebugCheck()
+{
+  if (Keyboard::isKeyPressed(Keyboard::Tilde))
+  {
+    if (debug_visible_)
+      debug_window_->SetVisible(false);
+    else
+      debug_window_->SetVisible(true);
+  }
+  else
+  {
+    debug_visible_ = debug_window_->GetVisible();
+  }
+}
+
+
 void Engine::Tact()
 {
+  if (debug_window_->GetVisible())
+  {
+    print(debug_stream_, "FPS: /#, clockdiff: /#\n", 1000/(1+clock()-clock1), clock()-clock1);
+    if (clock() - last_time_debug_ > 250)
+    {
+        last_time_debug_ = clock();
+        PrintDebug();
+        if (debug_stream_.str().length() > 200)
+        {
+          debug_stream_.str("");
+        }
+    }
+  }
+  mouse_position_ = sf::Mouse::getPosition(*window_);
+  /*window_->pollEvent(event_);*/
+  if (event_.type == sf::Event::Closed || Keyboard::isKeyPressed(Keyboard::Escape))
+      window_->close();
   if (is_game_over_) {
     window_->draw(GetGameOver());
     if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
@@ -354,6 +424,7 @@ void Engine::Tact()
   }
   else {
     Control();
+    DebugCheck();
     if ((clock() - GetLastTime()) > kTactTime)
     {
       MoveAll();
@@ -368,6 +439,8 @@ void Engine::Tact()
     ClearDead();
     DrawAll();
   }
+
+clock1 = clock();
 }
 
 void Engine::InitializationOfSurface()

@@ -74,7 +74,12 @@
 		<Unit filename="Engine.h" />
 		<Unit filename="GameObjects.h" />
 		<Unit filename="Transformation.h" />
+		<Unit filename="buttonfactory.h" />
+		<Unit filename="buttons.h" />
 		<Unit filename="constants.h" />
+		<Unit filename="delegates.h" />
+		<Unit filename="dialogfactory.h" />
+		<Unit filename="dialogmanager.h" />
 		<Unit filename="dialogs.h" />
 		<Unit filename="factory.h" />
 		<Unit filename="linearvector.h" />

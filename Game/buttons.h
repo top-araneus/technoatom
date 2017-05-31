@@ -28,6 +28,16 @@ public:
       return text_;
     }
     bool pressed_;
+    void SetCoords(LinearVector<int> coords)
+    {
+      print("new button coords /# /# \n", coords.x_, coords.y_);
+      coords_ = coords;
+      form_.setPosition(coords_);
+      LinearVector<int> text_coords;
+      text_coords.x_ = coords_.x_ + constraints_.x_ / 3;
+      text_coords.y_ = coords_.y_ + constraints_.y_ / 3;
+      text_.setPosition(text_coords);
+    }
 private:
     bool visible_; //get, set
     bool enabled_;
