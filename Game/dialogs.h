@@ -10,6 +10,7 @@ class DialogWindow
     ~DialogWindow();
     void Draw();
     Button* AddButton(LinearVector<int> constraints, LinearVector<int> coords, std::string caption);
+    sf::Text* AddText(int text_size, LinearVector<int> coords, std::string caption);
     const sf::RectangleShape& GetForm() {
       return form_;
     }
@@ -26,11 +27,16 @@ class DialogWindow
       is_visible_ = value;
     }
     void Close();
+
+    void TestFunc();
+    int ctr_ = 0;
+
     LinearVector<int> constraints_;
     LinearVector<int> coords_;
   protected:
     bool is_visible_;
     sf::Color background_color_;
+    sf::Font font_;
     Array<Button*> buttons_;  //get
     Array<sf::Text*> texts_;  //get
     sf::RectangleShape form_; //get
@@ -40,6 +46,8 @@ DialogWindow::DialogWindow(LinearVector<int> constraints, LinearVector<int> coor
 {
   constraints_ = constraints;
   coords_ = coords;
+  font_ = sf::Font();
+  font_.loadFromFile(kFontPath);
   background_color_ = kDialogWindowColor;
   form_ = sf::RectangleShape(constraints_);
   form_.setPosition(coords);
@@ -54,11 +62,17 @@ DialogWindow::DialogWindow(LinearVector<int> constraints, LinearVector<int> coor
   is_visible_ = true;
   buttons_[0] = ButtonFactory::GetExitButton(constraints, coords);
  buttons_[0]->OnClick.Connect(this, &DialogWindow::Close);
+ AddText(20, LinearVector<int>(50, 50), "Hello World!");
 }
 
 void DialogWindow::Close()
 {
   is_visible_ = false;
+}
+
+void DialogWindow::TestFunc()
+{
+  texts_[0]->setString(std::to_string(++ctr_));
 }
 
 Button* DialogWindow::AddButton(LinearVector<int> constraints, LinearVector<int> coords, std::string caption)
@@ -72,6 +86,23 @@ Button* DialogWindow::AddButton(LinearVector<int> constraints, LinearVector<int>
       button_coords.y_ = coords_.y_ + coords.y_;
       buttons_[i] = ButtonFactory::GetButton(constraints, button_coords, caption);
       return buttons_[i];
+    }
+  }
+  return nullptr;
+}
+
+sf::Text* DialogWindow::AddText(int text_size, LinearVector<int> coords, std::string caption)
+{
+  for (int i = 0; i<kDialogElemsMaxNumber; ++i)
+  {
+    if (texts_[i] == nullptr)
+    {
+      LinearVector<int> text_coords;
+      text_coords.x_ = coords_.x_ + coords.x_;
+      text_coords.y_ = coords_.y_ + coords.y_;
+      texts_[i] = new sf::Text(sf::String(caption), font_, text_size);
+      texts_[i]->setPosition(text_coords);
+      return texts_[i];
     }
   }
   return nullptr;

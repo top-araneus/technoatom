@@ -24,6 +24,7 @@ class Engine
     void ClearDead();
     void Tact();
     void InitializationOfSurface();
+    void ChangeWindowText(DialogWindow* window); //! REMOVE AFTER TEST
     void AddObject(GameObject& obj)
     {
       surface_.push_back(&obj);
@@ -95,6 +96,7 @@ DialogWindow* dialog; //! REMOVE AFTER TEST
     };
 };
 
+
 Engine::Engine()
 {
 	RenderWindow* window = new RenderWindow(sf::VideoMode(kWindowWidth, kWindowHeight), "Cyberpunk Universe"/*, sf::Style::Fullscreen*/);
@@ -116,10 +118,8 @@ Engine::Engine()
   dialog_manager_ = new DialogManager(window_);
   /*DialogWindow* */dialog = dialog_manager_->AddDialog(LinearVector<int>(300,300), LinearVector<int>(300,300));
   dialog->SetVisible(true);
-  dialog->AddButton(LinearVector<int>(100,50), LinearVector<int>(100,100), "Hello!");
-  DialogWindow* dialog2 = dialog_manager_->AddDialog(LinearVector<int>(600,300), LinearVector<int>(700,400));
-  dialog2->SetVisible(true);
-  dialog2->AddButton(LinearVector<int>(200,100), LinearVector<int>(100,100), "World!");
+  Button* button = dialog->AddButton(LinearVector<int>(100,50), LinearVector<int>(100,100), "Hello!");
+  button->OnClick.Connect(dialog, &DialogWindow::TestFunc);
 }
 
 Engine::~Engine()
@@ -312,8 +312,15 @@ void Engine::Control()
   {
     LinearVector<int> coords = LinearVector<int>(sf::Mouse::getPosition(*window_).x,
                                                   sf::Mouse::getPosition(*window_).y);
-    dialog_manager_->ManageClicks(coords);
+    dialog_manager_->ManageClicks(coords, false);
   }
+  else
+  {
+    LinearVector<int> coords = LinearVector<int>(sf::Mouse::getPosition(*window_).x,
+                                                  sf::Mouse::getPosition(*window_).y);
+    dialog_manager_->ManageClicks(coords, true);
+  }
+
   if (sf::Mouse::isButtonPressed(sf::Mouse::Right))
   {
     LinearVector<int> coords = LinearVector<int>(sf::Mouse::getPosition(*window_).x - GetFrame().GetX(),
@@ -332,10 +339,6 @@ void Engine::Control()
       }
 
     }
-  }
-  if (sf::Mouse::isButtonPressed(sf::Mouse::Middle))
-  {
-    dialog->GetButtons()[0]->OnClick();
   }
 }
 
