@@ -7,7 +7,7 @@ int main(int argc, char *argv[])
     std::string filename = argv[1];
     ALU alu(filename);
 
-    alu.Execute(5,4,2,2);
-    cout << "x: " << alu.GetRegister(0) << "y: " << alu.GetRegister(1) << endl;
+    alu.Execute(5);
+    cout << "x: " << alu.GetRegister(0) << endl;
     return a.exec();
 }

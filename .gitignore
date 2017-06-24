@@ -56,3 +56,6 @@ ALU/alu_bin/debug/main.o
 *.o
 *.user
 Translator/translator/translator.pro
+*.cbp
+Translator/translator/translator.pro.user
+*.pro

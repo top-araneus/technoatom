@@ -24,8 +24,8 @@ public:
 class CommandFactory
 {
 public:
-  CommandFactory();
-  virtual ~CommandFactory();
+  CommandFactory(){}
+  virtual ~CommandFactory(){}
 
   Command* CreateCommand(std::string& name_of_cmd) const;
   template <class cmd>
@@ -46,10 +46,10 @@ void CommandFactory::Add(const std::string& name_of_cmd)
     factory_map_[name_of_cmd] = new CmdCreator<cmd>();
 }
 
-Command* CommandFactory::Create(const string &name_of_cmd, typename Command::TypeOfMarksMap* marks)
+Command* CommandFactory::Create(const string& name_of_cmd, typename Command::TypeOfMarksMap* marks)
 {
   typename FactoryMap::iterator iter = factory_map_.find(name_of_cmd);
-  if (iter == factory_map_.end())
+  if (iter != factory_map_.end())
     return iter->second->CreateCommand(marks);
   return nullptr;
 }

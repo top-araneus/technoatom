@@ -8,7 +8,7 @@
 #define PRINT_H
 
 #include "iostream"
-
+#include <sstream>
 //====================================
 //! @brief writes argument to console.
 //! @arg const char*
@@ -99,6 +99,14 @@ void print(std::ostream& ost, const char* str, Type value, Args... args)
             break;
         }
     }
+}
+
+template <typename T>
+std::string to_string(T val)
+{
+	std::ostringstream oss;
+	oss<< val;
+	return oss.str();
 }
 
 #endif // PRINT_H

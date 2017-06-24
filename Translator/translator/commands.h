@@ -38,7 +38,7 @@ class Command
     FillArguments(fin);
     WriteToFile(fout);
   }
-  void SkipArguments(std::fstream& fin)
+  void SkipArguments(std::ifstream& fin)
   {
     string word;
     for(int i = 0; i < num_of_args_; ++i)
