@@ -27,6 +27,7 @@ class Engine
     void InitializationOfSurface();
     void DebugCheck();
     void ChangeWindowText(DialogWindow* window); //! REMOVE AFTER TEST
+    void Shoot();
     void AddObject(GameObject& obj)
     {
       surface_.push_back(&obj);
@@ -58,6 +59,7 @@ class Engine
     {
       debug_window_->GetTexts()[0]->setString(debug_stream_.str());
     }
+
 DialogWindow* debug_window_; //! REMOVE AFTER TEST
   private:
     std::vector<GameObject*>     surface_;         //get
@@ -72,6 +74,7 @@ DialogWindow* debug_window_; //! REMOVE AFTER TEST
     Text            game_over_;       //get
     time_t          last_time_change; //get, set
     time_t          last_time_debug_;
+    time_t          last_time_shoot_;
     bool            is_game_over_;
     GameObject*     player_;
     DialogManager*  dialog_manager_;
@@ -106,6 +109,18 @@ DialogWindow* debug_window_; //! REMOVE AFTER TEST
             engine.AddObject(*result);
             return result;
           }
+          else if(object_code == kBulletId)
+          {
+            sf::Image bullet_image;
+            bullet_image.loadFromFile(kPathToBulletTexture);
+            bullet_image.createMaskFromColor(sf::Color::White);
+            Texture bullet_texture;
+            bullet_texture.loadFromImage(bullet_image);
+            Bullet* result = new Bullet(engine.GetWindow(), engine.GetObjects(), kStandartSpriteSizeOfBullet, bullet_texture,
+                                        grid_coords, engine.GetFrame(), kNumOfBulletFrames, kNumOfBulletStates);
+            engine.AddObject(*result);
+            return result;
+          }
           else
           {
             print("Object: /# is not created", object_code);
@@ -113,7 +128,18 @@ DialogWindow* debug_window_; //! REMOVE AFTER TEST
           }
         }
     };
+    void CreateBullet(LinearVector<int>& direction, LinearVector<int> ref_coords)
+    {
+      GameObject* bullet = Factory::CreateCharacter(kBulletId, GetCellFromCoords(ref_coords), *this);
+      bullet->SetRefCoords(ref_coords);
+      LinearVector<double> velocity = direction.GetNorm();
+      velocity.x_ = kBulletVelocity * velocity.x_;
+      velocity.y_ = kBulletVelocity * velocity.y_;
+      bullet->SetVelocity(velocity);
+    }
+
 };
+
 
 
 Engine::Engine()
@@ -135,6 +161,7 @@ Engine::Engine()
   is_game_over_ = false;
   SetLastTime();
   last_time_debug_ = clock();
+  last_time_shoot_ = clock();
   dialog_manager_ = new DialogManager(window_);
   /*DialogWindow* */debug_window_ = dialog_manager_->AddDialog(LinearVector<int>(300,300), LinearVector<int>(300,300));
   debug_window_->SetVisible(true);
@@ -190,38 +217,7 @@ void Engine::DrawAll()
 {
   std::sort(surface_.begin(), surface_.end(), [](GameObject* left, GameObject* right) { return(left->GetRefCoords().y_ < right->GetRefCoords().y_); });
   std::for_each(surface_.begin(), surface_.end(), [](GameObject* obj){ obj->Draw(); });
-  /*
-  LinearVector<int> cell_coords (0, kTilesAtLine-1);
-  int last_x_index = kTilesAtLine-1;
-  while (cell_coords.y_ >= 0)
-  {
-    while (cell_coords.y_ < kTilesAtLine)
-    {
-      if (surface_[cell_coords.x_][cell_coords.y_] != nullptr)
-      {
-        surface_[cell_coords.x_][cell_coords.y_]->Draw();
-      }
-      cell_coords = cell_coords + LinearVector<int>(1,1);
-    }
-    last_x_index -= 1;
-    cell_coords = LinearVector<int>(0, last_x_index);
-  }
-  cell_coords = LinearVector<int>(1, 0);
-  last_x_index = 1;
-  while (cell_coords.x_ < kTilesAtLine)
-  {
-    int last_y_index = kTilesAtLine - cell_coords.x_;
-    while (cell_coords.y_ < last_y_index)
-    {
-      if (surface_[cell_coords.x_][cell_coords.y_] != nullptr)
-      {
-        surface_[cell_coords.x_][cell_coords.y_]->Draw();
-      }
-      cell_coords = cell_coords + LinearVector<int>(1, 1);
-    }
-    last_x_index += 1;
-    cell_coords = LinearVector<int>(last_x_index, 0);
-  }*/
+
 
   dialog_manager_->DrawDialogs();
 }
@@ -379,6 +375,24 @@ void Engine::Control()
   }
 }
 
+void Engine::Shoot()
+{
+  if (Keyboard::isKeyPressed(Keyboard::Space))
+  {
+      LinearVector<int> coords = LinearVector<int>(sf::Mouse::getPosition(*window_).x - GetFrame().GetX(),
+                                                  sf::Mouse::getPosition(*window_).y - GetFrame().GetY());
+      LinearVector<int> player_coords = LinearVector<int>(player_->GetRefCoords().x_, player_->GetRefCoords().y_);
+      LinearVector<int> direction = LinearVector<int>(coords.x_ - player_coords.x_, coords.y_ - player_coords.y_);
+      this->CreateBullet(direction, player_coords);
+      sf::Vertex line[] =
+      {
+        sf::Vertex(sf::Vector2f(player_coords.x_ + GetFrame().GetX(), player_coords.y_  + GetFrame().GetY() ) ),
+        sf::Vertex(sf::Vector2f(coords.x_ + GetFrame().GetX(), coords.y_ + GetFrame().GetY() ) )
+      };
+      window_->draw(line, 2, sf::Lines);
+  }
+}
+
 void Engine::DebugCheck()
 {
   if (Keyboard::isKeyPressed(Keyboard::Tilde))
@@ -424,6 +438,11 @@ void Engine::Tact()
   }
   else {
     Control();
+    if ((clock() - last_time_shoot_) > kShootCoolDown)
+    {
+      Shoot();
+      last_time_shoot_ = clock();
+    }
     DebugCheck();
     if ((clock() - GetLastTime()) > kTactTime)
     {

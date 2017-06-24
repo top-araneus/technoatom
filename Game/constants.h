@@ -20,6 +20,7 @@ const int               kWindowMargin = 100;
 //!id
 const unsigned char     kEnemyId = 148;
 const unsigned char     kPlayerId = 161;
+const unsigned char     kBulletId = 184;
 
 //!player
 const int               kPlayerVelocity = 7;
@@ -45,6 +46,14 @@ const time_t            kEnemyCoolDown = 500;
 const int               kEnemyDamage = 5;
 const int               kEnemyHp = 15;
 const unsigned char     kEnemyWidth = 64;
+
+//!bullet
+const char*             kPathToBulletTexture = "images/bullet.png";
+const int               kBulletVelocity = 30;
+const LinearVector<int> kStandartSpriteSizeOfBullet = LinearVector<int>(16,16);
+const unsigned char     kNumOfBulletFrames = 1;
+const unsigned char     kNumOfBulletStates = 1;
+const time_t            kShootCoolDown = 500;
 
 //!ALU
 const std::string       kEnemyProgram("pursuit80.bin");
