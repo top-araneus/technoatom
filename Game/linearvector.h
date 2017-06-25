@@ -12,6 +12,7 @@ class LinearVector
     LinearVector(LinearVector&& that);
     LinearVector& operator=(const LinearVector& that);
     LinearVector& operator=(LinearVector&& that);
+    LinearVector& operator-(LinearVector&& that) const;
     LinearVector& operator-(const LinearVector& that) const;
     LinearVector& operator+(LinearVector&& that) const;
     LinearVector& operator+(const LinearVector& that) const;
@@ -84,6 +85,16 @@ LinearVector<CoordType>& LinearVector<CoordType>::operator-(const LinearVector<C
   res.x_ = res.x_ - that.x_;
   res.y_ = res.y_ - that.y_;
   return res;
+}
+
+template <typename CoordType>
+LinearVector<CoordType>& LinearVector<CoordType>::operator-(LinearVector<CoordType>&& that) const
+{
+  //auto res = LinearVector<CoordType>(x_, y_);
+  that.x_ = x_ - that.x_;
+  that.y_ = y_ - that.y_;
+ // int x = 0;    // MAGIC BUT DOESN'T WORK WITHOUT THIS STRING
+  return that;
 }
 
 template <typename CoordType>

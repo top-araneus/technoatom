@@ -1,13 +1,20 @@
 # depslib dependency file v1.0
-1492199860 source:d:\projects\technoatom\game\main.cpp
+1496002599 source:d:\projects\technoatom\game\main.cpp
 	<SFML/Graphics.hpp>
+	<SFML/Audio.hpp>
+	<SFML/System/Clock.hpp>
 	<iostream>
-	<../../../utils/print.h>
-	<../../../ALU/ALU/alu.h>
-	<../../../stack/stack/stack.h>
-	<../../../stack/stack/smart_ptr.h>
-	<refpoint.h>
-	<GameObjects.h>
+	<windows.h>
+	"delegates.h"
+	<../utils/print.h>
+	<../ALU/ALU/alu.h>
+	<../stack/stack/stack.h>
+	<../stack/stack/smart_ptr.h>
+	<refframe.h>
+	"constants.h"
+	<gameobjects.h>
+	<engine.h>
+	"factory.h"
 
 1429780453 d:\projects\technoatom\game\sfml-2.3.2\include\sfml\graphics.hpp
 	<SFML/Window.hpp>
@@ -390,14 +397,15 @@
 1492169439 d:\projects\technoatom\utils\print.h
 	"iostream"
 
-1492169438 d:\projects\technoatom\alu\alu\alu.h
+1495007171 d:\projects\technoatom\alu\alu\alu.h
+	"math.h"
 	"..\..\stack/stack/array.h"
 	"..\..\stack/stack/stack.h"
 	"..\..\utils\exception.h"
 	"..\..\utils\print.h"
 	"..\..\utils\alupa.h"
 
-1492169439 d:\projects\technoatom\stack\stack\array.h
+1494427303 d:\projects\technoatom\stack\stack\array.h
 	<ctime>
 	<typeinfo>
 	<cstdlib>
@@ -419,17 +427,19 @@
 1492169439 d:\projects\technoatom\stack\stack\stack.h
 	"array.h"
 
-1492169439 d:\projects\technoatom\utils\alupa.h
+1495007171 d:\projects\technoatom\utils\alupa.h
 
 1492169439 d:\projects\technoatom\stack\stack\smart_ptr.h
 	<cstdlib>
 	"../../utils/exception.h"
 
-1492198994 d:\projects\technoatom\game\\refpoint.h
+1493814999 d:\projects\technoatom\game\\refpoint.h
 
-1492196773 d:\projects\technoatom\game\\gameobjects.h
-	"refpoint.h"
-	<../../../stack/stack/smart_ptr.h>
+1496002599 d:\projects\technoatom\game\\gameobjects.h
+	"transformation.h"
+	<../stack/stack/smart_ptr.h>
+	<../utils/print.h>
+	"../ALU/ALU/alu.h"
 
 1492881255 source:d:\dropbox\coding\mailru\technoatom\game\main.cpp
 	<SFML/Graphics.hpp>
@@ -1319,4 +1329,168 @@
 
 1492866288 d:\dropbox\coding\mailru\technoatom\game\view.h
 	<SFML/Graphics.hpp>
+
+1429780453 d:\projects\technoatom\game\sfml-2.3.2\include\sfml\audio.hpp
+	<SFML/System.hpp>
+	<SFML/Audio/InputSoundFile.hpp>
+	<SFML/Audio/Listener.hpp>
+	<SFML/Audio/Music.hpp>
+	<SFML/Audio/OutputSoundFile.hpp>
+	<SFML/Audio/Sound.hpp>
+	<SFML/Audio/SoundBuffer.hpp>
+	<SFML/Audio/SoundBufferRecorder.hpp>
+	<SFML/Audio/SoundFileFactory.hpp>
+	<SFML/Audio/SoundFileReader.hpp>
+	<SFML/Audio/SoundFileWriter.hpp>
+	<SFML/Audio/SoundRecorder.hpp>
+	<SFML/Audio/SoundSource.hpp>
+	<SFML/Audio/SoundStream.hpp>
+
+1429780453 d:\projects\technoatom\game\sfml-2.3.2\include\sfml\audio\inputsoundfile.hpp
+	<SFML/Audio/Export.hpp>
+	<SFML/System/NonCopyable.hpp>
+	<SFML/System/Time.hpp>
+	<string>
+
+1429780453 d:\projects\technoatom\game\sfml-2.3.2\include\sfml\audio\export.hpp
+	<SFML/Config.hpp>
+
+1429780453 d:\projects\technoatom\game\sfml-2.3.2\include\sfml\audio\listener.hpp
+	<SFML/Audio/Export.hpp>
+	<SFML/System/Vector3.hpp>
+
+1436034025 d:\projects\technoatom\game\sfml-2.3.2\include\sfml\audio\music.hpp
+	<SFML/Audio/Export.hpp>
+	<SFML/Audio/SoundStream.hpp>
+	<SFML/Audio/InputSoundFile.hpp>
+	<SFML/System/Mutex.hpp>
+	<SFML/System/Time.hpp>
+	<string>
+	<vector>
+
+1429780453 d:\projects\technoatom\game\sfml-2.3.2\include\sfml\audio\soundstream.hpp
+	<SFML/Audio/Export.hpp>
+	<SFML/Audio/SoundSource.hpp>
+	<SFML/System/Thread.hpp>
+	<SFML/System/Time.hpp>
+	<SFML/System/Mutex.hpp>
+	<cstdlib>
+
+1429780453 d:\projects\technoatom\game\sfml-2.3.2\include\sfml\audio\soundsource.hpp
+	<SFML/Audio/Export.hpp>
+	<SFML/Audio/AlResource.hpp>
+	<SFML/System/Vector3.hpp>
+
+1429780453 d:\projects\technoatom\game\sfml-2.3.2\include\sfml\audio\alresource.hpp
+	<SFML/Audio/Export.hpp>
+
+1429780453 d:\projects\technoatom\game\sfml-2.3.2\include\sfml\audio\outputsoundfile.hpp
+	<SFML/Audio/Export.hpp>
+	<SFML/System/NonCopyable.hpp>
+	<string>
+
+1429780453 d:\projects\technoatom\game\sfml-2.3.2\include\sfml\audio\sound.hpp
+	<SFML/Audio/Export.hpp>
+	<SFML/Audio/SoundSource.hpp>
+	<SFML/System/Time.hpp>
+	<cstdlib>
+
+1429780453 d:\projects\technoatom\game\sfml-2.3.2\include\sfml\audio\soundbuffer.hpp
+	<SFML/Audio/Export.hpp>
+	<SFML/Audio/AlResource.hpp>
+	<SFML/System/Time.hpp>
+	<string>
+	<vector>
+	<set>
+
+1429780453 d:\projects\technoatom\game\sfml-2.3.2\include\sfml\audio\soundbufferrecorder.hpp
+	<SFML/Audio/Export.hpp>
+	<SFML/Audio/SoundBuffer.hpp>
+	<SFML/Audio/SoundRecorder.hpp>
+	<vector>
+
+1436034025 d:\projects\technoatom\game\sfml-2.3.2\include\sfml\audio\soundrecorder.hpp
+	<SFML/Audio/Export.hpp>
+	<SFML/Audio/AlResource.hpp>
+	<SFML/System/Thread.hpp>
+	<SFML/System/Time.hpp>
+	<vector>
+	<string>
+
+1429780453 d:\projects\technoatom\game\sfml-2.3.2\include\sfml\audio\soundfilefactory.hpp
+	<SFML/Audio/Export.hpp>
+	<string>
+	<vector>
+	<SFML/Audio/SoundFileFactory.inl>
+
+1429780453 d:\projects\technoatom\game\sfml-2.3.2\include\sfml\audio\soundfilefactory.inl
+
+1429780453 d:\projects\technoatom\game\sfml-2.3.2\include\sfml\audio\soundfilereader.hpp
+	<SFML/Audio/Export.hpp>
+	<string>
+
+1429780453 d:\projects\technoatom\game\sfml-2.3.2\include\sfml\audio\soundfilewriter.hpp
+	<SFML/Audio/Export.hpp>
+	<string>
+
+1496002599 d:\projects\technoatom\game\\refframe.h
+	"linearvector.h"
+
+1496002599 d:\projects\technoatom\game\\linearvector.h
+	<math.h>
+
+1496002734 d:\projects\technoatom\game\constants.h
+
+1494944687 d:\projects\technoatom\game\\transformation.h
+	"linearvector.h"
+	<math.h>
+
+1496006787 d:\projects\technoatom\game\\engine.h
+	"GameObjects.h"
+	"dialogmanager.h"
+
+1496002599 d:\projects\technoatom\game\factory.h
+	"gameobjects.h"
+	<SFML/Graphics.hpp>
+	"constants.h"
+
+1496002599 d:\projects\technoatom\game\gameobjects.h
+	"transformation.h"
+	<../stack/stack/smart_ptr.h>
+	<../utils/print.h>
+	"../ALU/ALU/alu.h"
+
+1493814999 d:\projects\technoatom\game\refpoint.h
+
+1494944687 d:\projects\technoatom\game\transformation.h
+	"linearvector.h"
+	<math.h>
+
+1496002599 d:\projects\technoatom\game\linearvector.h
+	<math.h>
+
+1495027602 d:\projects\technoatom\game\\factory.h
+	"gameobjects.h"
+	<SFML/Graphics.hpp>
+	"constants.h"
+
+1496002734 d:\projects\technoatom\game\\constants.h
+
+1496002599 d:\projects\technoatom\game\delegates.h
+
+1496007071 d:\projects\technoatom\game\\dialogmanager.h
+	"dialogfactory.h"
+
+1496002599 d:\projects\technoatom\game\\dialogfactory.h
+	"dialogs.h"
+
+1496006787 d:\projects\technoatom\game\\dialogs.h
+	"refpoint.h"
+	"buttonfactory.h"
+
+1496002599 d:\projects\technoatom\game\\buttonfactory.h
+	"buttons.h"
+
+1496002599 d:\projects\technoatom\game\\buttons.h
+	"constants.h"
 

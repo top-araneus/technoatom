@@ -1,11 +1,11 @@
 #ifndef GAMEOBJECTS_H
 #define GAMEOBJECTS_H
-#include "refpoint.h"
 #include "transformation.h"
 #include <../stack/stack/smart_ptr.h>
 #include <../utils/print.h>
 #include "../ALU/ALU/alu.h"
 using namespace sf;
+
 
 class GameObject
 {
@@ -90,7 +90,7 @@ class GameObject
 
   protected:
     LinearVector<char> GiveDirection();
-    void GoToCellIfEmpty(LinearVector<int> oldCell, LinearVector<int> cell, LinearVector<int> coords);
+    void GoToPlaceIfEmpty(LinearVector<int> coords);
     bool InMap(LinearVector<int> new_coords)
     {
       return (new_coords.x_ >= 0 && new_coords.x_ < kTilesAtLine && new_coords.y_ >= 0 && new_coords.y_ < kTilesAtLine);
@@ -116,12 +116,11 @@ class GameObject
     Texture                     texture_;
     RenderWindow*               window_;
     LinearVector<int>           sprite_size_; //!< width and height of sprite
-    Array<Array<GameObject*>>*  map_; //! TODO: weak_ptr
+    std::vector<GameObject*> *map_; //! TODO: weak_ptr
     ReferenceFrame*             ref_frame_;
     GameObject*                 aim_of_interact_;        //get, set
 };
 
-typedef Array<Array<GameObject*>> SurfaceType;
 
 LinearVector<char> GameObject::GiveDirection()
 {
@@ -142,10 +141,9 @@ void GameObject::Move()
     where_to.x_ = ref_coords_.x_ + velocity_.x_;
     where_to.y_ = ref_coords_.y_ + velocity_.y_;
     LinearVector<int> new_cell = GetCellFromCoords(where_to);
-    LinearVector<int> old_cell = grid_coords_;
     if(InMap(new_cell))
     {
-      GoToCellIfEmpty(old_cell, new_cell, where_to);
+      GoToPlaceIfEmpty(where_to);
     }
   }
 }
@@ -160,37 +158,42 @@ void GameObject::NextFrame(char step)
   }
 }
 
-void GameObject::GoToCellIfEmpty(LinearVector<int> old_cell, LinearVector<int> cell, LinearVector<int> coords)
+void GameObject::GoToPlaceIfEmpty(LinearVector<int> coords)
 {
-  if ((old_cell != cell))
+  bool check = true;
+  for(int i = 0; i < (*map_).size(); ++i)
   {
-    if ((*map_)[cell.x_][cell.y_] == nullptr)
+    if((*map_)[i]->GetRefCoords().GetDistance(coords) <= kEnemyWidth && this != (*map_)[i])
     {
-      grid_coords_ = cell;
-      ref_coords_ = coords;
-      (*map_)[cell.x_][cell.y_] = this;
-      (*map_)[old_cell.x_][old_cell.y_] = nullptr;
+      check = false;
     }
   }
-  else
+  if(check)
   {
     ref_coords_ = coords;
   }
+
 }
 
 class Player: public GameObject
 {
   public:
-    Player(RenderWindow& window, SurfaceType& pMap, const LinearVector<int> spriteSize, Texture& texture,
+    Player(RenderWindow& window, std::vector<GameObject*>& pMap, const LinearVector<int> spriteSize, Texture& texture,
       LinearVector<int> gridCoords, ReferenceFrame& refFrame, const int numOfFrames, const int numOfStates);
     ~Player();
     virtual void Draw();
     virtual void Interact();
     virtual void NextFrame(char step = 1);
-    void DrawHp();
+    void DrawHUD();
     virtual void DecreaseHp(int damage)
     {
       GameObject::DecreaseHp(damage);
+    }
+    int GetXp(){
+      return xp_;
+    }
+    void SetXp(int xp){
+      xp_ = xp;
     }
     virtual void Move()
     {
@@ -198,10 +201,11 @@ class Player: public GameObject
     }
 
   private:
+    int xp_;                 //get, set
     bool next_sprite_right = true;
 };
 
-Player::Player(RenderWindow& window, SurfaceType& pMap, const LinearVector<int> spriteSize, Texture& texture,
+Player::Player(RenderWindow& window, std::vector<GameObject*>& pMap, const LinearVector<int> spriteSize, Texture& texture,
           LinearVector<int> gridCoords, ReferenceFrame& refFrame, const int numOfFrames, const int numOfStates)
 {
   window_ = &window;
@@ -223,24 +227,19 @@ Player::Player(RenderWindow& window, SurfaceType& pMap, const LinearVector<int> 
   object_code_ = kPlayerId;
   time_last_frame_changing_ = clock();
   frames_per_second_ = kFramesPerSec;
+  SetXp(0);
 }
 
 Player::~Player()
 {
-   for(int i = 0; i < kTilesAtLine; i++)
-   {
-     for(int j = 0; j < kTilesAtLine; j++)
-     {
-     if((*map_)[i][j])
-     {
-       if((*map_)[i][j]->GetObjectCode() == kEnemyId)
-       {
-       (*map_)[i][j]->SetAimOfInteract(nullptr);
-       }
-     }
-     }
-   }
-   (*map_)[grid_coords_.x_][grid_coords_.y_] = nullptr;
+   std::for_each((*map_).begin(), (*map_).end(),
+                 [](GameObject* obj)->void
+                 {
+                  if(obj->GetObjectCode() == kEnemyId)
+                  {
+                    obj->SetAimOfInteract(nullptr);
+                  }
+                 });
    in_death = true;
 }
 
@@ -256,7 +255,7 @@ void Player::Draw()
     player_sprite.setColor(sf::Color(255,128,128));
   else
     player_sprite.setColor(sf::Color(255,255,255));
-  DrawHp();
+  DrawHUD();
   window_->draw(player_sprite);
 }
 
@@ -266,7 +265,7 @@ void Player::Interact()
   {
     if (aim_of_interact_->GetObjectCode() == kEnemyId)
     {
-      if (aim_of_interact_->GetGridCoords().GetDistance(GetGridCoords()) <= kRangeOfPlayerAttack)
+      if (aim_of_interact_->GetRefCoords().GetDistance(GetRefCoords()) <= kRangeOfPlayerAttack)
       {
         if (clock() >= attack_ending_time_)
         {
@@ -274,6 +273,7 @@ void Player::Interact()
           aim_of_interact_->DecreaseHp(applied_damage_);
           aim_of_interact_->SetUnderAttack(true);
           aim_of_interact_->SetDamageEndingTime(clock() + kPlayerCoolDown);
+          SetXp(xp_ + kXpStep);
         }
       }
     }
@@ -302,29 +302,35 @@ void Player::NextFrame(char step)
   }
 }
 
-void Player::DrawHp()
+void Player::DrawHUD()
 {
-  std::string hp = std::to_string(hp_);
+  std::string hp = std::string("Health: ") + std::to_string(hp_);
+  std::string xp = std::string("Points: ") + std::to_string(xp_);
   sf::Font font;
   font.loadFromFile("fonts/font.ttf");
 
   sf::Text hp_text(hp, font);
   hp_text.setCharacterSize(40);
   hp_text.setColor(sf::Color::Green);
-  hp_text.setPosition(kWindowWidth - 120, 10);
+  hp_text.setPosition(kWindowWidth - 300, 10);
   window_->draw(hp_text);
+
+  sf::Text xp_text(xp, font);
+  xp_text.setCharacterSize(40);
+  xp_text.setColor(sf::Color::Red);
+  xp_text.setPosition(50, 10);
+  window_->draw(xp_text);
 }
 
 
 class Enemy: public GameObject
 {
   public:
-    Enemy(RenderWindow& window, SurfaceType& pMap, LinearVector<int> spriteSize, Texture& texture,
+    Enemy(RenderWindow& window, std::vector<GameObject*>& pMap, LinearVector<int> spriteSize, Texture& texture,
          LinearVector<int> gridCoords, ReferenceFrame& refFrame, int numOfFrames, int numOfStates);
     ~Enemy();
     virtual void Draw();
     virtual void Interact();
-    void CheckCellAndSetAim(LinearVector<int> coords);
     void Scan();
     void HandleALU();
     virtual void Move()
@@ -343,7 +349,7 @@ class Enemy: public GameObject
     ALU* alu_;
 };
 
-Enemy::Enemy(RenderWindow& window, SurfaceType& pMap, LinearVector<int> spriteSize, Texture& texture,
+Enemy::Enemy(RenderWindow& window, std::vector<GameObject*>& pMap, LinearVector<int> spriteSize, Texture& texture,
      LinearVector<int> gridCoords, ReferenceFrame& refFrame, int numOfFrames, int numOfStates)
 {
   window_ = &window;
@@ -370,7 +376,6 @@ Enemy::Enemy(RenderWindow& window, SurfaceType& pMap, LinearVector<int> spriteSi
 
 Enemy::~Enemy()
 {
-  (*map_)[grid_coords_.x_][grid_coords_.y_] = nullptr;
   aim_of_interact_ = nullptr;
   delete alu_;
 }
@@ -398,7 +403,7 @@ void Enemy::Interact()
   }
   if (aim_of_interact_ != nullptr)
   {
-    if (aim_of_interact_->GetGridCoords().GetDistance(GetGridCoords()) <= kRangeOfEnemyAttack)
+    if (aim_of_interact_->GetRefCoords().GetDistance(ref_coords_) <= kRangeOfEnemyAttack)
     {
       velocity_ = LinearVector<double>(0,0);
       if (clock() >= attack_ending_time_)
@@ -416,29 +421,17 @@ void Enemy::Interact()
   }
 }
 
-void Enemy::CheckCellAndSetAim(LinearVector<int> coords)
-{
-  if(coords.x_ >= 0 && coords.x_ < kTilesAtLine && coords.y_ >= 0 && coords.y_ < kTilesAtLine)
-  {
-    if((*map_)[coords.x_][coords.y_] != nullptr)
-    {
-      if((*map_)[coords.x_][coords.y_]->GetObjectCode() == kPlayerId)
-      {
-        aim_of_interact_ = (*map_)[coords.x_][coords.y_];
-      }
-    }
-  }
-}
+
 
 void Enemy::Scan()
 {
-  for(int i = -kRangeOfVision; i <= kRangeOfVision; i++)
+  for(int i = 0; i < (*map_).size(); i++)
   {
-    for(int j = -kRangeOfVision; j <= kRangeOfVision; j++)
+    if((*map_)[i]->GetObjectCode() == kPlayerId)
     {
-      if(i != 0 || j != 0)
+      if((*map_)[i]->GetRefCoords().GetDistance(ref_coords_) <= kRangeOfVision)
       {
-        CheckCellAndSetAim(LinearVector<int>(grid_coords_.x_ + i, grid_coords_.y_ + j));
+        aim_of_interact_ = (*map_)[i];
       }
     }
   }

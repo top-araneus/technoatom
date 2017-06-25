@@ -6,6 +6,7 @@ bool in_death = false;
 using namespace sf;
 #include <iostream>
 #include <windows.h>
+#include "delegates.h"
 #include <../utils/print.h>
 #include <../ALU/ALU/alu.h>
 #include <../stack/stack/stack.h>
@@ -19,15 +20,7 @@ using namespace sf;
 int main()
 {
   Engine engine;
-	for (int i=0; i<kTilesAtLine*kTilesAtLine; ++i)
-  {
-      if ((i/kTilesAtLine == 5) || (i%kTilesAtLine == 5) || (i/kTilesAtLine == kTilesAtLine-5)  || (i%kTilesAtLine == kTilesAtLine-5) )
-      {
-        Factory::CreateCharacter(kEnemyId, LinearVector<int>(i/kTilesAtLine,i%kTilesAtLine), engine);
-      }
-  }
-
-  GameObject* cilik = Factory::CreateCharacter(kPlayerId, LinearVector<int>(14,16), engine);
+	engine.InitializationOfSurface();
 	while (engine.GetWindow().isOpen())
 	{
     sf::Event event;
@@ -37,7 +30,7 @@ int main()
         engine.GetWindow().close();
     }
     engine.GetWindow().clear();
-    engine.Tact(*cilik);
+    engine.Tact();
     engine.GetWindow().display();
   }
 	return 0;
