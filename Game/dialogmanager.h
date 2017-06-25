@@ -15,7 +15,9 @@ public:
   void OnClick(LinearVector<int> coords);
   void DrawDialogs();
   DialogWindow* AddDialog(LinearVector<int> constraints, LinearVector<int> coords);
-  bool ManageClicks(LinearVector<int> coords);
+  DialogWindow* AddMenu();
+  bool ManageClicks(LinearVector<int> coords, bool released);
+  bool ManageMoves(LinearVector<int> coords, LinearVector<int> moved);
 };
 
 DialogManager::DialogManager(RenderWindow* window)
@@ -41,6 +43,19 @@ DialogWindow* DialogManager::AddDialog(LinearVector<int> constraints, LinearVect
   return nullptr;
 }
 
+DialogWindow* DialogManager::AddMenu()
+{
+  for (int i = 0; i<kDialogsMaxNumber; ++i)
+  {
+    if (dialogs_[i] == nullptr)
+    {
+      dialogs_[i] = DialogFactory::GetMenu();
+      return dialogs_[i];
+    }
+  }
+  return nullptr;
+}
+
 void DialogManager::DrawDialogs()
 {
   for (int i = 0; i<kDialogsMaxNumber; ++i)
@@ -57,7 +72,7 @@ void DialogManager::DrawDialogs()
         {
           if (texts[j] != nullptr)
           {
-            window_->draw(*(texts[j]));
+             window_->draw(*(texts[j]));
           }
         }
         for (int j = 0; j<kDialogElemsMaxNumber; ++j)
@@ -76,29 +91,66 @@ void DialogManager::DrawDialogs()
   }
 }
 
-bool DialogManager::ManageClicks(LinearVector<int> coords)
+
+bool DialogManager::ManageMoves(LinearVector<int> coords, LinearVector<int> moved = LinearVector<int>(0,0))
 {
   for (int i = 0; i<kDialogsMaxNumber; ++i)
   {
     if (dialogs_[i] != nullptr)
     {
       DialogWindow* dialog = dialogs_[i];
-      for (int j = 0; j<kDialogElemsMaxNumber; ++j)
+      if ((coords.x_ > dialog->coords_.x_ && coords.y_ > dialog->coords_.y_) && (coords.x_ < (dialog->coords_.x_ + dialog->constraints_.x_) && coords.y_ < (dialog->coords_.y_ + 100)))
       {
-        if (dialog->GetButtons()[j] != nullptr)
+        dialog->coords_.x_ += moved.x_ - coords.x_;
+        dialog->coords_.y_ += moved.y_ - coords.y_;
+        dialog->SetCoords(moved-coords,  dialog->coords_);
+
+      }
+    }
+    else break;
+  }
+  return false;
+}
+
+bool DialogManager::ManageClicks(LinearVector<int> coords, bool released)
+{
+  for (int i = 0; i<kDialogsMaxNumber; ++i)
+  {
+    if (dialogs_[i] != nullptr)
+    {
+      DialogWindow* dialog = dialogs_[i];
+      if ((coords.x_ > dialog->coords_.x_ && coords.y_ > dialog->coords_.y_)
+          && (coords.x_ < (dialog->coords_.x_ + dialog->constraints_.x_) && coords.y_ < (dialog->coords_.y_ + dialog->constraints_.y_)))
+      {
+        for (int j = 0; j<kDialogElemsMaxNumber; ++j)
         {
-          Button* button = dialog->GetButtons()[j];
-          int x = coords.x_;
-          int y = coords.y_;
-          int button_x = button->coords_.x_;
-          int button_y = button->coords_.y_;
-          int button_width = button->constraints_.x_;
-          int button_height = button->constraints_.y_;
-          //print("Clicked to /# /#, window /# button /# on /# /# with constraints /# /#\n", x,y,i,j,button_x, button_y, button_width, button_height);
-          if (dialogs_[i]->GetVisible() && (x > button_x && x < (button_x + button_width)) && (y > button_y && y < (button_y + button_height)))
+          if (dialog->GetButtons()[j] != nullptr)
           {
-            button->OnClick();
-            return true;
+            Button* button = dialog->GetButtons()[j];
+            int x = coords.x_;
+            int y = coords.y_;
+            int button_x = button->coords_.x_;
+            int button_y = button->coords_.y_;
+            int button_width = button->constraints_.x_;
+            int button_height = button->constraints_.y_;
+            //print("Clicked to /# /#, window /# button /# on /# /# with constraints /# /#\n", x,y,i,j,button_x, button_y, button_width, button_height);
+            if (dialogs_[i]->GetVisible() && (x > button_x && x < (button_x + button_width)) && (y > button_y && y < (button_y + button_height)))
+            {
+              if (released)
+              {
+                if (button->pressed_)
+                {
+                  button->pressed_ = false;
+                  button->OnClick();
+                  return true;
+                }
+              }
+              else
+              {
+                button->pressed_ = true;
+                return true;
+              }
+            }
           }
         }
       }

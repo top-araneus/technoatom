@@ -27,10 +27,19 @@ public:
     const sf::Text& GetText() {
       return text_;
     }
+    bool pressed_;
+    void SetCoords(LinearVector<int> coords)
+    {
+      coords_ = coords;
+      form_.setPosition(coords_);
+      LinearVector<int> text_coords;
+      text_coords.x_ = coords_.x_ + constraints_.x_ / 3;
+      text_coords.y_ = coords_.y_ + constraints_.y_ / 3;
+      text_.setPosition(text_coords);
+    }
 private:
     bool visible_; //get, set
     bool enabled_;
-    bool pressed_;
 };
 
 Button::Button(LinearVector<int> constraints, LinearVector<int> coords, std::string caption)
@@ -40,6 +49,7 @@ Button::Button(LinearVector<int> constraints, LinearVector<int> coords, std::str
   background_color_ = kButtonColor;
   visible_ = true;
   enabled_ = true;
+  pressed_ = false;
   form_ = sf::RectangleShape(constraints_);
   form_.setFillColor(background_color_);
   form_.setPosition(coords_);

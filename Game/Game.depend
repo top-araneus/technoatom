@@ -1,9 +1,10 @@
 # depslib dependency file v1.0
-1496002599 source:d:\projects\technoatom\game\main.cpp
+1498243180 source:d:\projects\technoatom\game\main.cpp
 	<SFML/Graphics.hpp>
 	<SFML/Audio.hpp>
 	<SFML/System/Clock.hpp>
 	<iostream>
+	<sstream>
 	<windows.h>
 	"delegates.h"
 	<../utils/print.h>
@@ -397,7 +398,7 @@
 1492169439 d:\projects\technoatom\utils\print.h
 	"iostream"
 
-1495007171 d:\projects\technoatom\alu\alu\alu.h
+1496094747 d:\projects\technoatom\alu\alu\alu.h
 	"math.h"
 	"..\..\stack/stack/array.h"
 	"..\..\stack/stack/stack.h"
@@ -405,7 +406,7 @@
 	"..\..\utils\print.h"
 	"..\..\utils\alupa.h"
 
-1494427303 d:\projects\technoatom\stack\stack\array.h
+1496094748 d:\projects\technoatom\stack\stack\array.h
 	<ctime>
 	<typeinfo>
 	<cstdlib>
@@ -427,31 +428,38 @@
 1492169439 d:\projects\technoatom\stack\stack\stack.h
 	"array.h"
 
-1495007171 d:\projects\technoatom\utils\alupa.h
+1496094748 d:\projects\technoatom\utils\alupa.h
 
 1492169439 d:\projects\technoatom\stack\stack\smart_ptr.h
 	<cstdlib>
 	"../../utils/exception.h"
 
-1493814999 d:\projects\technoatom\game\\refpoint.h
+1496094748 d:\projects\technoatom\game\\refpoint.h
 
-1496002599 d:\projects\technoatom\game\\gameobjects.h
+1498338336 d:\projects\technoatom\game\\gameobjects.h
 	"transformation.h"
 	<../stack/stack/smart_ptr.h>
 	<../utils/print.h>
 	"../ALU/ALU/alu.h"
 
-1492881255 source:d:\dropbox\coding\mailru\technoatom\game\main.cpp
+1498417022 source:d:\dropbox\coding\mailru\technoatom\game\main.cpp
 	<SFML/Graphics.hpp>
 	<SFML/Audio.hpp>
+	<SFML/System/Clock.hpp>
 	<iostream>
+	<sstream>
+	<windows.h>
+	"delegates.h"
 	<../utils/print.h>
 	<../ALU/ALU/alu.h>
 	<../stack/stack/stack.h>
 	<../stack/stack/smart_ptr.h>
-	<refpoint.h>
-	<GameObjects.h>
-	<Engine.h>
+	<refframe.h>
+	"constants.h"
+	"sounds.h"
+	<gameobjects.h>
+	<engine.h>
+	"factory.h"
 
 1429780453 c:\sfml-2.3.2\include\sfml\graphics.hpp
 	<SFML/Window.hpp>
@@ -831,14 +839,13 @@
 	<string>
 	<vector>
 
-1492717636 d:\dropbox\coding\mailru\technoatom\game\\refpoint.h
-	<math.h>
+1495392463 d:\dropbox\coding\mailru\technoatom\game\\refpoint.h
 
-1492984181 d:\dropbox\coding\mailru\technoatom\game\\gameobjects.h
-	"refpoint.h"
+1498420677 d:\dropbox\coding\mailru\technoatom\game\\gameobjects.h
+	"transformation.h"
 	<../stack/stack/smart_ptr.h>
 	<../utils/print.h>
-	<math.h>
+	"../ALU/ALU/alu.h"
 
 1429780453 d:\dropbox\coding\mailru\technoatom\game\sfml-2.3.2\include\sfml\graphics.hpp
 	<SFML/Window.hpp>
@@ -1321,8 +1328,9 @@
 	<SFML/Audio/Export.hpp>
 	<string>
 
-1492978467 d:\dropbox\coding\mailru\technoatom\game\\engine.h
+1498421732 d:\dropbox\coding\mailru\technoatom\game\\engine.h
 	"GameObjects.h"
+	"dialogmanager.h"
 
 1492866349 d:\dropbox\coding\mailru\technoatom\game\map.h
 	<SFML\Graphics.hpp>
@@ -1433,28 +1441,28 @@
 	<SFML/Audio/Export.hpp>
 	<string>
 
-1496002599 d:\projects\technoatom\game\\refframe.h
+1496094748 d:\projects\technoatom\game\\refframe.h
 	"linearvector.h"
 
-1496002599 d:\projects\technoatom\game\\linearvector.h
+1498243180 d:\projects\technoatom\game\\linearvector.h
 	<math.h>
 
-1496002734 d:\projects\technoatom\game\constants.h
+1498393150 d:\projects\technoatom\game\constants.h
 
-1494944687 d:\projects\technoatom\game\\transformation.h
+1496094748 d:\projects\technoatom\game\\transformation.h
 	"linearvector.h"
 	<math.h>
 
-1496006787 d:\projects\technoatom\game\\engine.h
+1498338309 d:\projects\technoatom\game\\engine.h
 	"GameObjects.h"
 	"dialogmanager.h"
 
-1496002599 d:\projects\technoatom\game\factory.h
+1498323843 d:\projects\technoatom\game\factory.h
 	"gameobjects.h"
 	<SFML/Graphics.hpp>
 	"constants.h"
 
-1496002599 d:\projects\technoatom\game\gameobjects.h
+1498338336 d:\projects\technoatom\game\gameobjects.h
 	"transformation.h"
 	<../stack/stack/smart_ptr.h>
 	<../utils/print.h>
@@ -1462,11 +1470,11 @@
 
 1493814999 d:\projects\technoatom\game\refpoint.h
 
-1494944687 d:\projects\technoatom\game\transformation.h
+1496094748 d:\projects\technoatom\game\transformation.h
 	"linearvector.h"
 	<math.h>
 
-1496002599 d:\projects\technoatom\game\linearvector.h
+1498243180 d:\projects\technoatom\game\linearvector.h
 	<math.h>
 
 1495027602 d:\projects\technoatom\game\\factory.h
@@ -1474,23 +1482,110 @@
 	<SFML/Graphics.hpp>
 	"constants.h"
 
-1496002734 d:\projects\technoatom\game\\constants.h
+1498393150 d:\projects\technoatom\game\\constants.h
 
-1496002599 d:\projects\technoatom\game\delegates.h
+1496094748 d:\projects\technoatom\game\delegates.h
 
-1496007071 d:\projects\technoatom\game\\dialogmanager.h
+1498243180 d:\projects\technoatom\game\\dialogmanager.h
 	"dialogfactory.h"
 
-1496002599 d:\projects\technoatom\game\\dialogfactory.h
+1496094748 d:\projects\technoatom\game\\dialogfactory.h
 	"dialogs.h"
 
-1496006787 d:\projects\technoatom\game\\dialogs.h
+1498243180 d:\projects\technoatom\game\\dialogs.h
 	"refpoint.h"
 	"buttonfactory.h"
 
-1496002599 d:\projects\technoatom\game\\buttonfactory.h
+1496094748 d:\projects\technoatom\game\\buttonfactory.h
 	"buttons.h"
 
-1496002599 d:\projects\technoatom\game\\buttons.h
+1498393150 d:\projects\technoatom\game\\buttons.h
 	"constants.h"
+
+1496001027 d:\dropbox\coding\mailru\technoatom\game\delegates.h
+
+1498421683 d:\dropbox\coding\mailru\technoatom\game\constants.h
+
+1495649088 d:\dropbox\coding\mailru\technoatom\game\factory.h
+	"gameobjects.h"
+	<SFML/Graphics.hpp>
+	"constants.h"
+
+1498420677 d:\dropbox\coding\mailru\technoatom\game\gameobjects.h
+	"transformation.h"
+	<../stack/stack/smart_ptr.h>
+	<../utils/print.h>
+	"../ALU/ALU/alu.h"
+
+1495392462 d:\dropbox\coding\mailru\technoatom\game\transformation.h
+	"linearvector.h"
+	<math.h>
+
+1496260075 d:\dropbox\coding\mailru\technoatom\game\linearvector.h
+	<math.h>
+
+1495631491 d:\dropbox\coding\mailru\technoatom\alu\alu\alu.h
+	"math.h"
+	"..\..\stack/stack/array.h"
+	"..\..\stack/stack/stack.h"
+	"..\..\utils\exception.h"
+	"..\..\utils\print.h"
+	"..\..\utils\alupa.h"
+
+1495392463 d:\dropbox\coding\mailru\technoatom\stack\stack\array.h
+	<ctime>
+	<typeinfo>
+	<cstdlib>
+	<fstream>
+	"array_iter.h"
+	"bit_iter.h"
+
+1492201505 d:\dropbox\coding\mailru\technoatom\stack\stack\array_iter.h
+	"../../utils/exception.h"
+
+1492201505 d:\dropbox\coding\mailru\technoatom\utils\exception.h
+	<exception>
+	<iomanip>
+	"print.h"
+
+1492201505 d:\dropbox\coding\mailru\technoatom\utils\print.h
+	"iostream"
+
+1492201505 d:\dropbox\coding\mailru\technoatom\stack\stack\bit_iter.h
+	<cstring>
+
+1492201505 d:\dropbox\coding\mailru\technoatom\stack\stack\stack.h
+	"array.h"
+
+1495631492 d:\dropbox\coding\mailru\technoatom\utils\alupa.h
+
+1495649081 d:\dropbox\coding\mailru\technoatom\game\\refframe.h
+	"linearvector.h"
+
+1496260075 d:\dropbox\coding\mailru\technoatom\game\\linearvector.h
+	<math.h>
+
+1495392462 d:\dropbox\coding\mailru\technoatom\game\\transformation.h
+	"linearvector.h"
+	<math.h>
+
+1498418362 d:\dropbox\coding\mailru\technoatom\game\\dialogmanager.h
+	"dialogfactory.h"
+
+1498398378 d:\dropbox\coding\mailru\technoatom\game\\dialogfactory.h
+	"dialogs.h"
+
+1498418737 d:\dropbox\coding\mailru\technoatom\game\\dialogs.h
+	"refpoint.h"
+	"buttonfactory.h"
+
+1496259183 d:\dropbox\coding\mailru\technoatom\game\\buttonfactory.h
+	"buttons.h"
+
+1498395496 d:\dropbox\coding\mailru\technoatom\game\\buttons.h
+	"constants.h"
+
+1498421683 d:\dropbox\coding\mailru\technoatom\game\\constants.h
+
+1498421499 d:\dropbox\coding\mailru\technoatom\game\sounds.h
 

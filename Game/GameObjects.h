@@ -6,7 +6,6 @@
 #include "../ALU/ALU/alu.h"
 using namespace sf;
 
-
 class GameObject
 {
   public:
@@ -55,6 +54,10 @@ class GameObject
     void              SetAimOfInteract(GameObject* aim) {
       aim_of_interact_ = aim;
     }
+    void              SetRefCoords(LinearVector<int>& ref_coords)
+    {
+      ref_coords_ = ref_coords;
+    }
     GameObject*       GetAimOfInteract() {
       return aim_of_interact_;
     }
@@ -87,7 +90,9 @@ class GameObject
     }
     virtual void NextFrame(char step = 1);
     void DecreaseHp(int damage);
-
+    virtual void DrawHUD() {}
+    virtual void SetXp(int xp) {}
+    virtual int GetXp() {}
   protected:
     LinearVector<char> GiveDirection();
     void GoToPlaceIfEmpty(LinearVector<int> coords);
@@ -179,7 +184,7 @@ class Player: public GameObject
 {
   public:
     Player(RenderWindow& window, std::vector<GameObject*>& pMap, const LinearVector<int> spriteSize, Texture& texture,
-      LinearVector<int> gridCoords, ReferenceFrame& refFrame, const int numOfFrames, const int numOfStates);
+      LinearVector<int> gridCoords, ReferenceFrame& refFrame, const int numOfFrames, const int numOfStates, SoundManager* sound_manager);
     ~Player();
     virtual void Draw();
     virtual void Interact();
@@ -200,13 +205,15 @@ class Player: public GameObject
       GameObject::Move();
     }
 
+    //void Shoot(LinearVector<double>& direction);
   private:
     int xp_;                 //get, set
     bool next_sprite_right = true;
+    SoundManager* sound_manager_;
 };
 
 Player::Player(RenderWindow& window, std::vector<GameObject*>& pMap, const LinearVector<int> spriteSize, Texture& texture,
-          LinearVector<int> gridCoords, ReferenceFrame& refFrame, const int numOfFrames, const int numOfStates)
+          LinearVector<int> gridCoords, ReferenceFrame& refFrame, const int numOfFrames, const int numOfStates, SoundManager* sound_manager)
 {
   window_ = &window;
   ref_frame_ = &refFrame;
@@ -228,6 +235,7 @@ Player::Player(RenderWindow& window, std::vector<GameObject*>& pMap, const Linea
   time_last_frame_changing_ = clock();
   frames_per_second_ = kFramesPerSec;
   SetXp(0);
+  sound_manager_ = sound_manager;
 }
 
 Player::~Player()
@@ -255,7 +263,7 @@ void Player::Draw()
     player_sprite.setColor(sf::Color(255,128,128));
   else
     player_sprite.setColor(sf::Color(255,255,255));
-  DrawHUD();
+  //DrawHUD();
   window_->draw(player_sprite);
 }
 
@@ -273,7 +281,7 @@ void Player::Interact()
           aim_of_interact_->DecreaseHp(applied_damage_);
           aim_of_interact_->SetUnderAttack(true);
           aim_of_interact_->SetDamageEndingTime(clock() + kPlayerCoolDown);
-          SetXp(xp_ + kXpStep);
+          sound_manager_->melee_sound_.play();
         }
       }
     }
@@ -305,7 +313,7 @@ void Player::NextFrame(char step)
 void Player::DrawHUD()
 {
   std::string hp = std::string("Health: ") + std::to_string(hp_);
-  std::string xp = std::string("Points: ") + std::to_string(xp_);
+  std::string xp = std::string("Baksy: ") + std::to_string(xp_);
   sf::Font font;
   font.loadFromFile("fonts/font.ttf");
 
@@ -450,5 +458,109 @@ void Enemy::HandleALU()
     }
   }
 }
+
+
+class Bullet: public GameObject
+{
+  public:
+    Bullet(RenderWindow& window, std::vector<GameObject*>& pMap, LinearVector<int> spriteSize, Texture& texture,
+         LinearVector<int> gridCoords, ReferenceFrame& refFrame, int numOfFrames, int numOfStates);
+    ~Bullet();
+    virtual void Draw();
+    virtual void Interact();
+    void Scan();
+    virtual void Move();
+    virtual void DecreaseHp(int damage)
+    {
+      GameObject::DecreaseHp(damage);
+    }
+    virtual void NextFrame(char step = 1)
+    {
+      GameObject::NextFrame(step);
+    }
+};
+
+Bullet::Bullet(RenderWindow& window, std::vector<GameObject*>& pMap, LinearVector<int> spriteSize, Texture& texture,
+     LinearVector<int> gridCoords, ReferenceFrame& refFrame, int numOfFrames, int numOfStates)
+{
+  window_ = &window;
+  ref_frame_ = &refFrame;
+  sprite_size_ = spriteSize;
+  texture_ = texture;
+  grid_coords_ = gridCoords;
+  ref_coords_ = GetCoordsFromCell(gridCoords);
+  num_of_frames_ = numOfFrames;
+  current_frame_ = 0;
+  num_of_state_ = numOfStates;
+  current_state_ = 0;
+  applied_damage_ = kEnemyDamage;
+  map_ = &pMap;
+  velocity_ = LinearVector<double>(0,0);
+  direction_ = GiveDirection();
+  hp_ = 1000;
+  object_code_ = kBulletId;
+  aim_of_interact_ = nullptr;
+  time_last_frame_changing_ = clock();
+  frames_per_second_ = kFramesPerSec;
+}
+
+Bullet::~Bullet()
+{
+  aim_of_interact_ = nullptr;
+}
+
+void Bullet::Draw()
+{
+    Sprite bullet_sprite;
+    bullet_sprite.setTexture(texture_);
+    bullet_sprite.setTextureRect(IntRect(current_frame_ * sprite_size_.x_, current_state_ * sprite_size_.y_,
+                    sprite_size_.x_, sprite_size_.y_));
+    bullet_sprite.setOrigin(Vector2f(sprite_size_.x_ / 2, sprite_size_.y_ - kCellHeight / 2));
+    bullet_sprite.setPosition(ref_frame_->GetX() + ref_coords_.x_, ref_frame_->GetY() + ref_coords_.y_);
+    window_->draw(bullet_sprite);
+}
+
+void Bullet::Interact()
+{
+  LinearVector<int> cell = GetCellFromCoords(ref_coords_);
+  if(InMap(cell)){
+    if (aim_of_interact_ == nullptr)
+    {
+      Scan();
+    }
+    if (aim_of_interact_ != nullptr)
+    {
+        aim_of_interact_->SetUnderAttack(true);
+        aim_of_interact_->SetDamageEndingTime(clock() + kEnemyCoolDown);
+        aim_of_interact_->DecreaseHp(applied_damage_);
+        hp_ = 0;
+    }
+  }
+  else{
+    hp_ = 0;
+  }
+}
+
+void Bullet::Scan()
+{
+  for(int i = 0; i < (*map_).size(); i++)
+  {
+    if((*map_)[i]->GetObjectCode() == kEnemyId)
+    {
+      if((*map_)[i]->GetRefCoords().GetDistance(ref_coords_) <= kEnemyWidth)
+      {
+        aim_of_interact_ = (*map_)[i];
+      }
+    }
+  }
+}
+
+void Bullet::Move()
+{
+    ref_coords_.x_ = ref_coords_.x_ + velocity_.x_;
+    ref_coords_.y_ = ref_coords_.y_ + velocity_.y_;
+}
+
+
 
 #endif

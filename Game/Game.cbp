@@ -14,23 +14,23 @@
 				<Compiler>
 					<Add option="-std=c++11" />
 					<Add option="-g" />
-					<Add directory="C:/SFML-2.3.2/include" />
-					<Add directory="D:/Dropbox/Coding/MailRu/technoatom/Game/" />
-					<Add directory="C:/SFML-2.3.2/lib" />
+					<Add directory="D:/projects/technoatom/Game/" />
+					<Add directory="SFML-2.3.2/include" />
+					<Add directory="SFML-2.3.2/lib" />
 				</Compiler>
 				<Linker>
-					<Add library="C:/SFML-2.3.2/lib/libopenal32.a" />
-					<Add library="C:/SFML-2.3.2/lib/libsfml-audio.a" />
-					<Add library="C:/SFML-2.3.2/lib/libsfml-audio-d.a" />
-					<Add library="C:/SFML-2.3.2/lib/libsfml-graphics.a" />
-					<Add library="C:/SFML-2.3.2/lib/libsfml-graphics-d.a" />
-					<Add library="C:/SFML-2.3.2/lib/libsfml-main.a" />
-					<Add library="C:/SFML-2.3.2/lib/libsfml-main-d.a" />
-					<Add library="C:/SFML-2.3.2/lib/libsfml-system.a" />
-					<Add library="C:/SFML-2.3.2/lib/libsfml-system-d.a" />
-					<Add library="C:/SFML-2.3.2/lib/libsfml-window.a" />
-					<Add library="C:/SFML-2.3.2/lib/libsfml-window-d.a" />
-					<Add library="C:/SFML-2.3.2/lib/libjpeg.a" />
+					<Add library="SFML-2.3.2/lib/libjpeg.a" />
+					<Add library="SFML-2.3.2/lib/libopenal32.a" />
+					<Add library="SFML-2.3.2/lib/libsfml-audio.a" />
+					<Add library="SFML-2.3.2/lib/libsfml-audio-d.a" />
+					<Add library="SFML-2.3.2/lib/libsfml-graphics.a" />
+					<Add library="SFML-2.3.2/lib/libsfml-graphics-d.a" />
+					<Add library="SFML-2.3.2/lib/libsfml-main.a" />
+					<Add library="SFML-2.3.2/lib/libsfml-main-d.a" />
+					<Add library="SFML-2.3.2/lib/libsfml-system.a" />
+					<Add library="SFML-2.3.2/lib/libsfml-system-d.a" />
+					<Add library="SFML-2.3.2/lib/libsfml-window.a" />
+					<Add library="SFML-2.3.2/lib/libsfml-window-d.a" />
 					<Add directory="C:/SFML-2.3.2/lib" />
 				</Linker>
 			</Target>
@@ -51,6 +51,8 @@
 			<Add option="-Wall" />
 			<Add option="-std=c++11" />
 			<Add directory="SFML-2.3.2/include" />
+			<Add directory="SFML-2.3.2/lib" />
+			<Add directory="D:/Dropbox/Coding/MailRu/technoatom/Game/" />
 		</Compiler>
 		<Linker>
 			<Add library="SFML-2.3.2/lib/libFLAC.a" />
@@ -74,13 +76,19 @@
 		<Unit filename="Engine.h" />
 		<Unit filename="GameObjects.h" />
 		<Unit filename="Transformation.h" />
+		<Unit filename="buttonfactory.h" />
+		<Unit filename="buttons.h" />
 		<Unit filename="constants.h" />
+		<Unit filename="delegates.h" />
+		<Unit filename="dialogfactory.h" />
+		<Unit filename="dialogmanager.h" />
 		<Unit filename="dialogs.h" />
 		<Unit filename="factory.h" />
 		<Unit filename="linearvector.h" />
 		<Unit filename="main.cpp" />
 		<Unit filename="refframe.h" />
 		<Unit filename="refpoint.h" />
+		<Unit filename="sounds.h" />
 		<Extensions>
 			<code_completion />
 			<debugger />
