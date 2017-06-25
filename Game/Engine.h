@@ -28,6 +28,7 @@ class Engine
     void DebugCheck();
     void ChangeWindowText(DialogWindow* window); //! REMOVE AFTER TEST
     void Shoot();
+    void RestartGame();
     void AddObject(GameObject& obj)
     {
       surface_.push_back(&obj);
@@ -42,9 +43,9 @@ class Engine
     RenderWindow&   GetWindow() {
       return *window_;
     }
-    Text&           GetGameOver() {
+    /*Text&           GetGameOver() {
       return game_over_;
-    }
+    }*/
     time_t          GetLastTime() {
       return last_time_change;
     }
@@ -59,8 +60,12 @@ class Engine
     {
       debug_window_->GetTexts()[0]->setString(debug_stream_.str());
     }
-
+    void            CloseWindow()
+    {
+      window_->close();
+    }
 DialogWindow* debug_window_; //! REMOVE AFTER TEST
+DialogWindow* menu_window_;
   private:
     std::vector<GameObject*>     surface_;         //get
     GroundType      ground_;
@@ -71,7 +76,7 @@ DialogWindow* debug_window_; //! REMOVE AFTER TEST
     ReferenceFrame  frame_;           //get
     RenderWindow*   window_;          //get
     Font            font_;
-    Text            game_over_;       //get
+    //Text            game_over_;       //get
     time_t          last_time_change; //get, set
     time_t          last_time_debug_;
     time_t          last_time_shoot_;
@@ -155,16 +160,21 @@ Engine::Engine()
   ground_sprite_.setTexture(ground_texture_);
   ground_sprite_.setTextureRect(IntRect(0, 0, kCellWidth, kCellHeight));
   font_.loadFromFile(kFontPath);
-  game_over_ = Text("GAME OVER", font_, 48);
-  game_over_.setColor(Color(255,0,0));
-  game_over_.setPosition(kWindowWidth/2 - 100, kWindowHeight/2);
   is_game_over_ = false;
   SetLastTime();
   last_time_debug_ = clock();
   last_time_shoot_ = clock();
   dialog_manager_ = new DialogManager(window_);
-  /*DialogWindow* */debug_window_ = dialog_manager_->AddDialog(LinearVector<int>(300,300), LinearVector<int>(300,300));
+  debug_window_ = dialog_manager_->AddDialog(LinearVector<int>(300,300), LinearVector<int>(300,300));
   debug_window_->SetVisible(true);
+  debug_window_->AddText(10, LinearVector<int>(10, 50), "");
+
+  menu_window_ = dialog_manager_->AddMenu();
+  menu_window_->GetTexts()[0]->setString(std::string("Menu"));
+  menu_window_->SetVisible(false);
+  menu_window_->GetButtons()[1]->OnClick.Connect(this, &Engine::RestartGame);
+  menu_window_->GetButtons()[2]->OnClick.Connect(this, &Engine::CloseWindow);
+
   Button* button = debug_window_->AddButton(LinearVector<int>(70,30), LinearVector<int>(130,250), "Debug!");
   button->OnClick.Connect(this, &Engine::PrintDebug);
   mouse_position_ = sf::Mouse::getPosition();
@@ -256,7 +266,11 @@ void Engine::ClearDead()
       if (surface_[i]->GetObjectCode() == kPlayerId)
       {
         is_game_over_ = true;
-     }
+      }
+      if (surface_[i]->GetObjectCode() == kEnemyId)
+      {
+        player_->SetXp(player_->GetXp() + kXpStep*(kEnemyHp/kEnemyDamage));
+      }
       delete surface_[i];
       surface_.erase(surface_.begin() + i);
       i--;
@@ -381,15 +395,9 @@ void Engine::Shoot()
   {
       LinearVector<int> coords = LinearVector<int>(sf::Mouse::getPosition(*window_).x - GetFrame().GetX(),
                                                   sf::Mouse::getPosition(*window_).y - GetFrame().GetY());
-      LinearVector<int> player_coords = LinearVector<int>(player_->GetRefCoords().x_, player_->GetRefCoords().y_);
+      LinearVector<int> player_coords = LinearVector<int>(player_->GetRefCoords().x_, player_->GetRefCoords().y_ - (kStandartSpriteSizeOfPlayer.y_ - 72) + player_->GetFrame()*32);
       LinearVector<int> direction = LinearVector<int>(coords.x_ - player_coords.x_, coords.y_ - player_coords.y_);
       this->CreateBullet(direction, player_coords);
-      sf::Vertex line[] =
-      {
-        sf::Vertex(sf::Vector2f(player_coords.x_ + GetFrame().GetX(), player_coords.y_  + GetFrame().GetY() ) ),
-        sf::Vertex(sf::Vector2f(coords.x_ + GetFrame().GetX(), coords.y_ + GetFrame().GetY() ) )
-      };
-      window_->draw(line, 2, sf::Lines);
   }
 }
 
@@ -406,6 +414,18 @@ void Engine::DebugCheck()
   {
     debug_visible_ = debug_window_->GetVisible();
   }
+  if (Keyboard::isKeyPressed(Keyboard::Escape))
+  {
+    menu_window_->SetVisible(true);
+  }
+}
+
+void Engine::RestartGame()
+{
+  menu_window_->GetTexts()[0]->setString(std::string("Menu"));
+  InitializationOfSurface();
+  is_game_over_ = false;
+  menu_window_->SetVisible(false);
 }
 
 
@@ -414,7 +434,7 @@ void Engine::Tact()
   if (debug_window_->GetVisible())
   {
     print(debug_stream_, "FPS: /#, clockdiff: /#\n", 1000/(1+clock()-clock1), clock()-clock1);
-    if (clock() - last_time_debug_ > 250)
+    if (clock() - last_time_debug_ > kDebugCoolDown)
     {
         last_time_debug_ = clock();
         PrintDebug();
@@ -426,38 +446,34 @@ void Engine::Tact()
   }
   mouse_position_ = sf::Mouse::getPosition(*window_);
   /*window_->pollEvent(event_);*/
-  if (event_.type == sf::Event::Closed || Keyboard::isKeyPressed(Keyboard::Escape))
+  if (event_.type == sf::Event::Closed)
       window_->close();
   if (is_game_over_) {
-    window_->draw(GetGameOver());
-    if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
-    {
-      InitializationOfSurface();
-      is_game_over_ = false;
-    }
+      //!TODO: MENU WINDOW
+    menu_window_->GetTexts()[0]->setString(std::string("Game over!"));
+    menu_window_->SetVisible(true);
   }
-  else {
-    Control();
-    if ((clock() - last_time_shoot_) > kShootCoolDown)
-    {
-      Shoot();
-      last_time_shoot_ = clock();
-    }
-    DebugCheck();
-    if ((clock() - GetLastTime()) > kTactTime)
-    {
-      MoveAll();
-    }
-    DrawGround();
-    InteractAll();
-    if ((clock() - GetLastTime()) > kTactTime)
-    {
-      ChangeAllFrames();
-      SetLastTime();
-    }
-    ClearDead();
-    DrawAll();
+  Control();
+  if ((clock() - last_time_shoot_) > kShootCoolDown)
+  {
+    Shoot();
+    last_time_shoot_ = clock();
   }
+  DebugCheck();
+  if ((clock() - GetLastTime()) > kTactTime)
+  {
+    MoveAll();
+  }
+  DrawGround();
+  InteractAll();
+  if ((clock() - GetLastTime()) > kTactTime)
+  {
+    ChangeAllFrames();
+    SetLastTime();
+  }
+  ClearDead();
+  DrawAll();
+  player_->DrawHUD();
 
 clock1 = clock();
 }

@@ -65,7 +65,7 @@ DialogWindow::DialogWindow(LinearVector<int> constraints, LinearVector<int> coor
   is_visible_ = true;
   buttons_[0] = ButtonFactory::GetExitButton(constraints, coords);
  buttons_[0]->OnClick.Connect(this, &DialogWindow::Close);
- AddText(10, LinearVector<int>(10, 50), "Hello World!");
+ //AddText(10, LinearVector<int>(10, 50), "");
 }
 
 void DialogWindow::Close()

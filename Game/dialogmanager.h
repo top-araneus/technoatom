@@ -15,6 +15,7 @@ public:
   void OnClick(LinearVector<int> coords);
   void DrawDialogs();
   DialogWindow* AddDialog(LinearVector<int> constraints, LinearVector<int> coords);
+  DialogWindow* AddMenu();
   bool ManageClicks(LinearVector<int> coords, bool released);
   bool ManageMoves(LinearVector<int> coords, LinearVector<int> moved);
 };
@@ -36,6 +37,19 @@ DialogWindow* DialogManager::AddDialog(LinearVector<int> constraints, LinearVect
     if (dialogs_[i] == nullptr)
     {
       dialogs_[i] = DialogFactory::GetDialogWindow(constraints, coords);
+      return dialogs_[i];
+    }
+  }
+  return nullptr;
+}
+
+DialogWindow* DialogManager::AddMenu()
+{
+  for (int i = 0; i<kDialogsMaxNumber; ++i)
+  {
+    if (dialogs_[i] == nullptr)
+    {
+      dialogs_[i] = DialogFactory::GetMenu();
       return dialogs_[i];
     }
   }

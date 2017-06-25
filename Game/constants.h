@@ -62,12 +62,13 @@ const std::string       kEnemyProgram("pursuit80.bin");
 const std::string       kFontPath("fonts/font.ttf");
 
 //!Dialog windows
+const time_t            kDebugCoolDown = 100;
 const sf::Color         kDialogWindowColor = sf::Color(192,128,0,192);
 const sf::Color         kButtonColor = sf::Color(255,64,64,255);
 const sf::Color         kTextColor = sf::Color(255,255,255,255);
-const LinearVector<int> kMenuConstraints = LinearVector<int>(400, 600);
+const LinearVector<int> kMenuConstraints = LinearVector<int>(350, 200);
 const LinearVector<int> kMenuCoords = LinearVector<int>(kWindowWidth/2 - kMenuConstraints.x_/2,
-                                                        kWindowHeight/2 - - kMenuConstraints.y_/2);
+                                                        kWindowHeight/3 - kMenuConstraints.y_/2);
 const int               kDialogsMaxNumber = 20;
 const int               kDialogElemsMaxNumber = 20;
 #endif // CONSTANTS_H

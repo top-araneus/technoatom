@@ -91,7 +91,9 @@ class GameObject
     }
     virtual void NextFrame(char step = 1);
     void DecreaseHp(int damage);
-
+    virtual void DrawHUD() {}
+    virtual void SetXp(int xp) {}
+    virtual int GetXp() {}
   protected:
     LinearVector<char> GiveDirection();
     void GoToPlaceIfEmpty(LinearVector<int> coords);
@@ -260,7 +262,7 @@ void Player::Draw()
     player_sprite.setColor(sf::Color(255,128,128));
   else
     player_sprite.setColor(sf::Color(255,255,255));
-  DrawHUD();
+  //DrawHUD();
   window_->draw(player_sprite);
 }
 
@@ -278,7 +280,6 @@ void Player::Interact()
           aim_of_interact_->DecreaseHp(applied_damage_);
           aim_of_interact_->SetUnderAttack(true);
           aim_of_interact_->SetDamageEndingTime(clock() + kPlayerCoolDown);
-          SetXp(xp_ + kXpStep);
         }
       }
     }
