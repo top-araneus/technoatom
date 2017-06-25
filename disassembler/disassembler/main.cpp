@@ -77,6 +77,24 @@ void Disassembler(std::string input, std::string output)
                 number_of_word += 1;
                 fout << "div" << endl;
         }
+        else if (buff == kAbs)
+        {
+                fout << number_of_word << "_#";
+                number_of_word += 1;
+                fout << "abs" << endl;
+        }
+        else if (buff == kNorm)
+        {
+                fout << number_of_word << "_#";
+                number_of_word += 1;
+                fout << "norm" << endl;
+        }
+        else if (buff == kSqrt)
+        {
+                fout << number_of_word << "_#";
+                number_of_word += 1;
+                fout << "sqrt" << endl;
+        }
         else if (buff == kJmp)
         {
                 fout << number_of_word << "_#";
@@ -183,8 +201,8 @@ void Disassembler(std::string input, std::string output)
 
 int main()
 {
-    std::string from("includeSUKA.bin");
-    std::string to("opa.alu");
+    std::string from("pursuit80_old.bin");
+    std::string to("disasmed_pursuit_old.alu");
     cout << "started" << endl;
     Disassembler("..\\..\\bin_code\\" + from, "..\\..\\disassembler_code\\" + to);
     cout << "done" << endl;

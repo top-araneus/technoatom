@@ -63,7 +63,7 @@ ALU::ALU(std::string filename)
 {
   regs_.Resize(kRegsDefaultSize);
   code_.Resize(kCodeDefaultSize);
-  Load("..\\..\\bin_code\\" + filename);
+  Load("scripts\\" + filename);
 }
 
 ALU::~ALU(){}

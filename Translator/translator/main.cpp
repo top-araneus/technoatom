@@ -17,9 +17,9 @@
 
 int main(int argc, char *argv[])
 {
-  std::string from("main.alu");
+  std::string from("pursuit80.alu");
   from = string("..\\..\\source_code\\") + from;
-  std::string to("dva.bin");
+  std::string to("pursuit80.bin");
   to = string("..\\..\\bin_code\\") + to;
   cout << "started" << endl;
   print("/#\n", from);

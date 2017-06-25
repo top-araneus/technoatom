@@ -334,7 +334,7 @@ public:
   inline NormCmd(TypeOfMarksMap* marks)
   {
     marks_ = marks;
-    num_of_args_ = 4;
+    num_of_args_ = 0;
     index_of_cmd_ = kNorm;
   }
   virtual void FillArguments(std::ifstream& fin) override
@@ -349,7 +349,7 @@ public:
   inline AbsCmd(TypeOfMarksMap* marks)
   {
     marks_ = marks;
-    num_of_args_ = 2;
+    num_of_args_ = 0;
     index_of_cmd_ = kAbs;
   }
   virtual void FillArguments(std::ifstream& fin) override
