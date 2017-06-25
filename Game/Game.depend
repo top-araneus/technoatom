@@ -1440,7 +1440,7 @@
 1498243180 d:\projects\technoatom\game\\linearvector.h
 	<math.h>
 
-1498337250 d:\projects\technoatom\game\constants.h
+1498393150 d:\projects\technoatom\game\constants.h
 
 1496094748 d:\projects\technoatom\game\\transformation.h
 	"linearvector.h"
@@ -1475,7 +1475,7 @@
 	<SFML/Graphics.hpp>
 	"constants.h"
 
-1498337250 d:\projects\technoatom\game\\constants.h
+1498393150 d:\projects\technoatom\game\\constants.h
 
 1496094748 d:\projects\technoatom\game\delegates.h
 
@@ -1492,6 +1492,6 @@
 1496094748 d:\projects\technoatom\game\\buttonfactory.h
 	"buttons.h"
 
-1498243180 d:\projects\technoatom\game\\buttons.h
+1498393150 d:\projects\technoatom\game\\buttons.h
 	"constants.h"
 

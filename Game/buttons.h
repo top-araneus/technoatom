@@ -30,7 +30,6 @@ public:
     bool pressed_;
     void SetCoords(LinearVector<int> coords)
     {
-      print("new button coords /# /# \n", coords.x_, coords.y_);
       coords_ = coords;
       form_.setPosition(coords_);
       LinearVector<int> text_coords;

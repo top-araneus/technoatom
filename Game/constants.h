@@ -53,7 +53,7 @@ const int               kBulletVelocity = 30;
 const LinearVector<int> kStandartSpriteSizeOfBullet = LinearVector<int>(16,16);
 const unsigned char     kNumOfBulletFrames = 1;
 const unsigned char     kNumOfBulletStates = 1;
-const time_t            kShootCoolDown = 500;
+const time_t            kShootCoolDown = 200;
 
 //!ALU
 const std::string       kEnemyProgram("pursuit80.bin");
