@@ -1,9 +1,10 @@
-#include <QCoreApplication>
+
 #include <fstream>
 #include <iostream>
 #include <sstream>
 #include "../../utils/print.h"
 #include "transl.h"
+#include "workwithfiles.h"
 
 /*void opa(std::ifstream& fin)
 {
@@ -16,8 +17,20 @@
 
 int main(int argc, char *argv[])
 {
-  QCoreApplication a(argc, argv);
-  std::string from(argv[1]);
+  std::string from("main.alu");
+  from = string("..\\..\\source_code\\") + from;
+  std::string to("chasnochi.bin");
+  to = string("..\\..\\bin_code\\") + to;
+  cout << "started" << endl;
+  print("/#\n", from);
+  print("/#\n", to);
+  Translator transl(from, to);
+  transl.FirstPass();
+  transl.SecondPass();
+  transl.ThirdPass();
+  cout << "done" << endl;
+
+  /*std::string from(argv[1]);
   from = string("..\\..\\source_code\\") + from;
   std::string to(argv[2]);
   to = string("..\\..\\bin_code\\") + to;
@@ -26,8 +39,8 @@ int main(int argc, char *argv[])
   transl.FirstPass();
   transl.SecondPass();
   transl.ThirdPass();
-  cout << "done" << endl;
-  return a.exec();
+  cout << "done" << endl;*/
+  return 0;
 
 
 /*  std::ifstream fin("../../source_code/sqrt.alu", std::ios_base::in);

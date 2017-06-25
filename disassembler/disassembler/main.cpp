@@ -1,4 +1,3 @@
-#include <QCoreApplication>
 #include "../../utils/alupa.h"
 #include <iostream>
 #include <fstream>
@@ -10,117 +9,171 @@ using namespace std;
 void Disassembler(std::string input, std::string output)
 {
     std::ifstream fin(input.c_str(), std::ios_base::in | std::ios_base::binary);
-	if (!fin.is_open())
-	{
-		cout << "File didn't open" << endl;
-		return;
-	}
+  if (!fin.is_open())
+  {
+    cout << "File didn't open" << endl;
+    return;
+  }
     std::ofstream fout(output.c_str(), std::ios_base::out);
-	BlockType buff;
+  BlockType buff;
+  long number_of_word = 0;
     while (fin.read((char*)&buff, sizeof(buff)))
     {
-        switch(buff)
+        if (buff == kExp)
         {
-            case EXC:
                 cout << "invalid instruction EXC (0) in code" << endl;
-            break;
-
-            case PUSH_RG:
+        }
+        else if (buff == kPushRG)
+        {
+                fout << number_of_word << "_#";
+                number_of_word += 1;
                 fout << "push x";
                 fin.read((char*)&buff, sizeof(buff));
+                fout << number_of_word << "_#";
+                number_of_word += 1;
                 fout << buff << endl;
-            break;
-
-            case PUSH_VL:
+        }
+        else if (buff == kPushVL)
+        {
+                fout << number_of_word << "_#";
+                number_of_word += 1;
                 fout << "push ";
                 fin.read((char*)&buff, sizeof(buff));
+                fout << number_of_word << "_#";
+                number_of_word += 1;
                 fout << buff << endl;
-            break;
-
-            case POP:
+        }
+        else if (buff == kPop)
+        {
+                fout << number_of_word << "_#";
+                number_of_word += 1;
                 fout << "pop x";
                 fin.read((char*)&buff, sizeof(buff));
+                fout << number_of_word << "_#";
+                number_of_word += 1;
                 fout << buff << endl;
-            break;
-
-            case ADD:
+        }
+        else if (buff == kAdd)
+        {
+                fout << number_of_word << "_#";
+                number_of_word += 1;
                 fout << "add" << endl;
-            break;
-
-            case SUB:
-            {
+        }
+        else if (buff == kSub)
+        {
+                fout << number_of_word << "_#";
+                number_of_word += 1;
                 fout << "sub" << endl;
-            }
-            break;
-
-            case MUL:
+        }
+        else if (buff == kMul)
+        {
+                fout << number_of_word << "_#";
+                number_of_word += 1;
                 fout << "mul" << endl;
-            break;
-
-            case DIV:
-            {
+        }
+        else if (buff == kDiv)
+        {
+                fout << number_of_word << "_#";
+                number_of_word += 1;
                 fout << "div" << endl;
-            }
-            break;
-
-            case JMP:
+        }
+        else if (buff == kJmp)
+        {
+                fout << number_of_word << "_#";
+                number_of_word += 1;
                 fout << "jmp ";
                 fin.read((char*)&buff, sizeof(buff));
+                fout << number_of_word << "_#";
+                number_of_word += 1;
                 fout << buff << endl;
-            break;
-
-            case CALL:
+        }
+        else if (buff == kCall)
+        {
+                fout << number_of_word << "_#";
+                number_of_word += 1;
                 fout << "call ";
                 fin.read((char*)&buff, sizeof(buff));
+                fout << number_of_word << "_#";
+                number_of_word += 1;
                 fout << buff << endl;
-            break;
-
-            case RET:
+        }
+        else if (buff == kRet)
+        {
+                fout << number_of_word << "_#";
+                number_of_word += 1;
                 fout << "ret" << endl;
-            break;
-
-            case JE:
+        }
+        else if (buff == kJe)
+        {
+                fout << number_of_word << "_#";
+                number_of_word += 1;
                 fout << "je ";
                 fin.read((char*)&buff, sizeof(buff));
+                fout << number_of_word << "_#";
+                number_of_word += 1;
                 fout << buff << endl;
-            break;
-
-            case JNE:
+        }
+        else if (buff == kJne)
+        {
+                fout << number_of_word << "_#";
+                number_of_word += 1;
                 fout << "jne ";
                 fin.read((char*)&buff, sizeof(buff));
+                fout << number_of_word << "_#";
+                number_of_word += 1;
                 fout << buff << endl;
-            break;
-
-            case JL:
+        }
+        else if (buff == kJl)
+        {
+                fout << number_of_word << "_#";
+                number_of_word += 1;
                 fout << "jl ";
                 fin.read((char*)&buff, sizeof(buff));
+                fout << number_of_word << "_#";
+                number_of_word += 1;
                 fout << buff << endl;
-            break;
-
-            case JLE:
+        }
+        else if (buff == kJle)
+        {
+                fout << number_of_word << "_#";
+                number_of_word += 1;
                 fout << "jle ";
                 fin.read((char*)&buff, sizeof(buff));
+                fout << number_of_word << "_#";
+                number_of_word += 1;
                 fout << buff << endl;
-            break;
-
-            case JG:
+        }
+        else if (buff == kJg)
+        {
+                fout << number_of_word << "_#";
+                number_of_word += 1;
                 fout << "jg ";
                 fin.read((char*)&buff, sizeof(buff));
+                fout << number_of_word << "_#";
+                number_of_word += 1;
                 fout << buff << endl;
-            break;
-
-            case JGE:
-                fout << "jge ";
-                fin.read((char*)&buff, sizeof(buff));
-                fout << buff << endl;
-            break;
-
-            case END:
-            {
+        }
+        else if (buff == kJge)
+        {
+            fout << number_of_word << "_#";
+            number_of_word += 1;
+            fout << "jge ";
+            fin.read((char*)&buff, sizeof(buff));
+            fout << number_of_word << "_#";
+            number_of_word += 1;
+            fout << buff << endl;
+        }
+        else if (buff == kEnd)
+        {
+                fout << number_of_word << "_#";
+                number_of_word += 1;
                 fout << "end" << endl;
-            }
-            break;
-
+        }
+        else
+        {
+                fout << number_of_word << "_#";
+                number_of_word += 1;
+                fout << "error" << endl;
         }
     }
     fout.close();
@@ -128,14 +181,13 @@ void Disassembler(std::string input, std::string output)
 }
 
 
-int main(int argc, char *argv[])
+int main()
 {
-    QCoreApplication a(argc, argv);
-    std::string from(argv[1]);
-    std::string to(argv[2]);
+    std::string from("includeSUKA.bin");
+    std::string to("includeSUKA.alu");
     cout << "started" << endl;
     Disassembler("..\\..\\bin_code\\" + from, "..\\..\\disassembler_code\\" + to);
     cout << "done" << endl;
 
-    return a.exec();
+    return 0;
 }

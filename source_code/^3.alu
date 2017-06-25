@@ -1,0 +1,10 @@
+include ..\\..\\source_code\\^2.alu
+:3
+pop x0
+push x0
+push x0
+push 0
+jne >1
+pop x0
+push 1
+ret

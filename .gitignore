@@ -59,3 +59,4 @@ Translator/translator/translator.pro
 *.cbp
 Translator/translator/translator.pro.user
 *.pro
+*.exe

@@ -38,6 +38,17 @@ Translator::Translator(string& in, string& out)
   file_input_.open(in.c_str());
   //file_full_instruction_.open("..\\..\\tmp_files\\__tmp_full_instruction_.txt");
   file_out_.open(out.c_str(), ios_base::binary);
+  list_of_includes_.PushBack(in);
+}
+
+inline bool Translator::IsMark(string word)
+{
+  return (word[0] == ':');
+}
+
+inline bool Translator::IsInclude(string word)
+{
+  return (word == string("include"));
 }
 
 void Translator::CollectIncludes(ifstream& fin, Array<string>& list_of_includes)
@@ -59,26 +70,26 @@ void Translator::CollectIncludes(ifstream& fin, Array<string>& list_of_includes)
 
 void Translator::FirstPass( )
 {
+  print("massive:\n /#\n", list_of_includes_);
   CollectIncludes(file_input_, list_of_includes_);
-  file_full_instruction_output_.open("..\\..\\tmp_files\\__tmp_full_instruction_.txt");
-  AppendFromFileToFile(file_input_, file_full_instruction_output_ );
-  for (auto it = list_of_includes_.begin(); it != list_of_includes_.end(); ++it)
+  print("massive:\n /#\n", list_of_includes_);
+  print("..\\..\\tmp_files\\__tmp_full_instruction_.txt");
+  file_full_instruction_output_.open("..\\..\\tmp_files\\__tmp_full_instruction_.txt", std::ios_base::app);
+  if (file_full_instruction_output_)
   {
-    ifstream tmp((*it).c_str());
-    AppendFromFileToFile(tmp, file_full_instruction_output_);
-    tmp.close();
+    std::ifstream tmp;
+    for (auto it = list_of_includes_.begin(); it != list_of_includes_.end(); ++it)
+    {
+      print("it: /#\n", (*it).c_str());
+      tmp.open((*it).c_str());
+      if (tmp)
+      {
+         AppendFromFileToFile(tmp, file_full_instruction_output_);
+      }
+      tmp.close();
+    }
   }
   file_full_instruction_output_.close();
-}
-
-inline bool Translator::IsMark(string word)
-{
-  return (word[0] == ':');
-}
-
-inline bool Translator::IsInclude(string word)
-{
-  return (word == string("include"));
 }
 
 void Translator::CollectMarks()
@@ -86,30 +97,30 @@ void Translator::CollectMarks()
   std::string word;
   double current_num_of_word = 0;
   file_full_instruction_input_.open("..\\..\\tmp_files\\__tmp_full_instruction_.txt");
-  file_full_instruction_input_.seekg(0,ios_base::beg);
+  int increase_of_line_number = 0;
   while(file_full_instruction_input_)
   {
     file_full_instruction_input_ >> word;
-    current_num_of_word += 1;
     if (IsInclude(word)){
       file_full_instruction_input_ >> word;
-      current_num_of_word += 1;
+      increase_of_line_number = 0;
     }
     else if (IsMark(word)){
       word.erase(0, 1);
-      marks_.insert(std::pair<std::string, double>(word, current_num_of_word + 1));
-      file_full_instruction_input_ >> word;
-      current_num_of_word += 1;
+      print("\n_word: /#, _num: /#\n", word, current_num_of_word);
+      marks_.insert(std::pair<std::string, double>(word, current_num_of_word));
+      increase_of_line_number = 0;
     }
     else{
       Command* cmd = factory_.Create(word, &marks_);
       if (cmd != nullptr)
       {
         cmd->SkipArguments(file_full_instruction_input_);
-        current_num_of_word += cmd->GetNumOfArgs();
+        increase_of_line_number = cmd->GetNumOfArgs() + 1;
       }
       delete cmd;
     }
+    current_num_of_word += increase_of_line_number;
   }
   file_full_instruction_input_.close();
 }
@@ -123,14 +134,14 @@ void Translator::ThirdPass()
 {
   string word;
   file_full_instruction_input_.open("..\\..\\tmp_files\\__tmp_full_instruction_.txt");
-  file_full_instruction_input_.seekg(0,ios_base::beg);
-  while(file_full_instruction_input_)
+  while(file_full_instruction_input_ >> word)
   {
-    file_full_instruction_input_ >> word;
-    if(IsMark(word) || IsInclude(word)){
+    if(IsInclude(word))
+    {
       file_full_instruction_input_ >> word;
     }
-    else{
+    else if(!IsMark(word))
+    {
       Command* cmd = factory_.Create(word, &marks_);
       if (cmd != nullptr)
         cmd->ConvertToBin(file_full_instruction_input_, file_out_);

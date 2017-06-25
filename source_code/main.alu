@@ -1,14 +1,6 @@
+include ..\\..\\source_code\\^3.alu
 call >3
 jmp >9
-:3
-pop x0
-push x0
-push x0
-push 0
-jne >1
-pop x0
-push 1
-ret
 :1
 pop x0
 push 1

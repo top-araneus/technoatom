@@ -34,9 +34,9 @@ class Command
   }
   void ConvertToBin(std::ifstream& fin, std::ofstream& fout)
   {
-    FillIndexOfCmd(fin);
-    FillArguments(fin);
-    WriteToFile(fout);
+    this->FillIndexOfCmd(fin);
+    this->FillArguments(fin);
+    this->WriteToFile(fout);
   }
   void SkipArguments(std::ifstream& fin)
   {
@@ -69,22 +69,18 @@ class PushCmd : public Command
   }
   virtual void FillIndexOfCmd(std::ifstream& fin) override
   {
-    int initial_pos_in_file = fin.tellg();
     std::string word;
     fin >> word;
     if(IsRegisterArg(word)){
-    word.erase(0, 1);
-    index_of_cmd_ = kPushRG;
+      word.erase(0, 1);
+      index_of_cmd_ = kPushRG;
     }
     else{
-    index_of_cmd_ = kPushVL;
+      index_of_cmd_ = kPushVL;
     }
-    fin.seekg(initial_pos_in_file);
+    arguments_.PushBack(fromString<BlockType>(word));
   }
-  virtual void FillArguments(std::ifstream& fin) override
-  {
-    Command::FillArguments(fin);
-  }
+  virtual void FillArguments(std::ifstream& fin) override{}
 };
 
 class PopCmd : public Command
@@ -127,6 +123,7 @@ public:
     if(IsMark(word)){
       word.erase(0, 1);
       auto number_of_line = marks_->find(word);
+      print("\n__Some JMP command. _word: /#, _line: /#\n", word, number_of_line->second);
       if (number_of_line != marks_->end()){
         arguments_.PushBack(number_of_line->second);
       }

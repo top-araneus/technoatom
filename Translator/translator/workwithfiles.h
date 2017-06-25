@@ -7,13 +7,12 @@
 
 void AppendFromFileToFile(std::ifstream& from, std::ofstream& to)
 {
-  char symbol;
-  from.clear();
-  from.seekg(0);
-  while(from.get(symbol))
-    to.put(symbol);
-  if(!from.eof() || !to)
-    print("suka");
+    char symbol;
+    from.clear();
+    from.seekg(0);
+    while(from.get(symbol))
+      to.put(symbol);
+    to.put('\n');
 }
 
 
