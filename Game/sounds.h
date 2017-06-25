@@ -8,6 +8,7 @@ public:
   sf::Sound range_sound_;
   sf::Sound restart_sound_;
   sf::Sound kill_sound_;
+  sf::Sound win_sound_;
   SoundManager()
   {
     bg_buf_.loadFromFile("sound/background.ogg");
@@ -15,14 +16,18 @@ public:
     range_buf_.loadFromFile("sound/range.ogg");
     restart_buf_.loadFromFile("sound/restart.ogg");
     kill_buf_.loadFromFile("sound/kill.ogg");
+    win_buf_.loadFromFile("sound/win.ogg");
     bg_sound_.setBuffer(bg_buf_);
     melee_sound_.setBuffer(melee_buf_);
     range_sound_.setBuffer(range_buf_);
     restart_sound_.setBuffer(restart_buf_);
     kill_sound_.setBuffer(kill_buf_);
+    win_sound_.setBuffer(win_buf_);
     melee_sound_.setVolume(30);
     kill_sound_.setVolume(30);
     range_sound_.setVolume(30);
+    win_sound_.setVolume(50);
+    restart_sound_.setVolume(50);
     bg_sound_.setLoop(true);
   }
 
@@ -32,6 +37,7 @@ private:
   sf::SoundBuffer range_buf_;
   sf::SoundBuffer restart_buf_;
   sf::SoundBuffer kill_buf_;
+  sf::SoundBuffer win_buf_;
 };
 
 #endif // SOUNDS_H

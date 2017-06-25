@@ -313,7 +313,7 @@ void Player::NextFrame(char step)
 void Player::DrawHUD()
 {
   std::string hp = std::string("Health: ") + std::to_string(hp_);
-  std::string xp = std::string("Points: ") + std::to_string(xp_);
+  std::string xp = std::string("Baksy: ") + std::to_string(xp_);
   sf::Font font;
   font.loadFromFile("fonts/font.ttf");
 

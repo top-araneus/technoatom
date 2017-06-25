@@ -44,7 +44,7 @@ const char*             kPathToEnemyTexture = "images/cub.png";
 const int               kRangeOfVision = 256;
 const time_t            kEnemyCoolDown = 500;
 const int               kEnemyDamage = 5;
-const int               kEnemyHp = 30;
+const int               kEnemyHp = 20;
 const unsigned char     kEnemyWidth = 64;
 
 //!bullet
@@ -53,7 +53,7 @@ const int               kBulletVelocity = 30;
 const LinearVector<int> kStandartSpriteSizeOfBullet = LinearVector<int>(16,16);
 const unsigned char     kNumOfBulletFrames = 1;
 const unsigned char     kNumOfBulletStates = 1;
-const time_t            kShootCoolDown = 500;
+const time_t            kShootCoolDown = 400;
 
 //!ALU
 const std::string       kEnemyProgram("pursuit80.bin");

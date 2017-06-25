@@ -67,8 +67,9 @@ class Engine
     {
       window_->close();
     }
-DialogWindow* debug_window_; //! REMOVE AFTER TEST
+DialogWindow* debug_window_;
 DialogWindow* menu_window_;
+int             enemies_count_;
   private:
     std::vector<GameObject*>     surface_;         //get
     GroundType      ground_;
@@ -110,6 +111,7 @@ DialogWindow* menu_window_;
           }
           else if(object_code == kEnemyId)
           {
+            ++(engine.enemies_count_);
             Texture enemy_texture;
             enemy_texture.loadFromFile(kPathToEnemyTexture);
             Enemy* result = new Enemy(engine.GetWindow(), engine.GetObjects(), kStandartSpriteSizeOfEnemy, enemy_texture,
@@ -170,7 +172,7 @@ Engine::Engine()
   last_time_shoot_ = clock();
   dialog_manager_ = new DialogManager(window_);
   debug_window_ = dialog_manager_->AddDialog(LinearVector<int>(300,300), LinearVector<int>(300,300));
-  debug_window_->SetVisible(true);
+  debug_window_->SetVisible(false);
   debug_window_->AddText(10, LinearVector<int>(10, 50), "");
 
   menu_window_ = dialog_manager_->AddMenu();
@@ -273,6 +275,7 @@ void Engine::ClearDead()
       }
       if (surface_[i]->GetObjectCode() == kEnemyId)
       {
+        --enemies_count_;
         sound_manager_->kill_sound_.play();
         player_->SetXp(player_->GetXp() + kXpStep*(kEnemyHp/kEnemyDamage));
       }
@@ -493,11 +496,23 @@ void Engine::Tact()
   player_->DrawHUD();
   }
 
+  if (enemies_count_ == 0)
+  {
+    menu_window_->GetTexts()[0]->setString(std::string("You won!"));
+    menu_window_->SetVisible(true);
+    if (!is_game_over_)
+    {
+      is_game_over_ = true;
+      sound_manager_->win_sound_.play();
+    }
+  }
+
 clock1 = clock();
 }
 
 void Engine::InitializationOfSurface()
 {
+  enemies_count_ = 0;
   sound_manager_->bg_sound_.play();
   for(int i = 0; i < surface_.size(); ++i)
   {

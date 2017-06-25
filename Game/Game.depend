@@ -841,7 +841,7 @@
 
 1495392463 d:\dropbox\coding\mailru\technoatom\game\\refpoint.h
 
-1498417535 d:\dropbox\coding\mailru\technoatom\game\\gameobjects.h
+1498420677 d:\dropbox\coding\mailru\technoatom\game\\gameobjects.h
 	"transformation.h"
 	<../stack/stack/smart_ptr.h>
 	<../utils/print.h>
@@ -1328,7 +1328,7 @@
 	<SFML/Audio/Export.hpp>
 	<string>
 
-1498419496 d:\dropbox\coding\mailru\technoatom\game\\engine.h
+1498421732 d:\dropbox\coding\mailru\technoatom\game\\engine.h
 	"GameObjects.h"
 	"dialogmanager.h"
 
@@ -1504,14 +1504,14 @@
 
 1496001027 d:\dropbox\coding\mailru\technoatom\game\delegates.h
 
-1498419379 d:\dropbox\coding\mailru\technoatom\game\constants.h
+1498421683 d:\dropbox\coding\mailru\technoatom\game\constants.h
 
 1495649088 d:\dropbox\coding\mailru\technoatom\game\factory.h
 	"gameobjects.h"
 	<SFML/Graphics.hpp>
 	"constants.h"
 
-1498417535 d:\dropbox\coding\mailru\technoatom\game\gameobjects.h
+1498420677 d:\dropbox\coding\mailru\technoatom\game\gameobjects.h
 	"transformation.h"
 	<../stack/stack/smart_ptr.h>
 	<../utils/print.h>
@@ -1585,7 +1585,7 @@
 1498395496 d:\dropbox\coding\mailru\technoatom\game\\buttons.h
 	"constants.h"
 
-1498419379 d:\dropbox\coding\mailru\technoatom\game\\constants.h
+1498421683 d:\dropbox\coding\mailru\technoatom\game\\constants.h
 
-1498417779 d:\dropbox\coding\mailru\technoatom\game\sounds.h
+1498421499 d:\dropbox\coding\mailru\technoatom\game\sounds.h
 
