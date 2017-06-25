@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
 {
   std::string from("main.alu");
   from = string("..\\..\\source_code\\") + from;
-  std::string to("chasnochi.bin");
+  std::string to("dva.bin");
   to = string("..\\..\\bin_code\\") + to;
   cout << "started" << endl;
   print("/#\n", from);

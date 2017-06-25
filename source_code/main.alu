@@ -1,4 +1,5 @@
 include ..\\..\\source_code\\^3.alu
+include ..\\..\\source_code\\^4.alu
 call >3
 jmp >9
 :1
@@ -6,19 +7,6 @@ pop x0
 push 1
 push x0
 call >4
-ret
-:4
-pop x0
-push x0
-push x0
-push 1
-jle >2
-push x0
-push 1
-sub
-call >4
-:2
-mul
 ret
 :9
 pop x0

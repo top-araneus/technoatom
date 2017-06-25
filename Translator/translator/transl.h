@@ -156,7 +156,7 @@ Translator::~Translator()
 {
   file_input_.close();
   file_out_.close();
-  //remove("..\\..\\tmp_files\\__tmp_full_instruction_.txt");
+  remove("..\\..\\tmp_files\\__tmp_full_instruction_.txt");
 }
 
 

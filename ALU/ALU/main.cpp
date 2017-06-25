@@ -1,7 +1,7 @@
 #include "alu.h"
 int main()
 {
-    std::string filename = "chasnochi.bin";
+    std::string filename = "dva.bin";
     ALU alu(filename);
 
     alu.Execute(5);

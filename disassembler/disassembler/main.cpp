@@ -184,7 +184,7 @@ void Disassembler(std::string input, std::string output)
 int main()
 {
     std::string from("includeSUKA.bin");
-    std::string to("includeSUKA.alu");
+    std::string to("opa.alu");
     cout << "started" << endl;
     Disassembler("..\\..\\bin_code\\" + from, "..\\..\\disassembler_code\\" + to);
     cout << "done" << endl;
