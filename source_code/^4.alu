@@ -1,0 +1,13 @@
+:4
+pop x0
+push x0
+push x0
+push 1
+jle >2
+push x0
+push 1
+sub
+call >4
+:2
+mul
+ret

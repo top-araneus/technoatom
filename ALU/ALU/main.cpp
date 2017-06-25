@@ -1,13 +1,10 @@
-#include <QCoreApplication>
 #include "alu.h"
-int main(int argc, char *argv[])
+int main()
 {
-    QCoreApplication a(argc, argv);
-
-    std::string filename = argv[1];
+    std::string filename = "dva.bin";
     ALU alu(filename);
 
-    alu.Execute(5,4,2,2);
-    cout << "x: " << alu.GetRegister(0) << "y: " << alu.GetRegister(1) << endl;
-    return a.exec();
+    alu.Execute(5);
+    cout << "x:" << alu.GetRegister(0) << endl;
+    return 0;
 }
