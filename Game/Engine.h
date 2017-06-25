@@ -49,6 +49,9 @@ class Engine
     time_t          GetLastTime() {
       return last_time_change;
     }
+    SoundManager*          GetSoundManager() {
+      return sound_manager_;
+    }
     void            SetLastTime() {
       last_time_change = clock();
     }
@@ -89,8 +92,8 @@ DialogWindow* menu_window_;
     LinearVector<int> ending_drag_;
     bool            debug_visible_;
     std::ostringstream debug_stream_;
-
     bool            dragging_;
+    SoundManager* sound_manager_; //get
     class Factory
     {
       public:
@@ -101,7 +104,7 @@ DialogWindow* menu_window_;
             Texture player_texture;
             player_texture.loadFromFile(kPathToPlayerTexture);
             Player* result = new Player(engine.GetWindow(), engine.GetObjects(), kStandartSpriteSizeOfPlayer, player_texture,
-                                        grid_coords, engine.GetFrame(), kNumOfPlayerFrames, kNumOfPlayerStates);
+                                        grid_coords, engine.GetFrame(), kNumOfPlayerFrames, kNumOfPlayerStates, engine.GetSoundManager());
             engine.AddObject(*result);
             return result;
           }
@@ -149,11 +152,12 @@ DialogWindow* menu_window_;
 
 Engine::Engine()
 {
-	RenderWindow* window = new RenderWindow(sf::VideoMode(kWindowWidth, kWindowHeight), "Cyberpunk Universe"/*, sf::Style::Fullscreen*/);
+	RenderWindow* window = new RenderWindow(sf::VideoMode(kWindowWidth, kWindowHeight), "MOZEE MONTANA UBIVAET BIT"/*, sf::Style::Fullscreen*/);
   window_ = window;
   window_->setFramerateLimit(kFrameRate);
   //window_->setVerticalSyncEnabled(true);
   frame_ = ReferenceFrame(-((kTilesAtLine + 1) * kCellWidth / 4), -((kTilesAtLine + 1) * kCellHeight / 4), 800, 600);
+  sound_manager_ = new SoundManager();
   ground_ = InitializeGround();
   ground_texture_.loadFromFile("images/debuggrid.png");
   num_of_grounds_ = ground_texture_.getSize().x / kCellWidth;
@@ -269,6 +273,7 @@ void Engine::ClearDead()
       }
       if (surface_[i]->GetObjectCode() == kEnemyId)
       {
+        sound_manager_->kill_sound_.play();
         player_->SetXp(player_->GetXp() + kXpStep*(kEnemyHp/kEnemyDamage));
       }
       delete surface_[i];
@@ -281,6 +286,37 @@ void Engine::ClearDead()
 
 void Engine::Control()
 {
+    if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+  {
+    LinearVector<int> coords = LinearVector<int>(sf::Mouse::getPosition(*window_).x,
+                                                  sf::Mouse::getPosition(*window_).y);
+    dialog_manager_->ManageClicks(coords, false);
+    if (!dragging_)
+    {
+      dragging_ = true;
+      starting_drag_ = mouse_position_;
+    }
+    else
+    {
+      ending_drag_ = mouse_position_;
+      dialog_manager_->ManageMoves(starting_drag_, ending_drag_);
+      starting_drag_ = ending_drag_;
+    }
+  }
+  else
+  {
+    LinearVector<int> coords = LinearVector<int>(sf::Mouse::getPosition(*window_).x,
+                                                  sf::Mouse::getPosition(*window_).y);
+
+    if (dragging_)
+    {
+      dragging_ = false;
+    }
+    dialog_manager_->ManageClicks(coords, true);
+  }
+
+  if (!is_game_over_)
+  {
   LinearVector<double> new_velocity(0,0);
   if (Keyboard::isKeyPressed(Keyboard::A)) {
       new_velocity.x_ -= 1;
@@ -339,34 +375,7 @@ void Engine::Control()
       GetFrame().SetY(GetFrame().GetY()+kCameraVelocity);
     }
   }
-  if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
-  {
-    LinearVector<int> coords = LinearVector<int>(sf::Mouse::getPosition(*window_).x,
-                                                  sf::Mouse::getPosition(*window_).y);
-    dialog_manager_->ManageClicks(coords, false);
-    if (!dragging_)
-    {
-      dragging_ = true;
-      starting_drag_ = mouse_position_;
-    }
-    else
-    {
-      ending_drag_ = mouse_position_;
-      dialog_manager_->ManageMoves(starting_drag_, ending_drag_);
-      starting_drag_ = ending_drag_;
-    }
-  }
-  else
-  {
-    LinearVector<int> coords = LinearVector<int>(sf::Mouse::getPosition(*window_).x,
-                                                  sf::Mouse::getPosition(*window_).y);
 
-    if (dragging_)
-    {
-      dragging_ = false;
-    }
-    dialog_manager_->ManageClicks(coords, true);
-  }
 
   if (sf::Mouse::isButtonPressed(sf::Mouse::Right))
   {
@@ -387,12 +396,14 @@ void Engine::Control()
 
     }
   }
+  }
 }
 
 void Engine::Shoot()
 {
   if (Keyboard::isKeyPressed(Keyboard::Space))
   {
+      sound_manager_->range_sound_.play();
       LinearVector<int> coords = LinearVector<int>(sf::Mouse::getPosition(*window_).x - GetFrame().GetX(),
                                                   sf::Mouse::getPosition(*window_).y - GetFrame().GetY());
       LinearVector<int> player_coords = LinearVector<int>(player_->GetRefCoords().x_, player_->GetRefCoords().y_ - (kStandartSpriteSizeOfPlayer.y_ - 72) + player_->GetFrame()*32);
@@ -422,6 +433,8 @@ void Engine::DebugCheck()
 
 void Engine::RestartGame()
 {
+  sound_manager_->bg_sound_.stop();
+  sound_manager_->restart_sound_.play();
   menu_window_->GetTexts()[0]->setString(std::string("Menu"));
   InitializationOfSurface();
   is_game_over_ = false;
@@ -454,10 +467,12 @@ void Engine::Tact()
     menu_window_->SetVisible(true);
   }
   Control();
+  if (!is_game_over_) {
   if ((clock() - last_time_shoot_) > kShootCoolDown)
   {
     Shoot();
     last_time_shoot_ = clock();
+  }
   }
   DebugCheck();
   if ((clock() - GetLastTime()) > kTactTime)
@@ -473,13 +488,17 @@ void Engine::Tact()
   }
   ClearDead();
   DrawAll();
+
+  if (!is_game_over_) {
   player_->DrawHUD();
+  }
 
 clock1 = clock();
 }
 
 void Engine::InitializationOfSurface()
 {
+  sound_manager_->bg_sound_.play();
   for(int i = 0; i < surface_.size(); ++i)
   {
     delete surface_[i];

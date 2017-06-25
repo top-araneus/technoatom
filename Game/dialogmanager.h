@@ -72,7 +72,7 @@ void DialogManager::DrawDialogs()
         {
           if (texts[j] != nullptr)
           {
-            window_->draw(*(texts[j]));
+             window_->draw(*(texts[j]));
           }
         }
         for (int j = 0; j<kDialogElemsMaxNumber; ++j)

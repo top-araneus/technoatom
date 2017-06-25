@@ -14,6 +14,7 @@ using namespace sf;
 #include <../stack/stack/smart_ptr.h>
 #include <refframe.h>
 #include "constants.h"
+#include "sounds.h"
 #include <gameobjects.h>
 #include <engine.h>
 #include "factory.h"

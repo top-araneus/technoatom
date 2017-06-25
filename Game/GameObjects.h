@@ -6,7 +6,6 @@
 #include "../ALU/ALU/alu.h"
 using namespace sf;
 
-
 class GameObject
 {
   public:
@@ -185,7 +184,7 @@ class Player: public GameObject
 {
   public:
     Player(RenderWindow& window, std::vector<GameObject*>& pMap, const LinearVector<int> spriteSize, Texture& texture,
-      LinearVector<int> gridCoords, ReferenceFrame& refFrame, const int numOfFrames, const int numOfStates);
+      LinearVector<int> gridCoords, ReferenceFrame& refFrame, const int numOfFrames, const int numOfStates, SoundManager* sound_manager);
     ~Player();
     virtual void Draw();
     virtual void Interact();
@@ -206,13 +205,15 @@ class Player: public GameObject
       GameObject::Move();
     }
 
+    //void Shoot(LinearVector<double>& direction);
   private:
     int xp_;                 //get, set
     bool next_sprite_right = true;
+    SoundManager* sound_manager_;
 };
 
 Player::Player(RenderWindow& window, std::vector<GameObject*>& pMap, const LinearVector<int> spriteSize, Texture& texture,
-          LinearVector<int> gridCoords, ReferenceFrame& refFrame, const int numOfFrames, const int numOfStates)
+          LinearVector<int> gridCoords, ReferenceFrame& refFrame, const int numOfFrames, const int numOfStates, SoundManager* sound_manager)
 {
   window_ = &window;
   ref_frame_ = &refFrame;
@@ -234,7 +235,7 @@ Player::Player(RenderWindow& window, std::vector<GameObject*>& pMap, const Linea
   time_last_frame_changing_ = clock();
   frames_per_second_ = kFramesPerSec;
   SetXp(0);
-  void Shoot(LinearVector<double>& direction);
+  sound_manager_ = sound_manager;
 }
 
 Player::~Player()
@@ -280,6 +281,7 @@ void Player::Interact()
           aim_of_interact_->DecreaseHp(applied_damage_);
           aim_of_interact_->SetUnderAttack(true);
           aim_of_interact_->SetDamageEndingTime(clock() + kPlayerCoolDown);
+          sound_manager_->melee_sound_.play();
         }
       }
     }
