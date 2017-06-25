@@ -51,8 +51,8 @@
 			<Add option="-Wall" />
 			<Add option="-std=c++11" />
 			<Add directory="SFML-2.3.2/include" />
-			<Add directory="D:/projects/technoatom/Game/" />
 			<Add directory="SFML-2.3.2/lib" />
+			<Add directory="D:/Dropbox/Coding/MailRu/technoatom/Game/" />
 		</Compiler>
 		<Linker>
 			<Add library="SFML-2.3.2/lib/libFLAC.a" />
@@ -88,6 +88,7 @@
 		<Unit filename="main.cpp" />
 		<Unit filename="refframe.h" />
 		<Unit filename="refpoint.h" />
+		<Unit filename="sounds.h" />
 		<Extensions>
 			<code_completion />
 			<debugger />
