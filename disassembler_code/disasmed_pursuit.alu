@@ -1,0 +1,31 @@
+0_#pop x1_#0
+2_#pop x3_#1
+4_#pop x5_#2
+6_#pop x7_#3
+8_#push x9_#0
+10_#push x11_#2
+12_#sub
+13_#pop x14_#4
+15_#push x16_#1
+17_#push x18_#3
+19_#sub
+20_#pop x21_#5
+22_#push x23_#4
+24_#push x25_#5
+26_#abs
+27_#push 28_#200
+29_#jge 30_#46
+31_#push x32_#3
+33_#push x34_#2
+35_#push x36_#1
+37_#push x38_#0
+39_#norm
+40_#pop x41_#0
+42_#pop x43_#1
+44_#jmp 45_#56
+46_#push 47_#0
+48_#push 49_#0
+50_#pop x51_#0
+52_#pop x53_#1
+54_#jmp 55_#56
+56_#end

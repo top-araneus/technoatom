@@ -474,10 +474,13 @@ class Bullet: public GameObject
     {
       GameObject::DecreaseHp(damage);
     }
-    virtual void NextFrame(char step = 1)
+    virtual void NextFrame(char step = 1);
+  /*  virtual void NextFrame(char step = 1)
     {
       GameObject::NextFrame(step);
-    }
+    }*/
+  private:
+    bool next_sprite_right = true;
 };
 
 Bullet::Bullet(RenderWindow& window, std::vector<GameObject*>& pMap, LinearVector<int> spriteSize, Texture& texture,
@@ -561,6 +564,27 @@ void Bullet::Move()
     ref_coords_.y_ = ref_coords_.y_ + velocity_.y_;
 }
 
+void Bullet::NextFrame(char step)
+{
+  if(next_sprite_right){
+    if(GetFrame() == GetNumOfFrames()-1){
+      next_sprite_right = false;
+      GameObject::NextFrame(-1);
+    }
+    else{
+      GameObject::NextFrame(1);
+    }
+  }
+  else {
+    if(GetFrame() == 0){
+      next_sprite_right = true;
+      GameObject::NextFrame(1);
+    }
+    else{
+      GameObject::NextFrame(-1);
+    }
+  }
+}
 
 
 #endif
